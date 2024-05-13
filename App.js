@@ -1,13 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { View, Image, StyleSheet } from 'react-native';
 import TelaLogin from './TelaLogin'; 
-import { createStackNavigator } from '@react-navigation/stack'; 
-
-
-const Stack = createStackNavigator();
-
-
-export default function App() {
+  export default function App() {
   const [exibirTelaLogin, setExibirTelaLogin] = useState(false);
 
   useEffect(() => {
@@ -24,8 +18,8 @@ export default function App() {
         <TelaLogin />
       ) : (
         <View style={styles.telaInicial}>
-          <Image source={require('./assets/logo.png')} style={styles.logo} />
-          <Image source={require('./assets/image.png')} style={styles.image} />
+          <Image source={require('./assets/fatec-logo.png')} style={styles.logofatec} />
+          <Image source={require('./assets/cps-logo.png')} style={styles.logocps} />
         </View>
       )}
     </View>
@@ -34,6 +28,7 @@ export default function App() {
 
 const styles = StyleSheet.create({
   container: {
+    position: 'fixed',
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
@@ -43,13 +38,15 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  logo: {
+  logofatec: {
+    position: 'fixed',
     width: 789,
     height: 386,
     left: 145, // Coordenada X
     top: 861, // Coordenada Y
   },
-  image: {
+  logocps: {
+    position: 'fixed',
     width: 325,
     height: 177,
     left: 377, // Coordenada X
