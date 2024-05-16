@@ -4,6 +4,7 @@ import { useFonts } from 'expo-font';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import LoginScreen from './LoginScreen';
+import HomeScreen from './HomeScreen'
 import ForgotPasswordScreen from './ForgotPasswordScreen';
 import AutoRegisterScreen from './AutoRegisterScreen';
 
@@ -36,6 +37,8 @@ function LoadingScreen({ navigation }) {
       ) : (
         <View style={styles.loadingScreen}>
           <Text style={styles.title}>Grade de Horário</Text>
+          <Text style={styles.subtitle}>Aplicativo do Alunos</Text>
+
           <Text style={styles.subtitle}>Aplicativo do Aluno</Text>
           <Image source={require('./assets/fatec-logo.png')} style={styles.logoFatec} />
           <Image source={require('./assets/cps-logo.png')} style={styles.logoCps} />
@@ -53,6 +56,8 @@ function App() {
       <Stack.Navigator screenOptions={{ headerShown: false }}>
         <Stack.Screen name="Projeto Integrador" component={LoadingScreen} />
         <Stack.Screen name="Login" component={LoginScreen} />
+        <Stack.Screen name="Home" component={HomeScreen} />
+
         <Stack.Screen name="ForgotPassword" component={ForgotPasswordScreen} />
         <Stack.Screen name="Register" component={AutoRegisterScreen} />
       </Stack.Navigator>

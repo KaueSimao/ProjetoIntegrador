@@ -1,8 +1,19 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, Button, StyleSheet } from 'react-native';
-
-const ForgotPasswordScreen = () => {
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, Image } from 'react-native';
+import { useFonts } from 'expo-font';
+// provavelmente o erro é no app.js 
+const ForgotPasswordScreen = ({ navigation }) => {
   const [email, setEmail] = useState('');
+
+  const [fontsLoaded] = useFonts({
+    'Roboto-Light': require('./assets/fonts/Roboto-Light.ttf'),
+    'Roboto-Regular': require('./assets/fonts/Roboto-Regular.ttf'),
+    'Roboto-Medium': require('./assets/fonts/Roboto-Medium.ttf'),
+  });
+
+  if (!fontsLoaded) {
+    return null; // ou um componente de carregamento
+  }
 
   const handleForgotPassword = () => {
     // Implementar lógica para enviar o email de recuperação de senha
@@ -11,11 +22,12 @@ const ForgotPasswordScreen = () => {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Recuperar Senha</Text>
-
+      <Text style={styles.textRecoverPassword}>RECUPERAR SENHA </Text>
+      <Image source={require("./assets/profile.png")} style={styles.logo} />
+      <Text style={styles.emailInstitucional}>Email institucional</Text>
       <TextInput
         style={styles.input}
-        placeholder="Digite seu email"
+        placeholder="Digite seu email: "
         value={email}
         onChangeText={(text) => setEmail(text)}
         keyboardType="email-address"
@@ -23,45 +35,83 @@ const ForgotPasswordScreen = () => {
         autoCorrect={false}
       />
 
-      <Button
+      <TouchableOpacity
         title="Enviar"
         onPress={handleForgotPassword}
-        style={styles.button}
-      />
+        style={styles.button1}
+      >
+        <Text style={styles.buttonText}>ENTRAR</Text>
+      </TouchableOpacity>
 
-      <Button
-        title="Voltar"
+      <TouchableOpacity
         onPress={() => navigation.goBack()}
-        style={styles.button}
-      />
+        style={styles.button2}
+      >
+        <Text style={styles.buttonText} onPress={() => navigation.goBack()}>VOLTARA</Text>
+      </TouchableOpacity>
     </View>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
-    padding: 20,
+    justifyContent:'center',
     alignItems: 'center',
   },
-  title: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    marginBottom: 20,
+  textRecoverPassword: {
+    fontSize: 72,
+    top:214, // Y
+    left:311, // x
+    fontFamily: 'Roboto-Regular',
+    position:'fixed'
+  },
+  logo: {
+    width: 287,
+    height: 287,
+    left: 397,
+    top: 486,
+  },
+  emailInstitucional: {
+    fontSize: 20,
+    fontFamily: 'Roboto-Regular',
+    marginTop: 25,
+    alignSelf: 'flex-start',
   },
   input: {
-    width: '100%',
+    fontSize: 16,
+    fontFamily: 'Roboto-Regular',
+    width: 450,
+    height: 50,
+    marginTop: 3,
     padding: 10,
     borderWidth: 1,
-    borderColor: '#ccc',
-    marginBottom: 10,
+    borderColor: '#CCC',
+    borderRadius: 5,
   },
-  button: {
-    width: '100%',
-    padding: 10,
-    backgroundColor: '#007bff',
-    color: '#fff',
-    marginBottom: 10,
+  button1: {
+    marginTop: 70,
+    width: 200,
+    height: 50,
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderRadius: 5,
+    backgroundColor: '#B20000',
+    top: 277,
+    left: 1266,
+  },
+  button2: {
+    marginTop: 30,
+    width: 200,
+    height: 50,
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderRadius: 5,
+    backgroundColor: '#141414',
+  },
+  buttonText: {
+    fontSize: 16,
+    fontFamily: 'Roboto-Medium',
+    color: 'white',
   },
 });
 

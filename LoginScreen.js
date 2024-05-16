@@ -10,7 +10,6 @@ export default function LoginScreen({ navigation }) {
     'Roboto-Medium': require('./assets/fonts/Roboto-Medium.ttf'),
   });
 
-  
 
   const [rememberLogin, setRememberLogin] = useState(false);
 
@@ -20,7 +19,11 @@ export default function LoginScreen({ navigation }) {
       <Image source={require("./assets/profile.png")} style={styles.logo} />
       <Text style={styles.emailInstitucional}>Email institucional</Text>
       <TextInput style={styles.inputEmail} placeholder="Digite seu email:" />
+
+      <Text style={styles.password}>Senhas</Text>
+
       <Text style={styles.password}>Senha</Text>
+
       <TextInput style={styles.inputPassword} placeholder="Digite sua senha:" secureTextEntry={true} />
       <View style={styles.optionsContainer}>
         <View style={styles.checkboxContainer}>
@@ -35,7 +38,7 @@ export default function LoginScreen({ navigation }) {
         </TouchableOpacity>   
       </View>
       <TouchableOpacity style={styles.button}>
-        <Text style={styles.buttonText}>ENTRAR</Text>
+        <Text onPress={() => navigation.navigate('Home')}  style={styles.buttonText}>ENTRAR</Text>
       </TouchableOpacity>
       <Text style={styles.signUp}  onPress={() => navigation.navigate('Register')}>Não tem uma conta? Cadastre-se</Text>
     </View>
