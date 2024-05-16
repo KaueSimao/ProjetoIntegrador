@@ -13,5 +13,9 @@ export default function LoginScreen({ navigation })
   });
 
   return(
-    
+    <View>
+      <Text>
+        CARLAO
+      </Text>
+    </View>
 )};

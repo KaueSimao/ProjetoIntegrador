@@ -17,7 +17,7 @@ export default function LoginScreen({ navigation }) {
       <Image source={require("./assets/profile.png")} style={styles.logo} />
       <Text style={styles.emailInstitucional}>Email institucional</Text>
       <TextInput style={styles.inputEmail} placeholder="Digite seu email:" />
-      <Text style={styles.password}>Senha</Text>
+      <Text style={styles.password}>Senhas</Text>
       <TextInput style={styles.inputPassword} placeholder="Digite sua senha:" secureTextEntry={true} />
       <View style={styles.optionsContainer}>
         <View style={styles.checkboxContainer}>

@@ -37,7 +37,7 @@ function LoadingScreen({ navigation }) {
       ) : (
         <View style={styles.loadingScreen}>
           <Text style={styles.title}>Grade de Horário</Text>
-          <Text style={styles.subtitle}>Aplicativo do Aluno</Text>
+          <Text style={styles.subtitle}>Aplicativo do Alunos</Text>
           <Image source={require('./assets/fatec-logo.png')} style={styles.logoFatec} />
           <Image source={require('./assets/cps-logo.png')} style={styles.logoCps} />
         </View>

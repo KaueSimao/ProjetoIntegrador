@@ -47,7 +47,7 @@ const ForgotPasswordScreen = ({ navigation }) => {
         onPress={() => navigation.goBack()}
         style={styles.button2}
       >
-        <Text style={styles.buttonText} onPress={() => navigation.goBack()}>VOLTAR</Text>
+        <Text style={styles.buttonText} onPress={() => navigation.goBack()}>VOLTARA</Text>
       </TouchableOpacity>
     </View>
   );

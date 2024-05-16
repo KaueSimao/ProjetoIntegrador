@@ -34,7 +34,7 @@ export default function AutoRegisterScreen({ navigation }) {
         <Text style={styles.label}>Nome Completo</Text>
         <TextInput style={styles.input} placeholder="Digite seu nome:" />
         <Text style={styles.label}>Email institucional</Text>
-        <TextInput style={styles.input} placeholder="Digite seu email:" />
+        <TextInput style={styles.input} placeholder="Digite seu email: " />
         <Text style={styles.label}>Senha</Text>
         <TextInput style={styles.input} placeholder="Digite sua senha: " secureTextEntry={true} />
         <Text style={styles.label}>Repita a senha</Text>
