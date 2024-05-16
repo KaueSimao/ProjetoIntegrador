@@ -22,7 +22,7 @@ const ForgotPasswordScreen = ({ navigation }) => {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.textRecoverPassword}>RECUPERAR SENHA</Text>
+      <Text style={styles.textRecoverPassword}>RECUPERAR SENHA </Text>
       <Image source={require("./assets/profile.png")} style={styles.logo} />
       <Text style={styles.emailInstitucional}>Email institucional</Text>
       <TextInput
