@@ -2,12 +2,14 @@ import React, { useState } from 'react';
 import { View, Image, TextInput, StyleSheet, Text, TouchableOpacity, CheckBox } from 'react-native';
 import { useFonts } from 'expo-font';
 
+
 export default function LoginScreen({ navigation }) {
   const [fontsLoaded] = useFonts({
     'Roboto-Light': require('./assets/fonts/Roboto-Light.ttf'),
     'Roboto-Regular': require('./assets/fonts/Roboto-Regular.ttf'),
     'Roboto-Medium': require('./assets/fonts/Roboto-Medium.ttf'),
   });
+
 
   const [rememberLogin, setRememberLogin] = useState(false);
 
@@ -17,7 +19,11 @@ export default function LoginScreen({ navigation }) {
       <Image source={require("./assets/profile.png")} style={styles.logo} />
       <Text style={styles.emailInstitucional}>Email institucional</Text>
       <TextInput style={styles.inputEmail} placeholder="Digite seu email:" />
+
       <Text style={styles.password}>Senhas</Text>
+
+      <Text style={styles.password}>Senha</Text>
+
       <TextInput style={styles.inputPassword} placeholder="Digite sua senha:" secureTextEntry={true} />
       <View style={styles.optionsContainer}>
         <View style={styles.checkboxContainer}>

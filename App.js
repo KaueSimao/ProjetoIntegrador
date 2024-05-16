@@ -38,6 +38,8 @@ function LoadingScreen({ navigation }) {
         <View style={styles.loadingScreen}>
           <Text style={styles.title}>Grade de Horário</Text>
           <Text style={styles.subtitle}>Aplicativo do Alunos</Text>
+
+          <Text style={styles.subtitle}>Aplicativo do Aluno</Text>
           <Image source={require('./assets/fatec-logo.png')} style={styles.logoFatec} />
           <Image source={require('./assets/cps-logo.png')} style={styles.logoCps} />
         </View>
@@ -55,6 +57,7 @@ function App() {
         <Stack.Screen name="Projeto Integrador" component={LoadingScreen} />
         <Stack.Screen name="Login" component={LoginScreen} />
         <Stack.Screen name="Home" component={HomeScreen} />
+
         <Stack.Screen name="ForgotPassword" component={ForgotPasswordScreen} />
         <Stack.Screen name="Register" component={AutoRegisterScreen} />
       </Stack.Navigator>
