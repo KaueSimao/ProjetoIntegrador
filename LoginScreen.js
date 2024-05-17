@@ -1,15 +1,21 @@
-import React, { useState } from 'react';
-import { View, Image, TextInput, StyleSheet, Text, TouchableOpacity, CheckBox } from 'react-native';
-import { useFonts } from 'expo-font';
-
+import React, { useState } from "react";
+import {
+  View,
+  Image,
+  TextInput,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  CheckBox,
+} from "react-native";
+import { useFonts } from "expo-font";
 
 export default function LoginScreen({ navigation }) {
   const [fontsLoaded] = useFonts({
-    'Roboto-Light': require('./assets/fonts/Roboto-Light.ttf'),
-    'Roboto-Regular': require('./assets/fonts/Roboto-Regular.ttf'),
-    'Roboto-Medium': require('./assets/fonts/Roboto-Medium.ttf'),
+    "Roboto-Light": require("./assets/fonts/Roboto-Light.ttf"),
+    "Roboto-Regular": require("./assets/fonts/Roboto-Regular.ttf"),
+    "Roboto-Medium": require("./assets/fonts/Roboto-Medium.ttf"),
   });
-
 
   const [rememberLogin, setRememberLogin] = useState(false);
 
@@ -20,42 +26,56 @@ export default function LoginScreen({ navigation }) {
       <Text style={styles.emailInstitucional}>Email institucional</Text>
       <TextInput style={styles.inputEmail} placeholder="Digite seu email:" />
 
-      <Text style={styles.password}>Senhas</Text>
-
       <Text style={styles.password}>Senha</Text>
 
-      <TextInput style={styles.inputPassword} placeholder="Digite sua senha:" secureTextEntry={true} />
+      <TextInput
+        style={styles.inputPassword}
+        placeholder="Digite sua senha:"
+        secureTextEntry={true}
+      />
       <View style={styles.optionsContainer}>
         <View style={styles.checkboxContainer}>
-          <CheckBox
-            value={rememberLogin}
-            onValueChange={setRememberLogin}
-          />
+          <CheckBox value={rememberLogin} onValueChange={setRememberLogin} />
           <Text style={styles.rememberLogin}>Lembrar meu login?</Text>
         </View>
         <TouchableOpacity>
-        <Text style={styles.forgotPassword} onPress={() => navigation.navigate('ForgotPassword')}>Esqueci minha senha </Text> 
-        </TouchableOpacity>   
+          <Text
+            style={styles.forgotPassword}
+            onPress={() => navigation.navigate("ForgotPassword")}
+          >
+            Esqueci minha senha{" "}
+          </Text>
+        </TouchableOpacity>
       </View>
       <TouchableOpacity style={styles.button}>
-        <Text onPress={() => navigation.navigate('Home')}  style={styles.buttonText}>ENTRAR</Text>
+        <Text
+          onPress={() => navigation.navigate("Home")}
+          style={styles.buttonText}
+        >
+          ENTRAR
+        </Text>
       </TouchableOpacity>
-      <Text style={styles.signUp}  onPress={() => navigation.navigate('Register')}>Não tem uma conta? Cadastre-se</Text>
+      <Text
+        style={styles.signUp}
+        onPress={() => navigation.navigate("Register")}
+      >
+        Não tem uma conta? Cadastre-se
+      </Text>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
-    alignItems: 'center',
+    alignItems: "center",
     top: 800,
   },
   textLogin: {
     fontSize: 96,
-    textTransform: 'uppercase',
+    textTransform: "uppercase",
     top: -400,
     left: 0,
-    fontFamily: 'Roboto-Regular',
+    fontFamily: "Roboto-Regular",
     height: 20,
   },
   logo: {
@@ -63,94 +83,93 @@ const styles = StyleSheet.create({
     left: 397,
     width: 287,
     height: 287,
-    position: 'fixed',
+    position: "fixed",
   },
   emailInstitucional: {
     fontSize: 16,
-    fontFamily: 'Roboto-Regular',
+    fontFamily: "Roboto-Regular",
     marginTop: 20,
-    alignSelf: 'flex-start',
+    alignSelf: "flex-start",
   },
   input1: {
     fontSize: 16,
-    fontFamily: 'Roboto-Regular',
+    fontFamily: "Roboto-Regular",
     width: 450,
     height: 50,
     marginTop: 3,
     padding: 10,
     borderWidth: 1,
-    borderColor: '#CCC',
+    borderColor: "#CCC",
     borderRadius: 5,
   },
   password: {
     fontSize: 16,
-    fontFamily: 'Roboto-Regular',
+    fontFamily: "Roboto-Regular",
     marginTop: 20,
-    alignSelf: 'flex-start',
+    alignSelf: "flex-start",
   },
   inputPassword: {
     fontSize: 16,
-    fontFamily: 'Roboto-Regular',
+    fontFamily: "Roboto-Regular",
     width: 450,
     height: 50,
     marginTop: 3,
     padding: 10,
     borderWidth: 1,
-    borderColor: '#CCC',
+    borderColor: "#CCC",
     borderRadius: 5,
   },
   inputEmail: {
     fontSize: 16,
-    fontFamily: 'Roboto-Regular',
+    fontFamily: "Roboto-Regular",
     width: 450,
     height: 50,
     marginTop: 3,
     padding: 10,
     borderWidth: 1,
-    borderColor: '#CCC',
+    borderColor: "#CCC",
     borderRadius: 5,
   },
   optionsContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
+    flexDirection: "row",
+    justifyContent: "space-between",
     width: 450,
     marginTop: 10,
   },
   checkboxContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
   },
   rememberLogin: {
     fontSize: 16,
-    fontFamily: 'Roboto-Regular',
+    fontFamily: "Roboto-Regular",
     marginLeft: 5,
   },
   forgotPassword: {
     fontSize: 16,
-    fontFamily: 'Roboto-Regular',
-    color: 'blue',
-    textDecorationLine: 'underline',
+    fontFamily: "Roboto-Regular",
+    color: "red",
+    textDecorationLine: "none",
   },
   button: {
     marginTop: 100,
     width: 200,
     height: 50,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
     borderRadius: 5,
-    backgroundColor: '#B20000',
+    backgroundColor: "#B20000",
   },
   buttonText: {
     fontSize: 16,
-    fontFamily: 'Roboto-Medium',
-    color: 'white',
+    fontFamily: "Roboto-Medium",
+    color: "black",
   },
   signUp: {
     fontSize: 16,
-    fontFamily: 'Roboto-Regular',
+    fontFamily: "Roboto-Regular",
     marginTop: 20,
-    color: 'blue',
-    top: 0,
-    left: 0,
+    color: "red",
+    textDecorationLine: "none",
   },
 });

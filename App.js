@@ -4,9 +4,13 @@ import { useFonts } from 'expo-font';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import LoginScreen from './LoginScreen';
-import HomeScreen from './HomeScreen'
+import HomeScreen from './HomeScreen';
 import ForgotPasswordScreen from './ForgotPasswordScreen';
 import AutoRegisterScreen from './AutoRegisterScreen';
+import SpecificSearchScreen from './SpecificSearchScreen';
+
+const Stack = createNativeStackNavigator();
+
 
 
 function LoadingScreen({ navigation }) {
@@ -33,22 +37,24 @@ function LoadingScreen({ navigation }) {
   return (
     <View style={styles.container}>
       {exibirTelaLogin ? (
-        <LoginScreen navigation={navigation}></LoginScreen> 
+        <LoginScreen navigation={navigation} />
       ) : (
         <View style={styles.loadingScreen}>
           <Text style={styles.title}>Grade de Horário</Text>
-          <Text style={styles.subtitle}>Aplicativo do Alunos</Text>
-
           <Text style={styles.subtitle}>Aplicativo do Aluno</Text>
-          <Image source={require('./assets/fatec-logo.png')} style={styles.logoFatec} />
-          <Image source={require('./assets/cps-logo.png')} style={styles.logoCps} />
+          <Image
+            source={require('./assets/fatec-logo.png')}
+            style={styles.logoFatec}
+          />
+          <Image
+            source={require('./assets/cps-logo.png')}
+            style={styles.logoCps}
+          />
         </View>
       )}
     </View>
   );
 }
-
-const Stack = createNativeStackNavigator();
 
 function App() {
   return (
@@ -57,16 +63,16 @@ function App() {
         <Stack.Screen name="Projeto Integrador" component={LoadingScreen} />
         <Stack.Screen name="Login" component={LoginScreen} />
         <Stack.Screen name="Home" component={HomeScreen} />
-
-        <Stack.Screen name="ForgotPassword" component={ForgotPasswordScreen} />
+        <Stack.Screen
+          name="ForgotPassword"
+          component={ForgotPasswordScreen}
+        />
         <Stack.Screen name="Register" component={AutoRegisterScreen} />
+        <Stack.Screen name="Search" component={SpecificSearchScreen} />
       </Stack.Navigator>
     </NavigationContainer>
   );
 }
-
-export default App;
-
 
 const styles = StyleSheet.create({
   container: {
@@ -105,5 +111,7 @@ const styles = StyleSheet.create({
     height: 177,
     left: 377, // Coordenada X
     top: 1914, // Coordenada Y
-  }
+  },
 });
+
+export default App;

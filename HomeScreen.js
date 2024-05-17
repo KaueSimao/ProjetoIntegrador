@@ -13,9 +13,39 @@ export default function LoginScreen({ navigation })
   });
 
   return(
-    <View>
-      <Text>
-        CARLAO
-      </Text>
-    </View>
+    <View style={styles.container}>
+    <Text style={styles.textemail}>Email institucional</Text>
+    <TextInput style={styles.inputemail} placeholder="Digite seu email:" />
+  </View>
+  
+
 )};
+
+const styles = StyleSheet.create({
+  container:{
+  },
+
+  textemail:{
+    fontSize: 16,
+    fontFamily: "Roboto-Regular",
+    marginTop: 20,
+    alignSelf: "flex-start",
+    
+  },
+
+inputemail: {
+  fontSize: 16,
+    fontFamily: "Roboto-Regular",
+    width: 450,
+    height: 50,
+    marginTop: 3,
+    padding: 10,
+    borderWidth: 1,
+    borderColor: "#CCC",
+    borderRadius: 5,
+
+}
+
+
+
+});

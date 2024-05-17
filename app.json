@@ -9,7 +9,7 @@
     "splash": {
       "image": "g",
       "resizeMode": "contain",
-      "backgroundColor": "#ffffff"
+      "backgroundColor": "white"
     },
     "ios": {
       "supportsTablet": true
@@ -17,11 +17,12 @@
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "",
-        "backgroundColor": "#ffffff"
+        "backgroundColor": "white"
       }
     },
     "web": {
-      "favicon": ""
+      "favicon": "",
+      "backgroundColor": "white"
     }
   }
 }
