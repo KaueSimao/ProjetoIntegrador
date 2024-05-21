@@ -5,6 +5,7 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import LoginScreen from './LoginScreen';
 import HomeScreen from './HomeScreen';
+import SearchScreen from './SearchScreen';
 import ForgotPasswordScreen from './ForgotPasswordScreen';
 import AutoRegisterScreen from './AutoRegisterScreen';
 import SpecificSearchScreen from './SpecificSearchScreen';
@@ -63,6 +64,7 @@ function App() {
         <Stack.Screen name="Projeto Integrador" component={LoadingScreen} />
         <Stack.Screen name="Login" component={LoginScreen} />
         <Stack.Screen name="Home" component={HomeScreen} />
+        <Stack.Screen name="SearchScreen" component={SearchScreen} />
         <Stack.Screen
           name="ForgotPassword"
           component={ForgotPasswordScreen}

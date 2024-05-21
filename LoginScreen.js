@@ -86,13 +86,13 @@ const styles = StyleSheet.create({
     position: "fixed",
   },
   emailInstitucional: {
-    fontSize: 16,
+    fontSize: 26,
     fontFamily: "Roboto-Regular",
     marginTop: 20,
     alignSelf: "flex-start",
   },
   input1: {
-    fontSize: 16,
+    fontSize: 26,
     fontFamily: "Roboto-Regular",
     width: 450,
     height: 50,
@@ -103,13 +103,13 @@ const styles = StyleSheet.create({
     borderRadius: 5,
   },
   password: {
-    fontSize: 16,
+    fontSize: 26,
     fontFamily: "Roboto-Regular",
     marginTop: 20,
     alignSelf: "flex-start",
   },
   inputPassword: {
-    fontSize: 16,
+    fontSize: 26,
     fontFamily: "Roboto-Regular",
     width: 450,
     height: 50,
@@ -120,7 +120,7 @@ const styles = StyleSheet.create({
     borderRadius: 5,
   },
   inputEmail: {
-    fontSize: 16,
+    fontSize: 26,
     fontFamily: "Roboto-Regular",
     width: 450,
     height: 50,
@@ -141,12 +141,12 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   rememberLogin: {
-    fontSize: 16,
+    fontSize: 26,
     fontFamily: "Roboto-Regular",
     marginLeft: 5,
   },
   forgotPassword: {
-    fontSize: 16,
+    fontSize: 26,
     fontFamily: "Roboto-Regular",
     color: "red",
     textDecorationLine: "none",
@@ -161,12 +161,12 @@ const styles = StyleSheet.create({
     backgroundColor: "#B20000",
   },
   buttonText: {
-    fontSize: 16,
+    fontSize: 26,
     fontFamily: "Roboto-Medium",
     color: "black",
   },
   signUp: {
-    fontSize: 16,
+    fontSize: 26,
     fontFamily: "Roboto-Regular",
     marginTop: 20,
     color: "red",

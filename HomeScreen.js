@@ -1,6 +1,15 @@
 import React, { useState } from 'react';
-import { View, Image, TextInput, StyleSheet, Text, TouchableOpacity, CheckBox } from 'react-native';
+import {
+  View,
+  Image,
+  TextInput,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  CheckBox,
+} from "react-native";
 import { useFonts } from 'expo-font';
+import { Button } from 'react-native-web';
 
 
 export default function LoginScreen({ navigation })
@@ -13,38 +22,101 @@ export default function LoginScreen({ navigation })
   });
 
   return(
-    <View style={styles.container}>
-    <Text style={styles.textemail}>Email institucional</Text>
-    <TextInput style={styles.inputemail} placeholder="Digite seu email:" />
-  </View>
-  
+<View style={styles.container}>
 
-)};
+<TouchableOpacity onPress={() => navigation.navigate("SearchScreen")} style={styles.button}>
+ <Text
+ 
+style={styles.buttonText}
+  >
+Menu
+ </Text>
+</TouchableOpacity>
+  
+    
+    <View style={styles.container}>
+    <Text style={styles.search}>Pesquisa</Text>
+    <TextInput style={styles.inputsearch} placeholder="Barra de Pesquisa:" />
+  </View>
+
+
+  <TouchableOpacity style={styles.buttonNext}>
+ <Text
+style={styles.nextText}
+  >
+   Próximo
+ </Text>
+</TouchableOpacity>
+  
+  </View>
+
+
+);
+}
 
 const styles = StyleSheet.create({
   container:{
   },
 
-  textemail:{
-    fontSize: 16,
+  
+search:{
+    fontSize: 60,
     fontFamily: "Roboto-Regular",
-    marginTop: 20,
+    marginTop: 100,
+    marginLeft: 400,
     alignSelf: "flex-start",
     
   },
 
-inputemail: {
-  fontSize: 16,
+inputsearch: {
+
+    fontSize: 60,
     fontFamily: "Roboto-Regular",
-    width: 450,
-    height: 50,
+    width: 900,
+    height: 119,
     marginTop: 3,
+    marginLeft: 50,
     padding: 10,
     borderWidth: 1,
     borderColor: "#CCC",
     borderRadius: 5,
+    
 
-}
+},
+
+button: {
+  fontSize: 26,
+  marginTop: 50,
+  marginLeft: 50,
+  width: 172,
+  height: 151,
+  borderRadius: 8,
+ backgroundColor: "#666666",
+},
+buttonText:{
+  fontSize: 40,
+    fontFamily: "Roboto-Medium",
+    color: "black",
+    alignItems: "center",
+    justifyContent: "center",
+},
+nextText:{
+  fontSize: 42,
+    fontFamily: "Roboto-Medium",
+    color: "black",
+    alignItems: "center",
+},
+buttonNext:{
+
+  marginTop: 1200,
+  marginLeft: 230,
+  width: 577,
+  height: 175,
+  borderRadius: 26,
+ backgroundColor: "#B20000",
+ justifyContent: "center",
+ alignItems: "center",
+},
 
 
 
