@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import RNPickerSelect from 'react-native-picker-select';
 import {
   View,
   Image,
@@ -6,17 +7,10 @@ import {
   StyleSheet,
   Text,
   TouchableOpacity,
-  CheckBox,
 } from "react-native";
 import { useFonts } from "expo-font";
+import database from './Database.json';
 
-const courses = [
-  { label: "Engenharia", value: "engenharia" },
-  { label: "Medicina", value: "medicina" },
-  { label: "Direito", value: "direito" },
-  { label: "Administração", value: "administracao" },
-  // Adicione mais cursos conforme necessário
-];
 export default function SpecificSearchScreen({ navigation }) {
   const [fontsLoaded] = useFonts({
     "Roboto-Light": require("./assets/fonts/Roboto-Light.ttf"),
@@ -24,24 +18,54 @@ export default function SpecificSearchScreen({ navigation }) {
     "Roboto-Medium": require("./assets/fonts/Roboto-Medium.ttf"),
   });
 
+  const [courses, setCourses] = useState([]);
+  const [semesters, setSemesters] = useState([]);
+  const [teachers, setTeachers] = useState([]);
+  const [disciplines, setDisciplines] = useState([]);
+  const [rooms, setRooms] = useState([]);
+
+  useEffect(() => {
+    setCourses(database.courses.map(course => ({ label: course, value: course.toLowerCase() })));
+    setSemesters(database.semesters.map(semester => ({ label: semester, value: semester.toLowerCase() })));
+    setTeachers(database.teachers.map(teacher => ({ label: teacher, value: teacher.toLowerCase() })));
+    setDisciplines(database.disciplines.map(discipline => ({ label: discipline, value: discipline.toLowerCase() })));
+    setRooms(database.rooms.map(room => ({ label: room, value: room.toLowerCase() })));
+  }, []);
+
   return (
     <View style={styles.container}>
       <Text style={styles.textSearch}>Pesquisa Específica</Text>
       <Image source={require("./assets/fatec-logo.png")} style={styles.logo} />
       <Text style={styles.lbl_course}>Curso</Text>
+      <RNPickerSelect
+        items={courses}
+        onValueChange={(value) => console.log(value)}
+        placeholder={{ label: "Escolha seu curso:", value: null }}
+      />
       <Text style={styles.lbl_semester}>Semestre</Text>
-      <TextInput style={styles.input} placeholder="Escolha seu semestre" />
+      <RNPickerSelect
+        items={semesters}
+        onValueChange={(value) => console.log(value)}
+        placeholder={{ label: "Escolha seu semestre:", value: null }}
+      />
       <Text style={styles.lbl_teacher}>Professor</Text>
-      <TextInput style={styles.input} placeholder="Escolha o professor" />
+      <RNPickerSelect
+        items={teachers}
+        onValueChange={(value) => console.log(value)}
+        placeholder={{ label: "Escolha o professor:", value: null }}
+      />
       <Text style={styles.lbl_discipline}>Disciplina</Text>
-      <TextInput style={styles.input} placeholder="Escolha a disciplina" />
+      <RNPickerSelect
+        items={disciplines}
+        onValueChange={(value) => console.log(value)}
+        placeholder={{ label: "Escolha a disciplina:", value: null }}
+      />
       <Text style={styles.lbl_room}>Sala</Text>
-      <TextInput style={styles.input} placeholder="Escolha a sala" />
-
-      <View style={styles.optionsContainer}>
-        <View style={styles.checkboxContainer}>
-        </View>
-      </View>
+      <RNPickerSelect
+        items={rooms}
+        onValueChange={(value) => console.log(value)}
+        placeholder={{ label: "Escolha a sala:", value: null }}
+      />
       <TouchableOpacity style={styles.button}>
         <Text
           onPress={() => navigation.navigate("Home")}
@@ -57,22 +81,20 @@ export default function SpecificSearchScreen({ navigation }) {
 const styles = StyleSheet.create({
   container: {
     alignItems: "center",
-    top: 800,
     backgroundColor: "white",
   },
   textSearch: {
     fontSize: 60,
-    top: 457,
-    left: 249,
     fontFamily: "Roboto-Light",
     height: 137,
     width: 582,
+    textAlign: 'center',
+    marginTop: 50,
   },
   logo: {
-    top: 138,
-    left: 7258,
     width: 357,
     height: 175,
+    marginBottom: 50,
   },
   lbl_course: {
     fontSize: 16,
@@ -104,17 +126,6 @@ const styles = StyleSheet.create({
     marginTop: 20,
     alignSelf: "flex-start",
   },
-  input: {
-    fontSize: 16,
-    fontFamily: "Roboto-Regular",
-    width: 450,
-    height: 50,
-    marginTop: 3,
-    padding: 10,
-    borderWidth: 1,
-    borderColor: "#CCC",
-    borderRadius: 5,
-  },
   button: {
     marginTop: 100,
     width: 200,
@@ -128,12 +139,5 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontFamily: "Roboto-Medium",
     color: "white",
-  },
-  signUp: {
-    fontSize: 16,
-    fontFamily: "Roboto-Regular",
-    marginTop: 20,
-    color: "red",
-    textDecorationLine: "none",
   },
 });

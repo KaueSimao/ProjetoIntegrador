@@ -7,7 +7,6 @@ import {
   Text,
   TouchableOpacity,
 } from "react-native";
-import CheckBox from "react-native-check-box";
 import RNPickerSelect from "react-native-picker-select";
 import { useFonts } from "expo-font";
 
@@ -23,7 +22,6 @@ export default function AutoRegisterScreen({ navigation }) {
     { label: "Medicina", value: "medicina" },
     { label: "Direito", value: "direito" },
     { label: "Administração", value: "administracao" },
-    // Adicione mais cursos conforme necessário
   ];
 
   const [selectedCourse, setSelectedCourse] = useState(null);
@@ -56,7 +54,6 @@ export default function AutoRegisterScreen({ navigation }) {
           <RNPickerSelect
             onValueChange={(value) => setSelectedCourse(value)}
             items={courses}
-            style={pickerSelectStyles}
             placeholder={{ label: "Escolha seu curso:", value: null }}
           />
         <TouchableOpacity
@@ -118,32 +115,5 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontFamily: "Roboto-Medium",
     color: "white",
-  },
-});
-
-const pickerSelectStyles = StyleSheet.create({
-  inputIOS: {
-    fontSize: 16,
-    fontFamily: "Roboto-Regular",
-    width: "100%",
-    height: 50,
-    padding: 50,
-    borderWidth: 1,
-    borderColor: "#CCC",
-    borderRadius: 5,
-    color: "#444",
-    paddingRight: 30, // Para assegurar que o texto não se sobrepõe ao ícone de dropdown
-  },
-  inputAndroid: {
-    fontSize: 16,
-    fontFamily: "Roboto-Regular",
-    width: "100%",
-    height: 50,
-    padding: 50,
-    borderWidth: 1,
-    borderColor: "#CCC",
-    borderRadius: 5,
-    color: "#444",
-    paddingRight: 30, // Para assegurar que o texto não se sobrepõe ao ícone de dropdown
   },
 });

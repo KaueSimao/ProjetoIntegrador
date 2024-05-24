@@ -1,0 +1,13 @@
+{
+    "courses": ["Engenharia", "Medicina", "Direito", "Administração"],
+    "semesters": ["1º", "2º", "3º", "4º"],
+    "teachers": ["Prof. A", "Prof. B", "Prof. C"],
+    "disciplines": ["Cálculo", "Estrutura de Dados", "Linguagem de Programação"],
+    "rooms": ["Sala 6", "Sala 10", "Sala 11", "Sala 12"],
+    "students" {
+        "email": ["josemarcio@gamil.com"],
+        "password": ["12124133"],
+        "course": ["Engenharia"]
+    }
+  }
+  
