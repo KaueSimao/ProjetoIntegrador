@@ -6,6 +6,7 @@ import {
   StyleSheet,
   Text,
   TouchableOpacity,
+  Alert,
 } from "react-native";
 import RNPickerSelect from "react-native-picker-select";
 import { useFonts } from "expo-font";
@@ -17,6 +18,10 @@ export default function AutoRegisterScreen({ navigation }) {
     "Roboto-Medium": require("./assets/fonts/Roboto-Medium.ttf"),
   });
 
+  const [nome, setNome] = useState("");
+  const [email, setEmail] = useState("");
+  const [senha, setSenha] = useState("");
+  const [selectedCourse, setSelectedCourse] = useState(null);
   const courses = [
     { label: "Engenharia", value: "engenharia" },
     { label: "Medicina", value: "medicina" },
@@ -24,10 +29,40 @@ export default function AutoRegisterScreen({ navigation }) {
     { label: "Administração", value: "administracao" },
   ];
 
-  const [selectedCourse, setSelectedCourse] = useState(null);
+  const cadastro = async () => {
+    try {
+      const response = await fetch('http://localhost:3000/students', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          nome,
+          email,
+          password: senha,
+          course: selectedCourse,
+        }),
+      });
+  
+      if (!response.ok) {
+        throw new Error('Erro ao cadastrar');
+      }
+  
+      const data = await response.json();
+      alert('Cadastro realizado com sucesso!');
+      console.log(data);
 
+      // Navegar para a página de login após cadastro bem-sucedido
+      navigation.navigate('Login');
+
+    } catch (error) {
+      console.error(error);
+      alert('Falha ao realizar o cadastro');
+    }
+  };
+  
   if (!fontsLoaded) {
-    return null; 
+    return null;
   }
 
   return (
@@ -35,14 +70,23 @@ export default function AutoRegisterScreen({ navigation }) {
       <Image source={require("./assets/fatec-logo.png")} style={styles.logo} />
       <View style={styles.groupInputs}>
         <Text style={styles.label}>Nome Completo</Text>
-        <TextInput style={styles.input} placeholder="Digite seu nome:" />
+        <TextInput
+          style={styles.input}
+          placeholder="Digite seu nome:"
+          onChangeText={(text) => setNome(text)}
+        />
         <Text style={styles.label}>Email institucional</Text>
-        <TextInput style={styles.input} placeholder="Digite seu email: " />
+        <TextInput
+          style={styles.input}
+          placeholder="Digite seu email: "
+          onChangeText={(text) => setEmail(text)}
+        />
         <Text style={styles.label}>Senha</Text>
         <TextInput
           style={styles.input}
           placeholder="Digite sua senha: "
           secureTextEntry={true}
+          onChangeText={(text) => setSenha(text)}
         />
         <Text style={styles.label}>Repita a senha</Text>
         <TextInput
@@ -51,18 +95,16 @@ export default function AutoRegisterScreen({ navigation }) {
           secureTextEntry={true}
         />
         <Text style={styles.label}>Curso</Text>
-          <RNPickerSelect
-            onValueChange={(value) => setSelectedCourse(value)}
-            items={courses}
-            placeholder={{ label: "Escolha seu curso:", value: null }}
-          />
+        <RNPickerSelect
+          onValueChange={(value) => setSelectedCourse(value)}
+          items={courses}
+          placeholder={{ label: "Escolha seu curso:", value: null }}
+        />
         <TouchableOpacity
           style={styles.button}
-          onPress={() => {
-            navigation.navigate("Search")
-          }}
+          onPress={cadastro}
         >
-          <Text style={styles.buttonText}>PRÓXIMO</Text>
+          <Text style={styles.buttonText}>CADASTRAR</Text>
         </TouchableOpacity>
       </View>
     </View>

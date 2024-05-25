@@ -9,7 +9,7 @@ import {
   TouchableOpacity,
 } from "react-native";
 import { useFonts } from "expo-font";
-import database from './Database.json';
+import database from './db.json';
 
 export default function SpecificSearchScreen({ navigation }) {
   const [fontsLoaded] = useFonts({
