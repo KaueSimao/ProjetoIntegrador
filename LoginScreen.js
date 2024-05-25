@@ -7,6 +7,7 @@ import {
   Text,
   TouchableOpacity,
   CheckBox,
+  Alert,
 } from "react-native";
 import { useFonts } from "expo-font";
 
@@ -17,14 +18,44 @@ export default function LoginScreen({ navigation }) {
     "Roboto-Medium": require("./assets/fonts/Roboto-Medium.ttf"),
   });
 
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [rememberLogin, setRememberLogin] = useState(false);
+
+  const login = async () => {
+    try {
+      const response = await fetch('http://localhost:3000/students');
+      const students = await response.json();
+
+      const user = students.find(student => student.email === email && student.password === password);
+
+      if (user) {
+        alert('Login bem-sucedido!');
+        navigation.navigate('Home');
+      } else {
+        alert('Email ou senha incorretos.');
+      }
+    } catch (error) {
+      console.error(error);
+      alert('Erro ao tentar fazer login.');
+    }
+  };
+
+  if (!fontsLoaded) {
+    return null;
+  }
 
   return (
     <View style={styles.container}>
       <Text style={styles.textLogin}>login</Text>
       <Image source={require("./assets/profile.png")} style={styles.logo} />
       <Text style={styles.emailInstitucional}>Email institucional</Text>
-      <TextInput style={styles.inputEmail} placeholder="Digite seu email:" />
+      <TextInput
+        style={styles.inputEmail}
+        placeholder="Digite seu email:"
+        value={email}
+        onChangeText={setEmail}
+      />
 
       <Text style={styles.password}>Senha</Text>
 
@@ -32,6 +63,8 @@ export default function LoginScreen({ navigation }) {
         style={styles.inputPassword}
         placeholder="Digite sua senha:"
         secureTextEntry={true}
+        value={password}
+        onChangeText={setPassword}
       />
       <View style={styles.optionsContainer}>
         <View style={styles.checkboxContainer}>
@@ -47,13 +80,8 @@ export default function LoginScreen({ navigation }) {
           </Text>
         </TouchableOpacity>
       </View>
-      <TouchableOpacity style={styles.button}>
-        <Text
-          onPress={() => navigation.navigate("Home")}
-          style={styles.buttonText}
-        >
-          ENTRAR
-        </Text>
+      <TouchableOpacity style={styles.button} onPress={login}>
+        <Text style={styles.buttonText}>ENTRAR</Text>
       </TouchableOpacity>
       <Text
         style={styles.signUp}
