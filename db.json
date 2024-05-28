@@ -1,111 +1,69 @@
 {
   "courses": [
-    {
-      "id": 1,
-      "name": "Engenharia"
-    },
-    {
-      "id": 2,
-      "name": "Medicina"
-    },
-    {
-      "id": 3,
-      "name": "Direito"
-    },
-    {
-      "id": 4,
-      "name": "Administração"
-    }
+    { "id": 1, "name": "Engenharia" },
+    { "id": 2, "name": "Medicina" },
+    { "id": 3, "name": "Direito" },
+    { "id": 4, "name": "Administração" },
+    { "id": 4, "name": "Desenvolvimento de sistemas" }
   ],
   "semesters": [
-    {
-      "id": 1,
-      "name": "1º"
-    },
-    {
-      "id": 2,
-      "name": "2º"
-    },
-    {
-      "id": 3,
-      "name": "3º"
-    },
-    {
-      "id": 4,
-      "name": "4º"
-    }
+    { "id": 1, "name": "1º" },
+    { "id": 2, "name": "2º" },
+    { "id": 3, "name": "3º" },
+    { "id": 4, "name": "4º" }
   ],
   "teachers": [
-    {
-      "id": 1,
-      "name": "Prof. A"
-    },
-    {
-      "id": 2,
-      "name": "Prof. B"
-    },
-    {
-      "id": 3,
-      "name": "Prof. C"
-    }
+    { "id": 1, "name": "Prof. A" },
+    { "id": 2, "name": "Prof. B" },
+    { "id": 3, "name": "Prof. C" }
   ],
   "disciplines": [
-    {
-      "id": 1,
-      "name": "Cálculo"
-    },
-    {
-      "id": 2,
-      "name": "Estrutura de Dados"
-    },
-    {
-      "id": 3,
-      "name": "Linguagem de Programação"
-    }
+    { "id": 1, "name": "Cálculo" },
+    { "id": 2, "name": "Estrutura de Dados" },
+    { "id": 3, "name": "Linguagem de Programação" }
   ],
   "rooms": [
+    { "id": 1, "name": "Sala 6" },
+    { "id": 2, "name": "Sala 10" },
+    { "id": 3, "name": "Sala 11" },
+    { "id": 4, "name": "Sala 12" }
+  ],
+  "timetable": [
     {
       "id": 1,
-      "name": "Sala 6"
+      "course": "engenharia",
+      "semester": "1º",
+      "teacher": "prof. a",
+      "discipline": "cálculo",
+      "room": "sala 6",
+      "time": "08:00 - 10:00"
     },
     {
       "id": 2,
-      "name": "Sala 10"
+      "course": "engenharia",
+      "semester": "2º",
+      "teacher": "prof. b",
+      "discipline": "estrutura de dados",
+      "room": "sala 10",
+      "time": "10:00 - 12:00"
     },
     {
       "id": 3,
-      "name": "Sala 11"
+      "course": "engenharia",
+      "semester": "3º",
+      "teacher": "prof. c",
+      "discipline": "linguagem de programação",
+      "room": "sala 11",
+      "time": "13:00 - 15:00"
     },
     {
       "id": 4,
-      "name": "Sala 12"
-    }
-  ],
-  "students": [
-    {
-      "id": 1,
-      "email": "josemarcio@gmail.com",
-      "password": "12124133",
-      "course": "Engenharia"
-    },
-    {
-      "id": "6d4c",
-      "email": "carlos@gmail.com",
-      "password": "carlos",
-      "course": "engenharia"
-    },
-    {
-      "id": "e63d",
-      "email": "julia@gmail.com",
-      "password": "julia123",
-      "course": "administracao"
-    },
-    {
-      "id": "8127",
-      "nome": "sasjaghsa",
-      "email": "sasasa",
-      "password": "sasasa",
-      "course": "medicina"
+      "course": "desenvolvimento de sistemas",
+      "semester": "2º",
+      "teacher": "prof. c",
+      "discipline": "estrutura de dados",
+      "room": "sala 10",
+      "time": "10:00 - 12:00"
     }
   ]
 }
