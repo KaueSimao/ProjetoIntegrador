@@ -12,11 +12,10 @@ const ForgotPasswordScreen = ({ navigation }) => {
   });
 
   if (!fontsLoaded) {
-    return null; // ou um componente de carregamento
+    return null; 
   }
 
   const handleForgotPassword = () => {
-    // Implementar lógica para enviar o email de recuperação de senha
     alert(`Email de recuperação enviado para ${email}`);
   };
 
