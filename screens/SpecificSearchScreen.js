@@ -11,7 +11,7 @@ import {
 } from "react-native";
 import { useFonts } from "expo-font";
 
-const API_URL = 'http://localhost:3000'; // Atualize com o URL do seu JSON server
+const API_URL = 'http://localhost:3000'; 
 
 export default function SpecificSearchScreen({ navigation }) {
   const [fontsLoaded] = useFonts({
@@ -20,12 +20,14 @@ export default function SpecificSearchScreen({ navigation }) {
     "Roboto-Medium": require("../assets/fonts/Roboto-Medium.ttf"),
   });
 
+  const [errorMessage, setErrorMessage] = useState(null);
+
   const [courses, setCourses] = useState([]);
   const [semesters, setSemesters] = useState([]);
   const [teachers, setTeachers] = useState([]);
   const [disciplines, setDisciplines] = useState([]);
   const [rooms, setRooms] = useState([]);
-  const [searchResults, setSearchResults] = useState([]);
+  const [timetable, setTimetable] = useState([]);
 
   const [selectedCourse, setSelectedCourse] = useState(null);
   const [selectedSemester, setSelectedSemester] = useState(null);
@@ -44,103 +46,141 @@ export default function SpecificSearchScreen({ navigation }) {
       const teachersResponse = await axios.get(`${API_URL}/teachers`);
       const disciplinesResponse = await axios.get(`${API_URL}/disciplines`);
       const roomsResponse = await axios.get(`${API_URL}/rooms`);
-      
-      setCourses(coursesResponse.data.map(course => ({ label: course.name, value: course.name.toLowerCase() })));
-      setSemesters(semestersResponse.data.map(semester => ({ label: semester.name, value: semester.name.toLowerCase() })));
-      setTeachers(teachersResponse.data.map(teacher => ({ label: teacher.name, value: teacher.name.toLowerCase() })));
-      setDisciplines(disciplinesResponse.data.map(discipline => ({ label: discipline.name, value: discipline.name.toLowerCase() })));
-      setRooms(roomsResponse.data.map(room => ({ label: room.name, value: room.name.toLowerCase() })));
+      const timetableResponse = await axios.get(`${API_URL}/timetable`);
+
+      setCourses(coursesResponse.data);
+      setSemesters(semestersResponse.data);
+      setTeachers(teachersResponse.data);
+      setDisciplines(disciplinesResponse.data);
+      setRooms(roomsResponse.data);
+      setTimetable(timetableResponse.data);
     } catch (error) {
-      console.error('Error fetching data:', error);
+      console.error(error);
     }
   };
 
-  const handleSearch = async () => {
-    try {
-      const response = await axios.get(`${API_URL}/timetable`, {
-        params: {
-          course: selectedCourse,
-          semester: selectedSemester,
-          teacher: selectedTeacher,
-          discipline: selectedDiscipline,
-          room: selectedRoom
-        }
-      });
-      setSearchResults(response.data);
-    } catch (error) {
-      console.error('Error searching data:', error);
+  const handleSearch = () => {
+    let filteredTimetable = timetable;
+
+    if (selectedCourse) {
+      filteredTimetable = filteredTimetable.filter(item => item.courseId === selectedCourse);
     }
+    if (selectedSemester) {
+      filteredTimetable = filteredTimetable.filter(item => item.semesterId === selectedSemester);
+    }
+    if (selectedTeacher) {
+      filteredTimetable = filteredTimetable.filter(item => item.teacherId === selectedTeacher);
+    }
+    if (selectedDiscipline) {
+      filteredTimetable = filteredTimetable.filter(item => item.disciplineId === selectedDiscipline);
+    }
+    if (selectedRoom) {
+      filteredTimetable = filteredTimetable.filter(item => item.roomId === selectedRoom);
+    }
+
+    if (filteredTimetable.length === 0) {
+      setErrorMessage("Nenhum resultado encontrado para os filtros selecionados.");
+    } else {
+      setErrorMessage(null);
+    }
+
+    setTimetable(filteredTimetable);
   };
+
+
+  const resetFilters = () => {
+    setSelectedCourse(null);
+    setSelectedSemester(null);
+    setSelectedTeacher(null);
+    setSelectedDiscipline(null);
+    setSelectedRoom(null);
+    fetchData();
+  };
+
+  const renderTimetableItem = ({ item }) => (
+    <View style={styles.tableRow}>
+      <Text style={styles.tableCell}>{item.id}</Text>
+      <Text style={styles.tableCell}>{courses.find(course => course.id === item.courseId)?.name}</Text>
+      <Text style={styles.tableCell}>{semesters.find(semester => semester.id === item.semesterId)?.name}</Text>
+      <Text style={styles.tableCell}>{teachers.find(teacher => teacher.id === item.teacherId)?.name}</Text>
+      <Text style={styles.tableCell}>{disciplines.find(discipline => discipline.id === item.disciplineId)?.name}</Text>
+      <Text style={styles.tableCell}>{rooms.find(room => room.id === item.roomId)?.name}</Text>
+      <Text style={styles.tableCell}>{item.time}</Text>
+      <Text style={styles.tableCell}>{item.day}</Text>
+    </View>
+  );
+
+  if (!fontsLoaded) {
+    return null;
+  }
 
   return (
     <View style={styles.container}>
-      <Text style={styles.textSearch}>Pesquisa Específica</Text>
       <Image source={require("../assets/fatec-logo.png")} style={styles.logo} />
-      
-      <Text style={styles.lbl_course}>Curso</Text>
+      <Text style={styles.title}>Filtro Específico</Text>
+
       <RNPickerSelect
-        items={courses}
-        onValueChange={setSelectedCourse}
-        placeholder={{ label: "Escolha seu curso:", value: '' }}
+        placeholder={{ label: "Selecione um curso", value: null }}
+        value={selectedCourse}
+        onValueChange={(value) => setSelectedCourse(value)}
+        items={courses.map(course => ({ label: course.name, value: course.id }))}
       />
-      
-      <Text style={styles.lbl_semester}>Semestre</Text>
+
       <RNPickerSelect
-        items={semesters}
-        onValueChange={setSelectedSemester}
-        placeholder={{ label: "Escolha seu semestre:", value: '' }}
+        placeholder={{ label: "Selecione um semestre", value: null }}
+        value={selectedSemester}
+        onValueChange={(value) => setSelectedSemester(value)}
+        items={semesters.map(semester => ({ label: semester.name, value: semester.id }))}
       />
-      
-      <Text style={styles.lbl_teacher}>Professor</Text>
+
       <RNPickerSelect
-        items={teachers}
-        onValueChange={setSelectedTeacher}
-        placeholder={{ label: "Escolha o professor:", value: '' }}
+        placeholder={{ label: "Selecione um professor", value: null }}
+        value={selectedTeacher}
+        onValueChange={(value) => setSelectedTeacher(value)}
+        items={teachers.map(teacher => ({ label: teacher.name, value: teacher.id }))}
       />
-      
-      <Text style={styles.lbl_discipline}>Disciplina</Text>
+
       <RNPickerSelect
-        items={disciplines}
-        onValueChange={setSelectedDiscipline}
-        placeholder={{ label: "Escolha a disciplina:", value: '' }}
+        placeholder={{ label: "Selecione uma disciplina", value: null }}
+        value={selectedDiscipline}
+        onValueChange={(value) => setSelectedDiscipline(value)}
+        items={disciplines.map(discipline => ({ label: discipline.name, value: discipline.id }))}
       />
-      
-      <Text style={styles.lbl_room}>Sala</Text>
+
       <RNPickerSelect
-        items={rooms}
-        onValueChange={setSelectedRoom}
-        placeholder={{ label: "Escolha a sala:", value: '' }}
+        placeholder={{ label: "Selecione uma sala", value: null }}
+        value={selectedRoom}
+        onValueChange={(value) => setSelectedRoom(value)}
+        items={rooms.map(room => ({ label: room.name, value: room.id }))}
       />
-      
-      <TouchableOpacity style={styles.button} onPress={handleSearch}>
-        <Text style={styles.buttonText}>PRÓXIMO</Text>
+
+      <TouchableOpacity style={styles.searchButton} onPress={handleSearch}>
+        <Text style={styles.searchButtonText}>Pesquisar</Text>
       </TouchableOpacity>
 
-      {searchResults.length > 0 && (
-        <View style={styles.table}>
-          <View style={styles.tableHeader}>
-            <Text style={styles.tableHeaderText}>Curso</Text>
-            <Text style={styles.tableHeaderText}>Semestre</Text>
-            <Text style={styles.tableHeaderText}>Professor</Text>
-            <Text style={styles.tableHeaderText}>Disciplina</Text>
-            <Text style={styles.tableHeaderText}>Sala</Text>
-            <Text style={styles.tableHeaderText}>Horário</Text>
-          </View>
-          <FlatList
-            data={searchResults}
-            keyExtractor={item => item.id.toString()}
-            renderItem={({ item }) => (
-              <View style={styles.tableRow}>
-                <Text style={styles.tableCell}>{item.course}</Text>
-                <Text style={styles.tableCell}>{item.semester}</Text>
-                <Text style={styles.tableCell}>{item.teacher}</Text>
-                <Text style={styles.tableCell}>{item.discipline}</Text>
-                <Text style={styles.tableCell}>{item.room}</Text>
-                <Text style={styles.tableCell}>{item.time}</Text>
-              </View>
-            )}
-          />
+      <TouchableOpacity style={styles.resetButton} onPress={resetFilters}>
+        <Text style={styles.resetButtonText}>Redefinir Filtros</Text>
+      </TouchableOpacity>
+
+      <View style={styles.table}>
+        <View style={styles.tableHeader}>
+          <Text style={styles.tableHeaderText}>ID</Text>
+          <Text style={styles.tableHeaderText}>Curso</Text>
+          <Text style={styles.tableHeaderText}>Semestre</Text>
+          <Text style={styles.tableHeaderText}>Professor</Text>
+          <Text style={styles.tableHeaderText}>Disciplina</Text>
+          <Text style={styles.tableHeaderText}>Sala</Text>
+          <Text style={styles.tableHeaderText}>Horário</Text>
+          <Text style={styles.tableHeaderText}>Dia</Text>
         </View>
+        <FlatList
+          data={timetable}
+          renderItem={renderTimetableItem}
+          keyExtractor={item => item.id.toString()}
+        />
+      </View>
+      {errorMessage && (
+        <Text style={styles.errorMessage}>{errorMessage}</Text>
       )}
     </View>
   );
@@ -148,94 +188,70 @@ export default function SpecificSearchScreen({ navigation }) {
 
 const styles = StyleSheet.create({
   container: {
+    flex: 1,
     alignItems: "center",
-    backgroundColor: "white",
-  },
-  textSearch: {
-    fontSize: 30,
-    fontFamily: "Roboto-Light",
-    height: 60,
-    width: "100%",
-    textAlign: 'center',
-    marginTop: 20,
+    backgroundColor: "#fff",
+    padding: 20,
   },
   logo: {
     width: 200,
     height: 100,
     marginBottom: 20,
+    left: 400,
   },
-  lbl_course: {
-    fontSize: 16,
-    fontFamily: "Roboto-Regular",
-    marginTop: 10,
-    alignSelf: "flex-start",
+  title: {
+    fontSize: 24,
+    fontWeight: "bold",
+    marginBottom: 20,
   },
-  lbl_semester: {
-    fontSize: 16,
-    fontFamily: "Roboto-Regular",
-    marginTop: 10,
-    alignSelf: "flex-start",
-  },
-  lbl_teacher: {
-    fontSize: 16,
-    fontFamily: "Roboto-Regular",
-    marginTop: 10,
-    alignSelf: "flex-start",
-  },
-  lbl_discipline: {
-    fontSize: 16,
-    fontFamily: "Roboto-Regular",
-    marginTop: 10,
-    alignSelf: "flex-start",
-  },
-  lbl_room: {
-    fontSize: 16,
-    fontFamily: "Roboto-Regular",
-    marginTop: 10,
-    alignSelf: "flex-start",
-  },
-  button: {
-    marginTop: 20,
-    width: 200,
-    height: 50,
-    justifyContent: "center",
-    alignItems: "center",
+  searchButton: {
+    backgroundColor: "blue",
+    padding: 10,
     borderRadius: 5,
-    backgroundColor: "#B20000",
+    marginTop: 10,
   },
-  buttonText: {
-    fontSize: 16,
-    fontFamily: "Roboto-Medium",
+  searchButtonText: {
     color: "white",
+    textAlign: "center",
+  },
+  resetButton: {
+    backgroundColor: "red",
+    padding: 10,
+    borderRadius: 5,
+    marginTop: 10,
+  },
+  resetButtonText: {
+    color: "white",
+    textAlign: "center",
   },
   table: {
     marginTop: 20,
-    width: '90%',
+    width: "90%",
     borderWidth: 1,
-    borderColor: '#000',
+    borderColor: "#000",
   },
   tableHeader: {
-    flexDirection: 'row',
-    backgroundColor: '#f1f1f1',
+    flexDirection: "row",
+    backgroundColor: "#f1f1f1",
     borderBottomWidth: 1,
-    borderBottomColor: '#000',
+    borderBottomColor: "#000",
   },
   tableHeaderText: {
     flex: 1,
     fontSize: 16,
-    fontWeight: 'bold',
-    textAlign: 'center',
+    fontWeight: "bold",
+    textAlign: "center",
     padding: 10,
   },
   tableRow: {
-    flexDirection: 'row',
+    flexDirection: "row",
     borderBottomWidth: 1,
-    borderBottomColor: '#000',
+    borderBottomColor: "#000",
   },
   tableCell: {
     flex: 1,
     fontSize: 14,
-    textAlign: 'center',
+    textAlign: "center",
     padding: 10,
-  }
+  },
 });
