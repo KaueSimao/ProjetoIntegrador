@@ -6,9 +6,9 @@ const ForgotPasswordScreen = ({ navigation }) => {
   const [email, setEmail] = useState('');
 
   const [fontsLoaded] = useFonts({
-    'Roboto-Light': require('./assets/fonts/Roboto-Light.ttf'),
-    'Roboto-Regular': require('./assets/fonts/Roboto-Regular.ttf'),
-    'Roboto-Medium': require('./assets/fonts/Roboto-Medium.ttf'),
+    'Roboto-Light': require('../assets/fonts/Roboto-Light.ttf'),
+    'Roboto-Regular': require('../assets/fonts/Roboto-Regular.ttf'),
+    'Roboto-Medium': require('../assets/fonts/Roboto-Medium.ttf'),
   });
 
   if (!fontsLoaded) {
@@ -22,7 +22,7 @@ const ForgotPasswordScreen = ({ navigation }) => {
   return (
     <View style={styles.container}>
       <Text style={styles.textRecoverPassword}>RECUPERAR SENHA </Text>
-      <Image source={require("./assets/profile.png")} style={styles.logo} />
+      <Image source={require("../assets/profile.png")} style={styles.logo} />
       <View style={styles.groupInputs}>
       <Text style={styles.emailInstitucional}>Email institucional</Text>
       <TextInput

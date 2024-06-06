@@ -12,9 +12,9 @@ import { useFonts } from "expo-font";
 
 export default function LoginScreen({ navigation }) {
   const [fontsLoaded] = useFonts({
-    "Roboto-Light": require("./assets/fonts/Roboto-Light.ttf"),
-    "Roboto-Regular": require("./assets/fonts/Roboto-Regular.ttf"),
-    "Roboto-Medium": require("./assets/fonts/Roboto-Medium.ttf"),
+    "Roboto-Light": require("../assets/fonts/Roboto-Light.ttf"),
+    "Roboto-Regular": require("../assets/fonts/Roboto-Regular.ttf"),
+    "Roboto-Medium": require("../assets/fonts/Roboto-Medium.ttf"),
   });
 
 

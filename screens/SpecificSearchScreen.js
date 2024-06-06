@@ -15,9 +15,9 @@ const API_URL = 'http://localhost:3000'; // Atualize com o URL do seu JSON serve
 
 export default function SpecificSearchScreen({ navigation }) {
   const [fontsLoaded] = useFonts({
-    "Roboto-Light": require("./assets/fonts/Roboto-Light.ttf"),
-    "Roboto-Regular": require("./assets/fonts/Roboto-Regular.ttf"),
-    "Roboto-Medium": require("./assets/fonts/Roboto-Medium.ttf"),
+    "Roboto-Light": require("../assets/fonts/Roboto-Light.ttf"),
+    "Roboto-Regular": require("../assets/fonts/Roboto-Regular.ttf"),
+    "Roboto-Medium": require("../assets/fonts/Roboto-Medium.ttf"),
   });
 
   const [courses, setCourses] = useState([]);
@@ -75,7 +75,7 @@ export default function SpecificSearchScreen({ navigation }) {
   return (
     <View style={styles.container}>
       <Text style={styles.textSearch}>Pesquisa Específica</Text>
-      <Image source={require("./assets/fatec-logo.png")} style={styles.logo} />
+      <Image source={require("../assets/fatec-logo.png")} style={styles.logo} />
       
       <Text style={styles.lbl_course}>Curso</Text>
       <RNPickerSelect

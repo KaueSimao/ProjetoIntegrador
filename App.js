@@ -3,12 +3,12 @@ import { View, Image, StyleSheet, Text } from 'react-native';
 import { useFonts } from 'expo-font';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import LoginScreen from './LoginScreen';
-import HomeScreen from './HomeScreen';
-import SearchScreen from './SearchScreen';
-import ForgotPasswordScreen from './ForgotPasswordScreen';
-import AutoRegisterScreen from './AutoRegisterScreen';
-import SpecificSearchScreen from './SpecificSearchScreen';
+import LoginScreen from './screens/LoginScreen';
+import HomeScreen from './screens/HomeScreen';
+import SearchScreen from './screens/SearchScreen';
+import ForgotPasswordScreen from './screens/ForgotPasswordScreen';
+import AutoRegisterScreen from './screens/AutoRegisterScreen';
+import SpecificSearchScreen from './screens/SpecificSearchScreen';
 
 const Stack = createNativeStackNavigator();
 

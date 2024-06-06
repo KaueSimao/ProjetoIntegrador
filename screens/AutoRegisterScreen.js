@@ -13,9 +13,9 @@ import { useFonts } from "expo-font";
 
 export default function AutoRegisterScreen({ navigation }) {
   const [fontsLoaded] = useFonts({
-    "Roboto-Light": require("./assets/fonts/Roboto-Light.ttf"),
-    "Roboto-Regular": require("./assets/fonts/Roboto-Regular.ttf"),
-    "Roboto-Medium": require("./assets/fonts/Roboto-Medium.ttf"),
+    "Roboto-Light": require("../assets/fonts/Roboto-Light.ttf"),
+    "Roboto-Regular": require("../assets/fonts/Roboto-Regular.ttf"),
+    "Roboto-Medium": require("../assets/fonts/Roboto-Medium.ttf"),
   });
 
   const [nome, setNome] = useState("");
@@ -67,7 +67,7 @@ export default function AutoRegisterScreen({ navigation }) {
 
   return (
     <View style={styles.container}>
-      <Image source={require("./assets/fatec-logo.png")} style={styles.logo} />
+      <Image source={require("../assets/fatec-logo.png")} style={styles.logo} />
       <View style={styles.groupInputs}>
         <Text style={styles.label}>Nome Completo</Text>
         <TextInput
