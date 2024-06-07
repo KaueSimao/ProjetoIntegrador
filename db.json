@@ -1,4 +1,7 @@
 {
+  "students": [
+    { "id": 1, "name": "Jose Marcio", "password": "Marcio1234", "email": "josemarcio@fatec.sp.gov.br", "courseId": 5 }
+  ],
   "courses": [
     { "id": 1, "name": "Engenharia" },
     { "id": 2, "name": "Medicina" },

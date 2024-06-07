@@ -10,7 +10,7 @@ import {
 } from "react-native";
 import { useFonts } from "expo-font";
 
-export default function LoginScreen({ navigation }) {
+export default function SearchScreen({ navigation }) {
   const [fontsLoaded] = useFonts({
     "Roboto-Light": require("../assets/fonts/Roboto-Light.ttf"),
     "Roboto-Regular": require("../assets/fonts/Roboto-Regular.ttf"),

@@ -37,8 +37,12 @@ Menu
     <View style={styles.container}>
     <Text style={styles.search}>Pesquisa</Text>
     <TextInput style={styles.inputsearch} placeholder="Barra de Pesquisa:" />
+    <TouchableOpacity nPress={() => navigation.navigate("Search")} style={styles.button}>
+
+    </TouchableOpacity>
   </View>
 
+ 
 
   <TouchableOpacity style={styles.buttonNext}>
  <Text
