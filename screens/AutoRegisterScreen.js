@@ -43,6 +43,18 @@ export default function AutoRegisterScreen({ navigation }) {
           course: selectedCourse,
         }),
       });
+
+    const emailDomain = "@fatec.sp.gov.br";
+
+    if (!email.endsWith(emailDomain)) {
+      alert('Erro, por favor, utilize um email institucional.');
+      return;
+    }
+
+    if (senha !== confirmaSenha) {
+      alert('Erro, as senhas não coincidem.');
+      return;
+    }
   
       if (!response.ok) {
         throw new Error('Erro ao cadastrar');
