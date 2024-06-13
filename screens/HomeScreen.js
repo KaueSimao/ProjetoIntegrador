@@ -33,18 +33,8 @@ Menu
  </Text>
 </TouchableOpacity>
   
-    
-    <View style={styles.container}>
-    <Text style={styles.search}>Pesquisa</Text>
-    <TextInput style={styles.inputsearch} placeholder="Barra de Pesquisa:" />
-    <TouchableOpacity nPress={() => navigation.navigate("Search")} style={styles.button}>
 
-    </TouchableOpacity>
-  </View>
-
- 
-
-  <TouchableOpacity style={styles.buttonNext}>
+  <TouchableOpacity onPress={() => navigation.navigate("Search")} style={styles.buttonNext}>
  <Text
 style={styles.nextText}
   >
@@ -107,7 +97,7 @@ buttonText:{
 nextText:{
   fontSize: 42,
     fontFamily: "Roboto-Medium",
-    color: "black",
+    color: "white",
     alignItems: "center",
 },
 buttonNext:{
