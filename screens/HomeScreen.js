@@ -32,6 +32,8 @@ style={styles.buttonText}
 Menu
  </Text>
 </TouchableOpacity>
+
+sda
   
 
   <TouchableOpacity onPress={() => navigation.navigate("Search")} style={styles.buttonNext}>

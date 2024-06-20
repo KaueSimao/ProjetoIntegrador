@@ -158,8 +158,13 @@ export default function SpecificSearchScreen({ navigation }) {
         <Text style={styles.searchButtonText}>Pesquisar</Text>
       </TouchableOpacity>
 
+
       <TouchableOpacity style={styles.resetButton} onPress={resetFilters}>
         <Text style={styles.resetButtonText}>Redefinir Filtros</Text>
+      </TouchableOpacity>
+
+      <TouchableOpacity style={styles.reserButton} onPress={() => navigation.navigate("HomeScreen")}>
+        <Text style={styles.buttonText}>Voltar</Text>
       </TouchableOpacity>
 
       <View style={styles.table}>

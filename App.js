@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { View, Image, StyleSheet, Text } from 'react-native';
+import { View, Image, StyleSheet, Text, Button } from 'react-native';
 import { useFonts } from 'expo-font';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import axios from 'axios'; // Importar Axios para fazer requisições HTTP
+
 import LoginScreen from './screens/LoginScreen';
 import HomeScreen from './screens/HomeScreen';
 import SearchScreen from './screens/SearchScreen';
@@ -11,8 +13,6 @@ import AutoRegisterScreen from './screens/AutoRegisterScreen';
 import SpecificSearchScreen from './screens/SpecificSearchScreen';
 
 const Stack = createNativeStackNavigator();
-
-
 
 function LoadingScreen({ navigation }) {
   const [exibirTelaLogin, setExibirTelaLogin] = useState(false);
@@ -24,12 +24,42 @@ function LoadingScreen({ navigation }) {
   });
 
   useEffect(() => {
-    // Simula a exibição da tela inicial por 2 segundos
-    const timer = setTimeout(() => {
-      setExibirTelaLogin(true);
-    }, 3000); // Tempo em milissegundos (2 segundos)
-    return () => clearTimeout(timer);
+    const fetchData = async () => {
+      try {
+        // Aqui você faria a requisição GET para verificar se há dados de usuário salvos no backend
+        // Simulação: Setar exibirTelaLogin como true após 3 segundos
+        setTimeout(() => {
+          setExibirTelaLogin(true);
+        }, 3000);
+      } catch (error) {
+        console.error('Erro ao buscar dados do backend:', error);
+        // Trate o erro conforme necessário
+      }
+    };
+
+    fetchData();
   }, []);
+
+  const registrarUsuario = async () => {
+    try {
+      // Simulação de dados de usuário a serem enviados para o backend
+      const dadosUsuario = {
+        nome: 'Exemplo',
+        email: 'exemplo@email.com',
+        senha: 'senha123',
+      };
+
+      // Simulação de requisição POST para registrar usuário no backend
+      const response = await axios.post('http://seu-backend-url.com/api/usuarios', dadosUsuario);
+      console.log('Usuário registrado com sucesso:', response.data);
+
+      // Após registrar o usuário, redirecionar para a tela de login
+      navigation.navigate('Login');
+    } catch (error) {
+      console.error('Erro ao registrar usuário:', error);
+      // Trate o erro conforme necessário
+    }
+  };
 
   if (!fontsLoaded) {
     return null;
@@ -51,6 +81,7 @@ function LoadingScreen({ navigation }) {
             source={require('./assets/cps-logo.png')}
             style={styles.logoCps}
           />
+          <Button title="Registrar Usuário" onPress={registrarUsuario} />
         </View>
       )}
     </View>
@@ -63,7 +94,7 @@ function App() {
       <Stack.Navigator screenOptions={{ headerShown: false }}>
         <Stack.Screen name="Projeto Integrador" component={LoadingScreen} />
         <Stack.Screen name="Login" component={LoginScreen} />
-        <Stack.Screen name="Home" component={HomeScreen} />
+        <Stack.Screen name="HomeScreen" component={HomeScreen} />
         <Stack.Screen name="SearchScreen" component={SearchScreen} />
         <Stack.Screen
           name="ForgotPassword"
@@ -78,6 +109,7 @@ function App() {
 
 const styles = StyleSheet.create({
   container: {
+    flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
     textAlign: 'center',
@@ -101,18 +133,16 @@ const styles = StyleSheet.create({
     flexDirection: 'column',
   },
   logoFatec: {
-    position: 'fixed',
-    width: 789,
-    height: 386,
-    left: 145, // Coordenada X
-    top: 861, // Coordenada Y
+    position: 'absolute',
+    width: 300,
+    height: 150,
+    top: 600,
   },
   logoCps: {
-    position: 'fixed',
-    width: 325,
-    height: 177,
-    left: 377, // Coordenada X
-    top: 1914, // Coordenada Y
+    position: 'absolute',
+    width: 150,
+    height: 100,
+    top: 800,
   },
 });
 
