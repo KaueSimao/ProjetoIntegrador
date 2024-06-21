@@ -81,7 +81,7 @@ function LoadingScreen({ navigation }) {
             source={require('./assets/cps-logo.png')}
             style={styles.logoCps}
           />
-          <Button title="Registrar Usuário" onPress={registrarUsuario} />
+         
         </View>
       )}
     </View>
@@ -112,37 +112,31 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
-    textAlign: 'center',
-    flexDirection: 'column',
   },
   title: {
-    flex: 1,
-    fontSize: 48,
+    fontSize: 24,
     fontFamily: 'Roboto-Regular',
-    top: 400,
+    marginTop: 20,
   },
   subtitle: {
-    flex: 2,
-    fontSize: 48,
+    fontSize: 18,
     fontFamily: 'Roboto-Regular',
-    top: 410,
+    marginTop: 10,
   },
   loadingScreen: {
+    flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
-    flexDirection: 'column',
   },
   logoFatec: {
-    position: 'absolute',
-    width: 300,
-    height: 150,
-    top: 600,
+    width: 200,
+    height: 100,
+    marginTop: 20,
   },
   logoCps: {
-    position: 'absolute',
-    width: 150,
-    height: 100,
-    top: 800,
+    width: 100,
+    height: 70,
+    marginTop: 20,
   },
 });
 
