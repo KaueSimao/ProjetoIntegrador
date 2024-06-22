@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   View,
   Image,
@@ -10,6 +10,9 @@ import {
   Alert,
 } from "react-native";
 import { useFonts } from "expo-font";
+import { AsyncStorage } from "react-native";
+
+const API_URL = "http://localhost:3000"; // Endpoint da API simulada
 
 export default function LoginScreen({ navigation }) {
   const [fontsLoaded] = useFonts({
@@ -22,27 +25,51 @@ export default function LoginScreen({ navigation }) {
   const [password, setPassword] = useState("");
   const [rememberLogin, setRememberLogin] = useState(false);
 
-  const login = async () => {
+  useEffect(() => {
+    // Ao carregar a tela, verificar se há um login lembrado
+    checkRememberedLogin();
+  }, []);
+
+  const checkRememberedLogin = async () => {
     try {
-      const response = await fetch('nosso http', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ email, password }),
-      });
-
-      const data = await response.json();
-
-      if (response.ok) {
-        alert('Login bem-sucedido!');
-        navigation.navigate('Home');
-      } else {
-        alert(data.message || 'Email ou senha incorretos.');
+      const rememberedLogin = await AsyncStorage.getItem("rememberedLogin");
+      if (rememberedLogin) {
+        setRememberLogin(true);
+        // Aqui você poderia automaticamente logar o usuário com os dados salvos
+        // Mas para esta implementação, apenas mantemos o estado de rememberLogin
       }
     } catch (error) {
-      console.error(error);
-      alert('Erro ao tentar fazer login.');
+      console.error("Erro ao recuperar o estado de lembrar login", error);
+    }
+  };
+
+  const login = async () => {
+    try {
+      // Buscar o estudante correspondente ao email fornecido
+      const response = await fetch(`${API_URL}/students`);
+      const students = await response.json();
+      const user = students.find((student) => student.email === email);
+
+      if (!user || user.password !== password) {
+        alert("Erro, email ou senha incorretos.");
+        return;
+      }
+
+      // Login bem-sucedido
+      alert("Sucesso, login bem-sucedido!");
+
+      // Login bem-sucedido
+      if (rememberLogin) {
+        // Salvar o estado de lembrar login localmente
+        await AsyncStorage.setItem("rememberedLogin", JSON.stringify(user));
+      }
+
+      // Navegar para a tela Home ou outra tela necessária após o login
+      navigation.navigate("HomeScreen", { user });
+
+    } catch (error) {
+      console.error("Erro ao tentar fazer login", error);
+      alert("Erro ao tentar fazer login.");
     }
   };
 
@@ -83,7 +110,7 @@ export default function LoginScreen({ navigation }) {
         </TouchableOpacity>
       </View>
 
-      <TouchableOpacity style={styles.button} onPress={() => navigation.navigate("HomeScreen")}>
+      <TouchableOpacity style={styles.button} onPress={login}>
         <Text style={styles.buttonText}>ENTRAR</Text>
       </TouchableOpacity>
 

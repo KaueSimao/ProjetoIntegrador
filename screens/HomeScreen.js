@@ -1,108 +1,114 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from "react";
+import axios from "axios";
 import {
   View,
   Image,
-  TextInput,
   StyleSheet,
   Text,
   TouchableOpacity,
-  CheckBox,
 } from "react-native";
-import { useFonts } from 'expo-font';
-import { Button } from 'react-native-web';
+import { useFonts } from "expo-font";
 
-
-export default function LoginScreen({ navigation })
-{
- 
+export default function HomeScreen({ navigation, route }) {
   const [fontsLoaded] = useFonts({
-    'Roboto-Light': require('../assets/fonts/Roboto-Light.ttf'),
-    'Roboto-Regular': require('../assets/fonts/Roboto-Regular.ttf'),
-    'Roboto-Medium': require('../assets/fonts/Roboto-Medium.ttf'),
+    "Roboto-Light": require("../assets/fonts/Roboto-Light.ttf"),
+    "Roboto-Regular": require("../assets/fonts/Roboto-Regular.ttf"),
+    "Roboto-Medium": require("../assets/fonts/Roboto-Medium.ttf"),
   });
 
-  return(
-<View style={styles.container}>
+  const [user, setUser] = useState(null); // State para armazenar o usuário
 
-<TouchableOpacity onPress={() => navigation.navigate("SearchScreen")} style={styles.button}>
- <Text
- 
-style={styles.buttonText}
-  >
-Menu
- </Text>
-</TouchableOpacity>
+  useEffect(() => {
+    // Recuperar o usuário passado como parâmetro de navegação
+    if (route.params && route.params.user) {
+      setUser(route.params.user);
+    }
+    // Aqui você pode continuar com o resto do seu código de inicialização
+  }, [route.params]);
 
+  if (!fontsLoaded || !user) {
+    return null; // Pode mostrar um spinner de carregamento aqui
+  }
 
-  
-
-  <TouchableOpacity onPress={() => navigation.navigate("Search")} style={styles.buttonNext}>
- <Text
-style={styles.nextText}
-  >
-   Próximo
- </Text>
-</TouchableOpacity>
-  
-  </View>
-
-
-);
+  return (
+    <View style={styles.container}>
+      <Image source={require("../assets/fatec-logo.png")} style={styles.logo} />
+      <Text style={styles.title}>Seja Bem-Vindo, {user.name}</Text>
+      {/* Rest of your UI */}
+      <TouchableOpacity
+        style={styles.button}
+        onPress={() => navigation.navigate("Search")}
+      >
+        <Text style={styles.buttonText}>Grade de Horários</Text>
+      </TouchableOpacity>
+      <View style={styles.navbar}>
+        <TouchableOpacity
+          style={styles.navItem}
+          onPress={() => navigation.navigate("HomeScreen")}
+        >
+          <Text style={styles.navText}>Home</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={styles.navItem}
+          onPress={() => navigation.navigate("Login")}
+        >
+          <Text style={styles.navText}>Sair</Text>
+        </TouchableOpacity>
+      </View>
+    </View>
+  );
 }
 
-
-  const styles = StyleSheet.create({
-    container: {
-      flex: 1,
-      alignItems: 'center',
-      justifyContent: 'center',
-      paddingHorizontal: 20,
-    },
-    search: {
-      fontSize: 30, 
-      fontFamily: 'Roboto-Regular',
-      marginTop: 20, 
-      alignSelf: 'flex-start', 
-    },
-    inputsearch: {
-      fontSize: 30, 
-      fontFamily: 'Roboto-Regular',
-      width: '100%', 
-      height: 50,
-      marginTop: 10, 
-      paddingHorizontal: 15,
-      borderWidth: 1,
-      borderColor: '#CCC',
-      borderRadius: 5,
-    },
-    button: {
-      fontSize: 20, 
-      marginTop: 20, 
-      width: 150, 
-      height: 50, 
-      borderRadius: 8,
-      backgroundColor: '#666666',
-      alignItems: 'center',
-      justifyContent: 'center',
-    },
-    buttonText: {
-      fontSize: 24, 
-      fontFamily: 'Roboto-Medium',
-      color: 'black',
-    },
-    nextText: {
-      fontSize: 26, 
-      fontFamily: 'Roboto-Medium',
-      color: 'white',
-    },
-    buttonNext: {
-      marginTop: 50, 
-      width: '70%', 
-      height: 60,
-      borderRadius: 12,
-      backgroundColor: '#B20000',
-      justifyContent: 'center',
-      alignItems: 'center',
-    },
-  });
-
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    alignItems: "center",
+    backgroundColor: "#f4f4f4",
+    padding: 20,
+  },
+  logo: {
+    width: 200,
+    height: 100,
+    marginBottom: 30,
+  },
+  title: {
+    fontSize: 20,
+    fontWeight: "bold",
+    marginBottom: 100,
+    color: "#333",
+  },
+  button: {
+    width: "100%",
+    height: 40,
+    backgroundColor: "#B20000",
+    justifyContent: "center",
+    alignItems: "center",
+    borderRadius: 5,
+    marginBottom: 15,
+  },
+  buttonText: {
+    fontSize: 18,
+    fontFamily: "Roboto-Medium",
+    color: "white",
+  },
+  navbar: {
+    flexDirection: "row",
+    justifyContent: "space-around",
+    alignItems: "center",
+    backgroundColor: "#B20000",
+    width: "100%",
+    position: "absolute",
+    bottom: 0,
+    height: 60,
+  },
+  navItem: {
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  navText: {
+    color: "#fff",
+    fontFamily: "Roboto-Regular",
+    fontSize: 16,
+  },
+});

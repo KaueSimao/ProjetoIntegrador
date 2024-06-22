@@ -21,6 +21,7 @@ export default function AutoRegisterScreen({ navigation }) {
   const [nome, setNome] = useState("");
   const [email, setEmail] = useState("");
   const [senha, setSenha] = useState("");
+  const [confirmaSenha, setConfirmaSenha] = useState("");
   const [selectedCourse, setSelectedCourse] = useState(null);
   const courses = [
     { label: "Engenharia", value: "engenharia" },
@@ -30,46 +31,43 @@ export default function AutoRegisterScreen({ navigation }) {
   ];
 
   const cadastro = async () => {
+    const data = {
+      name: nome,
+      email: email,
+      password: senha,
+      courseId: selectedCourse,
+    };
     try {
       const response = await fetch('http://localhost:3000/students', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({
-          nome,
-          email,
-          password: senha,
-          course: selectedCourse,
-        }),
+        body: JSON.stringify(data),
       });
 
-    const emailDomain = "@fatec.sp.gov.br";
-
-    if (!email.endsWith(emailDomain)) {
-      alert('Erro, por favor, utilize um email institucional.');
-      return;
-    }
-
-    if (senha !== confirmaSenha) {
-      alert('Erro, as senhas não coincidem.');
-      return;
-    }
-  
-      if (!response.ok) {
-        throw new Error('Erro ao cadastrar');
+      // Verificar se as senhas coincidem
+      if (senha !== confirmaSenha) {
+        alert("Erro, as senhas não coincidem.");
+        return;
       }
-  
-      const data = await response.json();
-      alert('Cadastro realizado com sucesso!');
-      console.log(data);
 
-      // Navegar para a página de login após cadastro bem-sucedido
-      navigation.navigate('Login');
+      // Validar se todos os campos obrigatórios foram preenchidos
+      if (!nome || !email || !senha || !selectedCourse) {
+        alert("Erro, preencha todos os campos obrigatórios.");
+        return;
+      }
 
+      if (response.ok) {
+        alert("Sucesso, cadastro realizado com sucesso!");
+        // Redirecionar para a tela de login ou outra tela necessária após o cadastro
+        navigation.navigate("Login");
+      } else {
+        alert("Erro", data.message || "Erro ao tentar realizar o cadastro.");
+      }
     } catch (error) {
       console.error(error);
-      alert('Falha ao realizar o cadastro');
+      alert("Erro ao tentar realizar o cadastro.");
     }
   };
   
@@ -90,27 +88,29 @@ export default function AutoRegisterScreen({ navigation }) {
         <Text style={styles.label}>Email institucional</Text>
         <TextInput
           style={styles.input}
-          placeholder="Digite seu email: "
+          placeholder="Digite seu email:"
           onChangeText={(text) => setEmail(text)}
         />
         <Text style={styles.label}>Senha</Text>
         <TextInput
           style={styles.input}
-          placeholder="Digite sua senha: "
+          placeholder="Digite sua senha:"
           secureTextEntry={true}
           onChangeText={(text) => setSenha(text)}
         />
         <Text style={styles.label}>Repita a senha</Text>
         <TextInput
           style={styles.input}
-          placeholder="Digite sua senha:"
+          placeholder="Repita sua senha:"
           secureTextEntry={true}
+          onChangeText={(text) => setConfirmaSenha(text)}
         />
         <Text style={styles.label}>Curso</Text>
         <RNPickerSelect
           onValueChange={(value) => setSelectedCourse(value)}
           items={courses}
           placeholder={{ label: "Escolha seu curso:", value: null }}
+          style={pickerSelectStyles}
         />
         <TouchableOpacity
           style={styles.button}
@@ -126,48 +126,73 @@ export default function AutoRegisterScreen({ navigation }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 50,
+    padding: 20,
     alignItems: "center",
+    backgroundColor: "#fff",
   },
   groupInputs: {
-    alignItems: "center",
+    width: "100%",
     marginTop: 20,
-    width: 450,
+    paddingHorizontal: 20,
   },
   logo: {
-    width: 689,
-    height: 286,
-    marginBottom: 50,
+    width: 200,
+    height: 100,
+    marginBottom: 20,
+    resizeMode: "contain",
   },
   label: {
     fontSize: 16,
     fontFamily: "Roboto-Regular",
-    marginTop: 20,
-    alignSelf: "flex-start",
+    marginTop: 10,
+    marginBottom: 5,
+    color: "#333",
   },
   input: {
     fontSize: 16,
     fontFamily: "Roboto-Regular",
-    width: 450,
-    height: 50,
-    marginTop: 5,
-    padding: 10,
+    height: 40,
+    borderColor: "#ccc",
     borderWidth: 1,
-    borderColor: "#CCC",
     borderRadius: 5,
+    paddingHorizontal: 10,
+    marginBottom: 10,
   },
   button: {
-    marginTop: 30,
-    width: 200,
-    height: 50,
-    justifyContent: "center",
-    alignItems: "center",
-    borderRadius: 5,
     backgroundColor: "#B20000",
+    paddingVertical: 12,
+    borderRadius: 5,
+    alignItems: "center",
+    marginTop: 20,
   },
   buttonText: {
-    fontSize: 16,
+    color: "#fff",
     fontFamily: "Roboto-Medium",
-    color: "white",
+    fontSize: 16,
+  },
+});
+
+const pickerSelectStyles = StyleSheet.create({
+  inputIOS: {
+    fontSize: 16,
+    fontFamily: "Roboto-Regular",
+    height: 40,
+    borderColor: "#ccc",
+    borderWidth: 1,
+    borderRadius: 5,
+    paddingHorizontal: 10,
+    marginBottom: 10,
+    color: "#333",
+  },
+  inputAndroid: {
+    fontSize: 16,
+    fontFamily: "Roboto-Regular",
+    height: 40,
+    borderColor: "#ccc",
+    borderWidth: 1,
+    borderRadius: 5,
+    paddingHorizontal: 10,
+    marginBottom: 10,
+    color: "#333",
   },
 });

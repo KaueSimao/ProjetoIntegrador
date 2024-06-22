@@ -1,17 +1,19 @@
 import React, { useState, useEffect } from "react";
-import RNPickerSelect from 'react-native-picker-select';
-import axios from 'axios';
+import RNPickerSelect from "react-native-picker-select";
+import axios from "axios";
 import {
   View,
   Image,
   StyleSheet,
   Text,
   TouchableOpacity,
-  FlatList
+  FlatList,
+  ScrollView,
+  StatusBar,
 } from "react-native";
 import { useFonts } from "expo-font";
 
-const API_URL = 'http://localhost:3000'; 
+const API_URL = "http://localhost:3000";
 
 export default function SpecificSearchScreen({ navigation }) {
   const [fontsLoaded] = useFonts({
@@ -63,30 +65,41 @@ export default function SpecificSearchScreen({ navigation }) {
     let filteredTimetable = timetable;
 
     if (selectedCourse) {
-      filteredTimetable = filteredTimetable.filter(item => item.courseId === selectedCourse);
+      filteredTimetable = filteredTimetable.filter(
+        (item) => item.courseId === selectedCourse
+      );
     }
     if (selectedSemester) {
-      filteredTimetable = filteredTimetable.filter(item => item.semesterId === selectedSemester);
+      filteredTimetable = filteredTimetable.filter(
+        (item) => item.semesterId === selectedSemester
+      );
     }
     if (selectedTeacher) {
-      filteredTimetable = filteredTimetable.filter(item => item.teacherId === selectedTeacher);
+      filteredTimetable = filteredTimetable.filter(
+        (item) => item.teacherId === selectedTeacher
+      );
     }
     if (selectedDiscipline) {
-      filteredTimetable = filteredTimetable.filter(item => item.disciplineId === selectedDiscipline);
+      filteredTimetable = filteredTimetable.filter(
+        (item) => item.disciplineId === selectedDiscipline
+      );
     }
     if (selectedRoom) {
-      filteredTimetable = filteredTimetable.filter(item => item.roomId === selectedRoom);
+      filteredTimetable = filteredTimetable.filter(
+        (item) => item.roomId === selectedRoom
+      );
     }
 
     if (filteredTimetable.length === 0) {
-      setErrorMessage("Nenhum resultado encontrado para os filtros selecionados.");
+      setErrorMessage(
+        "Nenhum resultado encontrado para os filtros selecionados."
+      );
     } else {
       setErrorMessage(null);
     }
 
     setTimetable(filteredTimetable);
   };
-
 
   const resetFilters = () => {
     setSelectedCourse(null);
@@ -100,11 +113,24 @@ export default function SpecificSearchScreen({ navigation }) {
   const renderTimetableItem = ({ item }) => (
     <View style={styles.tableRow}>
       <Text style={styles.tableCell}>{item.id}</Text>
-      <Text style={styles.tableCell}>{courses.find(course => course.id === item.courseId)?.name}</Text>
-      <Text style={styles.tableCell}>{semesters.find(semester => semester.id === item.semesterId)?.name}</Text>
-      <Text style={styles.tableCell}>{teachers.find(teacher => teacher.id === item.teacherId)?.name}</Text>
-      <Text style={styles.tableCell}>{disciplines.find(discipline => discipline.id === item.disciplineId)?.name}</Text>
-      <Text style={styles.tableCell}>{rooms.find(room => room.id === item.roomId)?.name}</Text>
+      <Text style={styles.tableCell}>
+        {courses.find((course) => course.id === item.courseId)?.name}
+      </Text>
+      <Text style={styles.tableCell}>
+        {semesters.find((semester) => semester.id === item.semesterId)?.name}
+      </Text>
+      <Text style={styles.tableCell}>
+        {teachers.find((teacher) => teacher.id === item.teacherId)?.name}
+      </Text>
+      <Text style={styles.tableCell}>
+        {
+          disciplines.find((discipline) => discipline.id === item.disciplineId)
+            ?.name
+        }
+      </Text>
+      <Text style={styles.tableCell}>
+        {rooms.find((room) => room.id === item.roomId)?.name}
+      </Text>
       <Text style={styles.tableCell}>{item.time}</Text>
       <Text style={styles.tableCell}>{item.day}</Text>
     </View>
@@ -119,53 +145,69 @@ export default function SpecificSearchScreen({ navigation }) {
       <Image source={require("../assets/fatec-logo.png")} style={styles.logo} />
       <Text style={styles.title}>Filtro Específico</Text>
 
-      <RNPickerSelect
-        placeholder={{ label: "Selecione um curso", value: null }}
-        value={selectedCourse}
-        onValueChange={(value) => setSelectedCourse(value)}
-        items={courses.map(course => ({ label: course.name, value: course.id }))}
-      />
+      <View>
+      <ScrollView style={styles.filtersContainer}>
+        <RNPickerSelect
+          placeholder={{ label: "Selecione um curso", value: null }}
+          value={selectedCourse}
+          onValueChange={(value) => setSelectedCourse(value)}
+          items={courses.map((course) => ({
+            label: course.name,
+            value: course.id,
+          }))}
+          style={pickerSelectStyles}
+        />
 
-      <RNPickerSelect
-        placeholder={{ label: "Selecione um semestre", value: null }}
-        value={selectedSemester}
-        onValueChange={(value) => setSelectedSemester(value)}
-        items={semesters.map(semester => ({ label: semester.name, value: semester.id }))}
-      />
+        <RNPickerSelect
+          placeholder={{ label: "Selecione um semestre", value: null }}
+          value={selectedSemester}
+          onValueChange={(value) => setSelectedSemester(value)}
+          items={semesters.map((semester) => ({
+            label: semester.name,
+            value: semester.id,
+          }))}
+          style={pickerSelectStyles}
+        />
 
-      <RNPickerSelect
-        placeholder={{ label: "Selecione um professor", value: null }}
-        value={selectedTeacher}
-        onValueChange={(value) => setSelectedTeacher(value)}
-        items={teachers.map(teacher => ({ label: teacher.name, value: teacher.id }))}
-      />
+        <RNPickerSelect
+          placeholder={{ label: "Selecione um professor", value: null }}
+          value={selectedTeacher}
+          onValueChange={(value) => setSelectedTeacher(value)}
+          items={teachers.map((teacher) => ({
+            label: teacher.name,
+            value: teacher.id,
+          }))}
+          style={pickerSelectStyles}
+        />
 
-      <RNPickerSelect
-        placeholder={{ label: "Selecione uma disciplina", value: null }}
-        value={selectedDiscipline}
-        onValueChange={(value) => setSelectedDiscipline(value)}
-        items={disciplines.map(discipline => ({ label: discipline.name, value: discipline.id }))}
-      />
+        <RNPickerSelect
+          placeholder={{ label: "Selecione uma disciplina", value: null }}
+          value={selectedDiscipline}
+          onValueChange={(value) => setSelectedDiscipline(value)}
+          items={disciplines.map((discipline) => ({
+            label: discipline.name,
+            value: discipline.id,
+          }))}
+          style={pickerSelectStyles}
+        />
 
-      <RNPickerSelect
-        placeholder={{ label: "Selecione uma sala", value: null }}
-        value={selectedRoom}
-        onValueChange={(value) => setSelectedRoom(value)}
-        items={rooms.map(room => ({ label: room.name, value: room.id }))}
-      />
+        <RNPickerSelect
+          placeholder={{ label: "Selecione uma sala", value: null }}
+          value={selectedRoom}
+          onValueChange={(value) => setSelectedRoom(value)}
+          items={rooms.map((room) => ({ label: room.name, value: room.id }))}
+          style={pickerSelectStyles}
+        />
+      </ScrollView>
 
-      <TouchableOpacity style={styles.searchButton} onPress={handleSearch}>
-        <Text style={styles.searchButtonText}>Pesquisar</Text>
-      </TouchableOpacity>
+        <TouchableOpacity style={styles.searchButton} onPress={handleSearch}>
+          <Text style={styles.searchButtonText}>Pesquisar</Text>
+        </TouchableOpacity>
 
-
-      <TouchableOpacity style={styles.resetButton} onPress={resetFilters}>
-        <Text style={styles.resetButtonText}>Redefinir Filtros</Text>
-      </TouchableOpacity>
-
-      <TouchableOpacity style={styles.reserButton} onPress={() => navigation.navigate("HomeScreen")}>
-        <Text style={styles.buttonText}>Voltar</Text>
-      </TouchableOpacity>
+        <TouchableOpacity style={styles.resetButton} onPress={resetFilters}>
+          <Text style={styles.resetButtonText}>Redefinir Filtros</Text>
+        </TouchableOpacity>
+      </View>
 
       <View style={styles.table}>
         <View style={styles.tableHeader}>
@@ -181,82 +223,171 @@ export default function SpecificSearchScreen({ navigation }) {
         <FlatList
           data={timetable}
           renderItem={renderTimetableItem}
-          keyExtractor={item => item.id.toString()}
+          keyExtractor={(item) => item.id.toString()}
         />
       </View>
-      {errorMessage && (
-        <Text style={styles.errorMessage}>{errorMessage}</Text>
-      )}
+      {errorMessage && <Text style={styles.errorMessage}>{errorMessage}</Text>}
+      <View style={styles.navbar}>
+        <TouchableOpacity
+          style={styles.navItem}
+          onPress={() => navigation.navigate("HomeScreen")}
+        >
+          <Text style={styles.navText}>Home</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={styles.navItem}
+          onPress={() => navigation.navigate("Login")}
+        >
+          <Text style={styles.navText}>Sair</Text>
+        </TouchableOpacity>
+      </View>
     </View>
   );
 }
 
+const pickerSelectStyles = StyleSheet.create({
+  inputIOS: {
+    fontSize: 16,
+    paddingVertical: 12,
+    paddingHorizontal: 10,
+    borderWidth: 1,
+    borderColor: "#ddd",
+    borderRadius: 4,
+    color: "#444",
+    paddingRight: 30,
+    marginBottom: 20,
+    backgroundColor: "#f9f9f9",
+  },
+  inputAndroid: {
+    fontSize: 16,
+    paddingHorizontal: 10,
+    paddingVertical: 8,
+    borderWidth: 0.5,
+    borderColor: "#ddd",
+    borderRadius: 4,
+    color: "#444",
+    paddingRight: 30,
+    marginBottom: 20,
+    backgroundColor: "#f9f9f9",
+  },
+});
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    overflow: "scroll",
     alignItems: "center",
-    backgroundColor: "#fff",
-    padding: 20,
+    backgroundColor: "#f4f4f4",
   },
   logo: {
     width: 200,
     height: 100,
     marginBottom: 20,
-    left: 400,
   },
   title: {
-    fontSize: 24,
+    fontSize: 28,
     fontWeight: "bold",
     marginBottom: 20,
+    color: "#333",
+  },
+  filtersContainer: {
+    width: "100%",
   },
   searchButton: {
-    backgroundColor: "blue",
-    padding: 10,
-    borderRadius: 5,
+    backgroundColor: "#6200ea",
+    padding: 12,
+    borderRadius: 8,
     marginTop: 10,
+    alignItems: "center",
   },
   searchButtonText: {
     color: "white",
-    textAlign: "center",
+    fontSize: 16,
+    fontWeight: "bold",
   },
   resetButton: {
-    backgroundColor: "red",
-    padding: 10,
-    borderRadius: 5,
+    backgroundColor: "#e53935",
+    padding: 12,
+    borderRadius: 8,
     marginTop: 10,
+    alignItems: "center",
   },
   resetButtonText: {
     color: "white",
-    textAlign: "center",
+    fontSize: 16,
+    fontWeight: "bold",
+  },
+  backButton: {
+    backgroundColor: "#757575",
+    padding: 12,
+    borderRadius: 8,
+    marginTop: 10,
+    alignItems: "center",
+  },
+  backButtonText: {
+    color: "white",
+    fontSize: 16,
+    fontWeight: "bold",
   },
   table: {
     marginTop: 20,
-    width: "90%",
+    width: "100%",
     borderWidth: 1,
-    borderColor: "#000",
+    borderColor: "#ddd",
+    borderRadius: 8,
+    backgroundColor: "#fff",
   },
   tableHeader: {
     flexDirection: "row",
-    backgroundColor: "#f1f1f1",
+    backgroundColor: "#6200ea",
     borderBottomWidth: 1,
-    borderBottomColor: "#000",
+    borderBottomColor: "#ddd",
+    borderTopLeftRadius: 8,
+    borderTopRightRadius: 8,
   },
   tableHeaderText: {
     flex: 1,
     fontSize: 16,
     fontWeight: "bold",
     textAlign: "center",
+    color: "white",
     padding: 10,
   },
   tableRow: {
     flexDirection: "row",
     borderBottomWidth: 1,
-    borderBottomColor: "#000",
+    borderBottomColor: "#ddd",
   },
   tableCell: {
     flex: 1,
     fontSize: 14,
     textAlign: "center",
     padding: 10,
+    color: "#333",
+  },
+  errorMessage: {
+    marginTop: 20,
+    color: "red",
+    fontWeight: "bold",
+  },
+  navbar: {
+    flexDirection: "row",
+    justifyContent: "space-around",
+    alignItems: "center",
+    backgroundColor: "#B20000",
+    width: "100%",
+    position: "fixed",
+    height: 60,
+    bottom: 0,
+  },
+  navItem: {
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  navText: {
+    color: "#fff",
+    fontFamily: "Roboto-Regular",
+    fontSize: 16,
   },
 });

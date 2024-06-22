@@ -134,7 +134,7 @@ const styles = StyleSheet.create({
     marginTop: 20,
   },
   logoCps: {
-    width: 100,
+    width: 110,
     height: 70,
     marginTop: 20,
   },
