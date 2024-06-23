@@ -10,7 +10,7 @@ import {
   Alert,
 } from "react-native";
 import { useFonts } from "expo-font";
-import { AsyncStorage } from "react-native";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const API_URL = "http://localhost:3000"; // Endpoint da API simulada
 
@@ -34,9 +34,10 @@ export default function LoginScreen({ navigation }) {
     try {
       const rememberedLogin = await AsyncStorage.getItem("rememberedLogin");
       if (rememberedLogin) {
+        const user = JSON.parse(rememberedLogin);
+        setEmail(user.email);
+        setPassword(user.password);
         setRememberLogin(true);
-        // Aqui você poderia automaticamente logar o usuário com os dados salvos
-        // Mas para esta implementação, apenas mantemos o estado de rememberLogin
       }
     } catch (error) {
       console.error("Erro ao recuperar o estado de lembrar login", error);
@@ -58,10 +59,12 @@ export default function LoginScreen({ navigation }) {
       // Login bem-sucedido
       alert("Sucesso, login bem-sucedido!");
 
-      // Login bem-sucedido
       if (rememberLogin) {
         // Salvar o estado de lembrar login localmente
         await AsyncStorage.setItem("rememberedLogin", JSON.stringify(user));
+      } else {
+        // Remover o estado de lembrar login se a opção não estiver selecionada
+        await AsyncStorage.removeItem("rememberedLogin");
       }
 
       // Navegar para a tela Home ou outra tela necessária após o login

@@ -294,7 +294,7 @@ const styles = StyleSheet.create({
     width: "100%",
   },
   searchButton: {
-    backgroundColor: "#6200ea",
+    backgroundColor: "#000",
     padding: 12,
     borderRadius: 8,
     marginTop: 10,
@@ -306,7 +306,7 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
   },
   resetButton: {
-    backgroundColor: "#e53935",
+    backgroundColor: "#B20000",
     padding: 12,
     borderRadius: 8,
     marginTop: 10,
@@ -339,7 +339,7 @@ const styles = StyleSheet.create({
   },
   tableHeader: {
     flexDirection: "row",
-    backgroundColor: "#6200ea",
+    backgroundColor: "#000",
     borderBottomWidth: 1,
     borderBottomColor: "#ddd",
     borderTopLeftRadius: 8,

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useCallback } from "react";
 import {
   View,
   Image,
@@ -10,6 +10,7 @@ import {
 } from "react-native";
 import RNPickerSelect from "react-native-picker-select";
 import { useFonts } from "expo-font";
+import { useFocusEffect } from "@react-navigation/native";
 
 export default function AutoRegisterScreen({ navigation }) {
   const [fontsLoaded] = useFonts({
@@ -31,12 +32,31 @@ export default function AutoRegisterScreen({ navigation }) {
   ];
 
   const cadastro = async () => {
+    // Validar se todos os campos obrigatórios foram preenchidos
+    if (!nome || !email || !senha || !selectedCourse) {
+      alert("Erro, preencha todos os campos obrigatórios.");
+      return;
+    }
+
+    // Verificar se as senhas coincidem
+    if (senha !== confirmaSenha) {
+      alert("Erro, as senhas não coincidem.");
+      return;
+    }
+
+    // Verificar se o email é institucional
+    if (!email.endsWith("@fatec.sp.gov.br")) {
+      alert("O email precisa ser institucional.");
+      return;
+    }
+
     const data = {
       name: nome,
       email: email,
       password: senha,
       courseId: selectedCourse,
     };
+
     try {
       const response = await fetch('http://localhost:3000/students', {
         method: 'POST',
@@ -46,31 +66,32 @@ export default function AutoRegisterScreen({ navigation }) {
         body: JSON.stringify(data),
       });
 
-      // Verificar se as senhas coincidem
-      if (senha !== confirmaSenha) {
-        alert("Erro, as senhas não coincidem.");
-        return;
-      }
-
-      // Validar se todos os campos obrigatórios foram preenchidos
-      if (!nome || !email || !senha || !selectedCourse) {
-        alert("Erro, preencha todos os campos obrigatórios.");
-        return;
-      }
-
       if (response.ok) {
         alert("Sucesso, cadastro realizado com sucesso!");
         // Redirecionar para a tela de login ou outra tela necessária após o cadastro
         navigation.navigate("Login");
       } else {
-        alert("Erro", data.message || "Erro ao tentar realizar o cadastro.");
+        const responseData = await response.json();
+        alert("Erro", responseData.message || "Erro ao tentar realizar o cadastro.");
       }
+
     } catch (error) {
       console.error(error);
       alert("Erro ao tentar realizar o cadastro.");
     }
   };
   
+  useFocusEffect(
+    useCallback(() => {
+      // Resetar os campos quando a tela ganha foco
+      setNome("");
+      setEmail("");
+      setSenha("");
+      setConfirmaSenha("");
+      setSelectedCourse(null);
+    }, [])
+  );
+
   if (!fontsLoaded) {
     return null;
   }
@@ -84,12 +105,14 @@ export default function AutoRegisterScreen({ navigation }) {
           style={styles.input}
           placeholder="Digite seu nome:"
           onChangeText={(text) => setNome(text)}
+          value={nome}
         />
         <Text style={styles.label}>Email institucional</Text>
         <TextInput
           style={styles.input}
           placeholder="Digite seu email:"
           onChangeText={(text) => setEmail(text)}
+          value={email}
         />
         <Text style={styles.label}>Senha</Text>
         <TextInput
@@ -97,6 +120,7 @@ export default function AutoRegisterScreen({ navigation }) {
           placeholder="Digite sua senha:"
           secureTextEntry={true}
           onChangeText={(text) => setSenha(text)}
+          value={senha}
         />
         <Text style={styles.label}>Repita a senha</Text>
         <TextInput
@@ -104,6 +128,7 @@ export default function AutoRegisterScreen({ navigation }) {
           placeholder="Repita sua senha:"
           secureTextEntry={true}
           onChangeText={(text) => setConfirmaSenha(text)}
+          value={confirmaSenha}
         />
         <Text style={styles.label}>Curso</Text>
         <RNPickerSelect
@@ -111,12 +136,20 @@ export default function AutoRegisterScreen({ navigation }) {
           items={courses}
           placeholder={{ label: "Escolha seu curso:", value: null }}
           style={pickerSelectStyles}
+          value={selectedCourse}
         />
         <TouchableOpacity
           style={styles.button}
           onPress={cadastro}
         >
           <Text style={styles.buttonText}>CADASTRAR</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={styles.buttonVoltar}
+          onPress={() => navigation.navigate("Login")}
+        >
+          <Text style={styles.buttonText}>VOLTAR</Text>
         </TouchableOpacity>
       </View>
     </View>
@@ -132,13 +165,12 @@ const styles = StyleSheet.create({
   },
   groupInputs: {
     width: "100%",
-    marginTop: 20,
     paddingHorizontal: 20,
   },
   logo: {
     width: 200,
     height: 100,
-    marginBottom: 20,
+    marginBottom: 10,
     resizeMode: "contain",
   },
   label: {
@@ -164,6 +196,13 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     alignItems: "center",
     marginTop: 20,
+  },
+  buttonVoltar: {
+    backgroundColor: "#000",
+    paddingVertical: 12,
+    borderRadius: 5,
+    alignItems: "center",
+    marginTop: 10,
   },
   buttonText: {
     color: "#fff",

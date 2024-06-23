@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import {
   View,
   Image,
@@ -23,8 +23,16 @@ export default function HomeScreen({ navigation, route }) {
     if (route.params && route.params.user) {
       setUser(route.params.user);
     }
-    // Aqui você pode continuar com o resto do seu código de inicialização
   }, [route.params]);
+
+  const logout = async () => {
+    try {
+      await AsyncStorage.removeItem("rememberedLogin");
+      navigation.navigate("Login");
+    } catch (error) {
+      console.error("Erro ao tentar fazer logout", error);
+    }
+  };
 
   if (!fontsLoaded || !user) {
     return null; // Pode mostrar um spinner de carregamento aqui
@@ -50,7 +58,7 @@ export default function HomeScreen({ navigation, route }) {
         </TouchableOpacity>
         <TouchableOpacity
           style={styles.navItem}
-          onPress={() => navigation.navigate("Login")}
+          onPress={logout}
         >
           <Text style={styles.navText}>Sair</Text>
         </TouchableOpacity>
