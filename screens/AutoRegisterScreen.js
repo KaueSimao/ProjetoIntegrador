@@ -31,28 +31,44 @@ export default function AutoRegisterScreen({ navigation }) {
     { label: "Administração", value: "administracao" },
   ];
 
-  const cadastro = async () => {
-    // Validar se todos os campos obrigatórios foram preenchidos
-    if (!nome || !email || !senha || !selectedCourse) {
-      alert("Erro, preencha todos os campos obrigatórios.");
-      return;
+  const validateFields = () => {
+    // Trim whitespace from inputs
+    const trimmedNome = nome.trim();
+    const trimmedEmail = email.trim();
+    const trimmedSenha = senha.trim();
+    const trimmedConfirmaSenha = confirmaSenha.trim();
+    const regex = /^[\s]+$/;
+
+    // Validate name: no special characters
+    const nameRegex = /^[A-Za-z\s]+$/;
+    if (!trimmedNome || !nameRegex.test(trimmedNome)) {
+      alert("Erro, nome deve conter apenas letras e espaços.");
+      return false;
     }
 
-    // Verificar se as senhas coincidem
-    if (senha !== confirmaSenha) {
+    // Validate email: must be institutional
+    if (!trimmedEmail.endsWith("@fatec.sp.gov.br") && !regex.test(trimmedEmail)) {
+      alert("Erro, o email precisa ser institucional.");
+      return false;
+    }
+
+    // Validate password match
+    if (trimmedSenha !== trimmedConfirmaSenha) {
       alert("Erro, as senhas não coincidem.");
-      return;
+      return false;
     }
 
-    // Verificar se o email é institucional
-    if (!email.endsWith("@fatec.sp.gov.br")) {
-      alert("O email precisa ser institucional.");
+    return true;
+  };
+
+  const cadastro = async () => {
+    if (!validateFields()) {
       return;
     }
 
     const data = {
-      name: nome,
-      email: email,
+      name: nome.trim(), // Ensure trimmed value is used for saving
+      email: email.trim(), // Ensure trimmed value is used for saving
       password: senha,
       courseId: selectedCourse,
     };
@@ -68,7 +84,6 @@ export default function AutoRegisterScreen({ navigation }) {
 
       if (response.ok) {
         alert("Sucesso, cadastro realizado com sucesso!");
-        // Redirecionar para a tela de login ou outra tela necessária após o cadastro
         navigation.navigate("Login");
       } else {
         const responseData = await response.json();
@@ -80,10 +95,9 @@ export default function AutoRegisterScreen({ navigation }) {
       alert("Erro ao tentar realizar o cadastro.");
     }
   };
-  
+
   useFocusEffect(
     useCallback(() => {
-      // Resetar os campos quando a tela ganha foco
       setNome("");
       setEmail("");
       setSenha("");
@@ -111,7 +125,7 @@ export default function AutoRegisterScreen({ navigation }) {
         <TextInput
           style={styles.input}
           placeholder="Digite seu email:"
-          onChangeText={(text) => setEmail(text)}
+          onChangeText={(text) => setEmail(text.trim())}
           value={email}
         />
         <Text style={styles.label}>Senha</Text>
@@ -119,15 +133,16 @@ export default function AutoRegisterScreen({ navigation }) {
           style={styles.input}
           placeholder="Digite sua senha:"
           secureTextEntry={true}
-          onChangeText={(text) => setSenha(text)}
+          onChangeText={(text) => setSenha(text.trim())} // Trim input
           value={senha}
         />
+
         <Text style={styles.label}>Repita a senha</Text>
         <TextInput
           style={styles.input}
           placeholder="Repita sua senha:"
           secureTextEntry={true}
-          onChangeText={(text) => setConfirmaSenha(text)}
+          onChangeText={(text) => setConfirmaSenha(text.trim())} // Trim input
           value={confirmaSenha}
         />
         <Text style={styles.label}>Curso</Text>

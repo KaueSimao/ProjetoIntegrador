@@ -13,41 +13,6 @@
       "email": "carlos.eduardo@gmail.com",
       "password": "carlos123",
       "courseId": "engenharia"
-    },
-    {
-      "id": "ae5b",
-      "name": "sasas",
-      "email": "sasas",
-      "password": "sasa",
-      "courseId": "engenharia"
-    },
-    {
-      "id": "de79",
-      "name": "a",
-      "email": "a@fatec.sp.gov.br",
-      "password": "a",
-      "courseId": "engenharia"
-    },
-    {
-      "id": "db84",
-      "name": "a",
-      "email": "a@fatec.sp.gov.br",
-      "password": "a",
-      "courseId": "medicina"
-    },
-    {
-      "id": "f897",
-      "name": "a",
-      "email": "a@fatec.sp.gov.br",
-      "password": "a",
-      "courseId": "administracao"
-    },
-    {
-      "id": "b689",
-      "name": "a",
-      "email": "a@fatec.sp.gov.br",
-      "password": "a",
-      "courseId": "engenharia"
     }
   ],
   "courses": [
