@@ -5,10 +5,10 @@ import {
   TextInput,
   StyleSheet,
   Text,
-  TouchableOpacity,
-  Alert,
+  TouchableOpacity
 } from "react-native";
 import RNPickerSelect from "react-native-picker-select";
+import AwesomeAlert from 'react-native-awesome-alerts';
 import { useFonts } from "expo-font";
 import { useFocusEffect } from "@react-navigation/native";
 
@@ -24,6 +24,10 @@ export default function AutoRegisterScreen({ navigation }) {
   const [senha, setSenha] = useState("");
   const [confirmaSenha, setConfirmaSenha] = useState("");
   const [selectedCourse, setSelectedCourse] = useState(null);
+  const [alertVisible, setAlertVisible] = useState(false);
+  const [alertMessage, setAlertMessage] = useState("");
+  const [redirectToLogin, setRedirectToLogin] = useState(false);
+
   const courses = [
     { label: "Engenharia", value: "engenharia" },
     { label: "Medicina", value: "medicina" },
@@ -32,29 +36,34 @@ export default function AutoRegisterScreen({ navigation }) {
   ];
 
   const validateFields = () => {
-    // Trim whitespace from inputs
     const trimmedNome = nome.trim();
     const trimmedEmail = email.trim();
     const trimmedSenha = senha.trim();
     const trimmedConfirmaSenha = confirmaSenha.trim();
     const regex = /^[\s]+$/;
 
-    // Validate name: no special characters
     const nameRegex = /^[A-Za-z\s]+$/;
     if (!trimmedNome || !nameRegex.test(trimmedNome)) {
-      alert("Erro, nome deve conter apenas letras e espaços.");
+      setAlertMessage("Erro, o nome deve conter apenas letras e espaços.");
+      setAlertVisible(true);
       return false;
     }
 
-    // Validate email: must be institutional
     if (!trimmedEmail.endsWith("@fatec.sp.gov.br") && !regex.test(trimmedEmail)) {
-      alert("Erro, o email precisa ser institucional.");
+      setAlertMessage("Erro, o email precisa ser institucional.");
+      setAlertVisible(true);
       return false;
     }
 
-    // Validate password match
+    if (trimmedSenha === "" && trimmedConfirmaSenha === "") {
+      setAlertMessage("Erro, digite uma senha.");
+      setAlertVisible(true);
+      return false;
+    }
+
     if (trimmedSenha !== trimmedConfirmaSenha) {
-      alert("Erro, as senhas não coincidem.");
+      setAlertMessage("Erro, as senhas não coincidem.");
+      setAlertVisible(true);
       return false;
     }
 
@@ -67,8 +76,8 @@ export default function AutoRegisterScreen({ navigation }) {
     }
 
     const data = {
-      name: nome.trim(), // Ensure trimmed value is used for saving
-      email: email.trim(), // Ensure trimmed value is used for saving
+      name: nome.trim(),
+      email: email.trim(),
       password: senha,
       courseId: selectedCourse,
     };
@@ -83,16 +92,18 @@ export default function AutoRegisterScreen({ navigation }) {
       });
 
       if (response.ok) {
-        alert("Sucesso, cadastro realizado com sucesso!");
-        navigation.navigate("Login");
+        setAlertMessage("Sucesso, cadastro realizado com sucesso!");
+        setAlertVisible(true);
+        setRedirectToLogin(true); // Defina para redirecionar após a confirmação
       } else {
         const responseData = await response.json();
-        alert("Erro", responseData.message || "Erro ao tentar realizar o cadastro.");
+        setAlertMessage(responseData.message || "Erro ao tentar realizar o cadastro.");
+        setAlertVisible(true);
       }
-
     } catch (error) {
       console.error(error);
-      alert("Erro ao tentar realizar o cadastro.");
+      setAlertMessage("Erro ao tentar realizar o cadastro.");
+      setAlertVisible(true);
     }
   };
 
@@ -133,16 +144,15 @@ export default function AutoRegisterScreen({ navigation }) {
           style={styles.input}
           placeholder="Digite sua senha:"
           secureTextEntry={true}
-          onChangeText={(text) => setSenha(text.trim())} // Trim input
+          onChangeText={(text) => setSenha(text.trim())}
           value={senha}
         />
-
         <Text style={styles.label}>Repita a senha</Text>
         <TextInput
           style={styles.input}
           placeholder="Repita sua senha:"
           secureTextEntry={true}
-          onChangeText={(text) => setConfirmaSenha(text.trim())} // Trim input
+          onChangeText={(text) => setConfirmaSenha(text.trim())}
           value={confirmaSenha}
         />
         <Text style={styles.label}>Curso</Text>
@@ -159,7 +169,6 @@ export default function AutoRegisterScreen({ navigation }) {
         >
           <Text style={styles.buttonText}>CADASTRAR</Text>
         </TouchableOpacity>
-
         <TouchableOpacity
           style={styles.buttonVoltar}
           onPress={() => navigation.navigate("Login")}
@@ -167,6 +176,27 @@ export default function AutoRegisterScreen({ navigation }) {
           <Text style={styles.buttonText}>VOLTAR</Text>
         </TouchableOpacity>
       </View>
+      <AwesomeAlert
+        show={alertVisible}
+        showProgress={false}
+        title="Atenção"
+        message={alertMessage}
+        closeOnTouchOutside={false}
+        closeOnHardwareBackPress={false}
+        showCancelButton={false}
+        showConfirmButton={true}
+        confirmText="OK"
+        confirmButtonColor="#000"
+        onConfirmPressed={() => {
+          setAlertVisible(false);
+          if (redirectToLogin) {
+            navigation.navigate("Login"); // Redirecionar para a tela de login
+          }
+        }}
+        titleStyle={styles.alertTitle}
+        messageStyle={styles.alertMessage}
+        confirmButtonTextStyle={styles.alertButtonText}
+      />
     </View>
   );
 }
@@ -223,6 +253,21 @@ const styles = StyleSheet.create({
     color: "#fff",
     fontFamily: "Roboto-Medium",
     fontSize: 16,
+  },
+  alertTitle: {
+    fontFamily: "Roboto-Medium",
+    fontSize: 18,
+    color: "#B20000",
+  },
+  alertMessage: {
+    fontFamily: "Roboto-Regular",
+    fontSize: 16,
+    color: "#333",
+  },
+  alertButtonText: {
+    fontFamily: "Roboto-Medium",
+    fontSize: 16,
+    color: "#fff",
   },
 });
 

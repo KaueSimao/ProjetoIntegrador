@@ -1,13 +1,8 @@
 import React, { useState, useEffect } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import {
-  View,
-  Image,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-} from "react-native";
+import { View, Image, StyleSheet, Text, TouchableOpacity } from "react-native";
 import { useFonts } from "expo-font";
+import AwesomeAlert from "react-native-awesome-alerts";
 
 export default function HomeScreen({ navigation, route }) {
   const [fontsLoaded] = useFonts({
@@ -17,6 +12,7 @@ export default function HomeScreen({ navigation, route }) {
   });
 
   const [user, setUser] = useState(null); // State para armazenar o usuário
+  const [showAlert, setShowAlert] = useState(false); // Estado para mostrar o alerta
 
   useEffect(() => {
     // Recuperar o usuário passado como parâmetro de navegação
@@ -32,6 +28,19 @@ export default function HomeScreen({ navigation, route }) {
     } catch (error) {
       console.error("Erro ao tentar fazer logout", error);
     }
+  };
+
+  const handleLogout = () => {
+    setShowAlert(true);
+  };
+
+  const handleConfirmLogout = () => {
+    setShowAlert(false);
+    logout();
+  };
+
+  const handleCancelLogout = () => {
+    setShowAlert(false);
   };
 
   if (!fontsLoaded || !user) {
@@ -58,11 +67,27 @@ export default function HomeScreen({ navigation, route }) {
         </TouchableOpacity>
         <TouchableOpacity
           style={styles.navItem}
-          onPress={logout}
+          onPress={handleLogout}
         >
           <Text style={styles.navText}>Sair</Text>
         </TouchableOpacity>
       </View>
+      <AwesomeAlert
+        show={showAlert}
+        showProgress={false}
+        title="Confirmação"
+        message="Você realmente deseja sair?"
+        closeOnTouchOutside={false}
+        closeOnHardwareBackPress={false}
+        showCancelButton={true}
+        showConfirmButton={true}
+        cancelText="Cancelar"
+        confirmText="Sair"
+        cancelButtonColor="#000"
+        confirmButtonColor="#B20000"
+        onCancelPressed={handleCancelLogout}
+        onConfirmPressed={handleConfirmLogout}
+      />
     </View>
   );
 }

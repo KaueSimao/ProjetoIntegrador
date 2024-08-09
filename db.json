@@ -13,6 +13,20 @@
       "email": "carlos.eduardo@gmail.com",
       "password": "carlos123",
       "courseId": "engenharia"
+    },
+    {
+      "name": "Matheus Marques",
+      "email": "marques@fatec.sp.gov.br",
+      "password": "1234",
+      "courseId": "engenharia",
+      "id": "WkDw_-b"
+    },
+    {
+      "name": "Marcos Silva",
+      "email": "marcossilva@fatec.sp.gov.br",
+      "password": "marcos123",
+      "courseId": "medicina",
+      "id": "0rKXCMD"
     }
   ],
   "courses": [

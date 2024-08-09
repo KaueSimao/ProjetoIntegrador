@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, Image } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, Image} from 'react-native';
 import { useFonts } from 'expo-font';
-// provavelmente o erro é no app.js 
+
 const ForgotPasswordScreen = ({ navigation }) => {
   const [email, setEmail] = useState('');
 
@@ -12,7 +12,7 @@ const ForgotPasswordScreen = ({ navigation }) => {
   });
 
   if (!fontsLoaded) {
-    return null; 
+    return null;
   }
 
   const handleForgotPassword = () => {
@@ -21,95 +21,87 @@ const ForgotPasswordScreen = ({ navigation }) => {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.textRecoverPassword}>RECUPERAR SENHA </Text>
+      <Text style={styles.textRecoverPassword}>RECUPERAR SENHA</Text>
       <Image source={require("../assets/profile.png")} style={styles.logo} />
       <View style={styles.groupInputs}>
-      <Text style={styles.emailInstitucional}>Email institucional</Text>
-      <TextInput
-        style={styles.inputEmail}
-        placeholder="Digite seu email: "
-        value={email}
-        onChangeText={(text) => setEmail(text)}
-        keyboardType="email-address"
-        autoCapitalize="none"
-        autoCorrect={false}
-      />
-
-      <TouchableOpacity
-        title="Enviar"
-        onPress={handleForgotPassword}
-        style={styles.button1}
-      >
-        <Text style={styles.buttonText}>ENTRAR</Text>
-      </TouchableOpacity>
-
-      <TouchableOpacity
-        onPress={() => navigation.goBack()}
-        style={styles.button2}
-      >
-        <Text style={styles.buttonText} onPress={() => navigation.goBack()}>VOLTAR</Text>
-      </TouchableOpacity>
-    </View>
+        <Text style={styles.emailInstitucional}>Email institucional</Text>
+        <TextInput
+          style={styles.inputEmail}
+          placeholder="Digite seu email: "
+          value={email}
+          onChangeText={(text) => setEmail(text)}
+          keyboardType="email-address"
+          autoCapitalize="none"
+          autoCorrect={false}
+        />
+        <TouchableOpacity
+          onPress={handleForgotPassword}
+          style={styles.button1}
+        >
+          <Text style={styles.buttonText}>ENVIAR</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          onPress={() => navigation.goBack()}
+          style={styles.button2}
+        >
+          <Text style={styles.buttonText}>VOLTAR</Text>
+        </TouchableOpacity>
+      </View>
     </View>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
+    flex: 1,
+    justifyContent: 'center',
     alignItems: 'center',
-    top: 800,
+    padding: 20,
   },
   textRecoverPassword: {
-    fontSize: 72,
-    top: -400,
+    fontSize: 18,
+    marginBottom: 20,
     fontFamily: 'Roboto-Regular',
   },
   logo: {
-    top: 500,
-    left: 397,
-    width: 287,
-    height: 287,
-    position: "fixed",
+    width: 150,
+    height: 150,
+    marginBottom: 20,
   },
   groupInputs: {
-    alignItems: "center",
-    marginTop: 20,
-    width: 450,
+    width: '100%',
   },
   emailInstitucional: {
     fontSize: 16,
-    fontFamily: "Roboto-Regular",
-    marginTop: 20,
-    alignSelf: "flex-start",
+    fontFamily: 'Roboto-Regular',
+    marginBottom: 10,
   },
   inputEmail: {
     fontSize: 16,
-    fontFamily: "Roboto-Regular",
-    width: 450,
+    fontFamily: 'Roboto-Regular',
     height: 50,
-    marginTop: 3,
-    padding: 10,
+    paddingHorizontal: 10,
     borderWidth: 1,
     borderColor: "#CCC",
     borderRadius: 5,
+    marginBottom: 20,
   },
   button1: {
-    width: 200,
     height: 50,
-    marginTop: 90,
-    marginBottom: 20,
     justifyContent: 'center',
     alignItems: 'center',
     borderRadius: 5,
     backgroundColor: '#B20000',
+    marginBottom: 10,
+    width: '100%',
   },
   button2: {
-    width: 200,
     height: 50,
     justifyContent: 'center',
     alignItems: 'center',
     borderRadius: 5,
     backgroundColor: '#141414',
+    width: '100%',
   },
   buttonText: {
     fontSize: 16,

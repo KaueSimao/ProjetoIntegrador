@@ -9,6 +9,7 @@ import {
   CheckBox,
   Alert,
 } from "react-native";
+import AwesomeAlert from 'react-native-awesome-alerts';
 import { useFonts } from "expo-font";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
@@ -24,6 +25,8 @@ export default function LoginScreen({ navigation }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [rememberLogin, setRememberLogin] = useState(false);
+  const [alertVisible, setAlertVisible] = useState(false);
+  const [alertMessage, setAlertMessage] = useState("");
 
   useEffect(() => {
     // Ao carregar a tela, verificar se há um login lembrado
@@ -52,13 +55,12 @@ export default function LoginScreen({ navigation }) {
       const user = students.find((student) => student.email === email);
 
       if (!user || user.password !== password) {
-        alert("Erro, email ou senha incorretos.");
+        setAlertMessage("Erro, email ou senha incorretos.");
+        setAlertVisible(true);
         return;
       }
 
       // Login bem-sucedido
-      alert("Sucesso, login bem-sucedido!");
-
       if (rememberLogin) {
         // Salvar o estado de lembrar login localmente
         await AsyncStorage.setItem("rememberedLogin", JSON.stringify(user));
@@ -120,6 +122,28 @@ export default function LoginScreen({ navigation }) {
       <TouchableOpacity onPress={() => navigation.navigate("Register")}>
         <Text style={styles.signUp}>Não tem uma conta? Cadastre-se</Text>
       </TouchableOpacity>
+
+      <AwesomeAlert
+        show={alertVisible}
+        showProgress={false}
+        title="Atenção"
+        message={alertMessage}
+        closeOnTouchOutside={false}
+        closeOnHardwareBackPress={false}
+        showCancelButton={false}
+        showConfirmButton={true}
+        confirmText="OK"
+        confirmButtonColor="#000"
+        onConfirmPressed={() => {
+          setAlertVisible(false);
+          if (redirectToLogin) {
+            navigation.navigate("Login"); // Redirecionar para a tela de login
+          }
+        }}
+        titleStyle={styles.alertTitle}
+        messageStyle={styles.alertMessage}
+        confirmButtonTextStyle={styles.alertButtonText}
+      />
     </View>
   );
 }
