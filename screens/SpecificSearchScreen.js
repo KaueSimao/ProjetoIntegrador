@@ -10,6 +10,7 @@ import {
   FlatList,
   ScrollView,
   StatusBar,
+  Dimensions,
 } from "react-native";
 import { useFonts } from "expo-font";
 
@@ -23,7 +24,6 @@ export default function SpecificSearchScreen({ navigation }) {
   });
 
   const [errorMessage, setErrorMessage] = useState(null);
-
   const [courses, setCourses] = useState([]);
   const [semesters, setSemesters] = useState([]);
   const [teachers, setTeachers] = useState([]);
@@ -36,10 +36,18 @@ export default function SpecificSearchScreen({ navigation }) {
   const [selectedTeacher, setSelectedTeacher] = useState(null);
   const [selectedDiscipline, setSelectedDiscipline] = useState(null);
   const [selectedRoom, setSelectedRoom] = useState(null);
+  
+  const [currentDayIndex, setCurrentDayIndex] = useState(0);
+
+  const daysOfWeek = ["Segunda", "Terça", "Quarta", "Quinta", "Sexta", "Sabado"];
 
   useEffect(() => {
     fetchData();
   }, []);
+
+  useEffect(() => {
+    handleSearch();
+  }, [selectedCourse, selectedSemester, selectedTeacher, selectedDiscipline, selectedRoom]);
 
   const fetchData = async () => {
     try {
@@ -110,6 +118,22 @@ export default function SpecificSearchScreen({ navigation }) {
     fetchData();
   };
 
+  const handleDayChange = (direction) => {
+    if (direction === "prev") {
+      setCurrentDayIndex((prevIndex) =>
+        prevIndex === 0 ? daysOfWeek.length - 1 : prevIndex - 1
+      );
+    } else {
+      setCurrentDayIndex((prevIndex) =>
+        prevIndex === daysOfWeek.length - 1 ? 0 : prevIndex + 1
+      );
+    }
+  };
+
+  const getDayTimetable = (day) => {
+    return timetable.filter((item) => item.day === day);
+  };
+
   const renderTimetableItem = ({ item }) => (
     <View style={styles.tableRow}>
       <Text style={styles.tableCell}>{item.id}</Text>
@@ -132,7 +156,6 @@ export default function SpecificSearchScreen({ navigation }) {
         {rooms.find((room) => room.id === item.roomId)?.name}
       </Text>
       <Text style={styles.tableCell}>{item.time}</Text>
-      <Text style={styles.tableCell}>{item.day}</Text>
     </View>
   );
 
@@ -140,12 +163,14 @@ export default function SpecificSearchScreen({ navigation }) {
     return null;
   }
 
+  const currentDay = daysOfWeek[currentDayIndex];
+  const dayTimetable = getDayTimetable(currentDay);
+
   return (
     <View style={styles.container}>
       <Image source={require("../assets/fatec-logo.png")} style={styles.logo} />
       <Text style={styles.title}>Filtro Específico</Text>
 
-      <View>
       <ScrollView style={styles.filtersContainer}>
         <RNPickerSelect
           placeholder={{ label: "Selecione um curso", value: null }}
@@ -200,14 +225,13 @@ export default function SpecificSearchScreen({ navigation }) {
         />
       </ScrollView>
 
-        <TouchableOpacity style={styles.searchButton} onPress={handleSearch}>
-          <Text style={styles.searchButtonText}>Pesquisar</Text>
-        </TouchableOpacity>
+      <TouchableOpacity style={styles.searchButton} onPress={handleSearch}>
+        <Text style={styles.searchButtonText}>Pesquisar</Text>
+      </TouchableOpacity>
 
-        <TouchableOpacity style={styles.resetButton} onPress={resetFilters}>
-          <Text style={styles.resetButtonText}>Redefinir Filtros</Text>
-        </TouchableOpacity>
-      </View>
+      <TouchableOpacity style={styles.resetButton} onPress={resetFilters}>
+        <Text style={styles.resetButtonText}>Redefinir Filtros</Text>
+      </TouchableOpacity>
 
       <View style={styles.table}>
         <View style={styles.tableHeader}>
@@ -218,176 +242,122 @@ export default function SpecificSearchScreen({ navigation }) {
           <Text style={styles.tableHeaderText}>Disciplina</Text>
           <Text style={styles.tableHeaderText}>Sala</Text>
           <Text style={styles.tableHeaderText}>Horário</Text>
-          <Text style={styles.tableHeaderText}>Dia</Text>
         </View>
-        <FlatList
-          data={timetable}
-          renderItem={renderTimetableItem}
-          keyExtractor={(item) => item.id.toString()}
-        />
+        {dayTimetable.length > 0 ? (
+          <FlatList
+            data={dayTimetable}
+            renderItem={renderTimetableItem}
+            keyExtractor={(item) => item.id.toString()}
+          />
+        ) : (
+          <Text style={styles.emptyMessage}>Nenhum item encontrado para {currentDay}</Text>
+        )}
       </View>
-      {errorMessage && <Text style={styles.errorMessage}>{errorMessage}</Text>}
-      <View style={styles.navbar}>
-        <TouchableOpacity
-          style={styles.navItem}
-          onPress={() => navigation.navigate("HomeScreen")}
-        >
-          <Text style={styles.navText}>Home</Text>
+
+      <View style={styles.navigation}>
+        <TouchableOpacity onPress={() => handleDayChange("prev")}>
+          <Text style={styles.navigationText}>{"<"}</Text>
         </TouchableOpacity>
-        <TouchableOpacity
-          style={styles.navItem}
-          onPress={() => navigation.navigate("Login")}
-        >
-          <Text style={styles.navText}>Sair</Text>
+        <Text style={styles.navigationText}>{currentDay}</Text>
+        <TouchableOpacity onPress={() => handleDayChange("next")}>
+          <Text style={styles.navigationText}>{">"}</Text>
         </TouchableOpacity>
       </View>
     </View>
   );
 }
 
-const pickerSelectStyles = StyleSheet.create({
-  inputIOS: {
-    fontSize: 16,
-    paddingVertical: 12,
-    paddingHorizontal: 10,
-    borderWidth: 1,
-    borderColor: "#ddd",
-    borderRadius: 4,
-    color: "#444",
-    paddingRight: 30,
-    marginBottom: 20,
-    backgroundColor: "#f9f9f9",
-  },
-  inputAndroid: {
-    fontSize: 16,
-    paddingHorizontal: 10,
-    paddingVertical: 8,
-    borderWidth: 0.5,
-    borderColor: "#ddd",
-    borderRadius: 4,
-    color: "#444",
-    paddingRight: 30,
-    marginBottom: 20,
-    backgroundColor: "#f9f9f9",
-  },
-});
-
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    overflow: "scroll",
-    alignItems: "center",
-    backgroundColor: "#f4f4f4",
+    padding: 20,
+    backgroundColor: "#fff",
   },
   logo: {
-    width: 200,
-    height: 100,
-    marginBottom: 20,
+    width: 100,
+    height: 50,
+    alignSelf: "center",
+    marginVertical: 20,
   },
   title: {
-    fontSize: 28,
-    fontWeight: "bold",
+    fontSize: 24,
+    fontFamily: "Roboto-Medium",
+    textAlign: "center",
     marginBottom: 20,
-    color: "#333",
   },
   filtersContainer: {
-    width: "100%",
+    marginBottom: 20,
   },
   searchButton: {
-    backgroundColor: "#000",
-    padding: 12,
-    borderRadius: 8,
-    marginTop: 10,
-    alignItems: "center",
+    backgroundColor: "#4CAF50",
+    padding: 10,
+    borderRadius: 5,
+    marginBottom: 10,
   },
   searchButtonText: {
-    color: "white",
-    fontSize: 16,
-    fontWeight: "bold",
+    color: "#fff",
+    textAlign: "center",
+    fontFamily: "Roboto-Regular",
   },
   resetButton: {
-    backgroundColor: "#B20000",
-    padding: 12,
-    borderRadius: 8,
-    marginTop: 10,
-    alignItems: "center",
+    backgroundColor: "#f44336",
+    padding: 10,
+    borderRadius: 5,
+    marginBottom: 20,
   },
   resetButtonText: {
-    color: "white",
-    fontSize: 16,
-    fontWeight: "bold",
-  },
-  backButton: {
-    backgroundColor: "#757575",
-    padding: 12,
-    borderRadius: 8,
-    marginTop: 10,
-    alignItems: "center",
-  },
-  backButtonText: {
-    color: "white",
-    fontSize: 16,
-    fontWeight: "bold",
+    color: "#fff",
+    textAlign: "center",
+    fontFamily: "Roboto-Regular",
   },
   table: {
-    marginTop: 20,
-    width: "100%",
-    borderWidth: 1,
-    borderColor: "#ddd",
-    borderRadius: 8,
-    backgroundColor: "#fff",
+    marginBottom: 20,
   },
   tableHeader: {
     flexDirection: "row",
-    backgroundColor: "#000",
-    borderBottomWidth: 1,
-    borderBottomColor: "#ddd",
-    borderTopLeftRadius: 8,
-    borderTopRightRadius: 8,
+    backgroundColor: "#f1f1f1",
+    padding: 10,
   },
   tableHeaderText: {
     flex: 1,
-    fontSize: 16,
     fontWeight: "bold",
-    textAlign: "center",
-    color: "white",
-    padding: 10,
   },
   tableRow: {
     flexDirection: "row",
-    borderBottomWidth: 1,
-    borderBottomColor: "#ddd",
+    padding: 10,
   },
   tableCell: {
     flex: 1,
-    fontSize: 14,
+  },
+  emptyMessage: {
     textAlign: "center",
-    padding: 10,
-    color: "#333",
-  },
-  errorMessage: {
     marginTop: 20,
-    color: "red",
-    fontWeight: "bold",
   },
-  navbar: {
+  navigation: {
     flexDirection: "row",
-    justifyContent: "space-around",
+    justifyContent: "space-between",
     alignItems: "center",
-    backgroundColor: "#B20000",
-    width: "100%",
-    position: "fixed",
-    height: 60,
-    bottom: 0,
   },
-  navItem: {
-    flex: 1,
-    alignItems: "center",
-    justifyContent: "center",
+  navigationText: {
+    fontSize: 20,
   },
-  navText: {
-    color: "#fff",
-    fontFamily: "Roboto-Regular",
+});
+
+const pickerSelectStyles = StyleSheet.create({
+  inputIOS: {
     fontSize: 16,
+    padding: 12,
+    borderColor: "#ddd",
+    borderWidth: 1,
+    borderRadius: 5,
+    marginBottom: 10,
+  },
+  inputAndroid: {
+    fontSize: 16,
+    padding: 12,
+    borderColor: "#ddd",
+    borderWidth: 1,
+    borderRadius: 5,
+    marginBottom: 10,
   },
 });

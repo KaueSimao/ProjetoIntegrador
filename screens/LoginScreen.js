@@ -74,7 +74,8 @@ export default function LoginScreen({ navigation }) {
 
     } catch (error) {
       console.error("Erro ao tentar fazer login", error);
-      alert("Erro ao tentar fazer login.");
+      setAlertMessage("Erro ao tentar fazer login.");
+      setAlertVisible(true);
     }
   };
 
