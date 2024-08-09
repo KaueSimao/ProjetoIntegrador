@@ -173,7 +173,7 @@ export default function SpecificSearchScreen({ navigation }) {
 
       <ScrollView style={styles.filtersContainer}>
         <RNPickerSelect
-          placeholder={{ label: "Selecione um curso", value: null }}
+          placeholder={{ label: "Selecione seu curso", value: null }}
           value={selectedCourse}
           onValueChange={(value) => setSelectedCourse(value)}
           items={courses.map((course) => ({
