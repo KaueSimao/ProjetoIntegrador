@@ -9,12 +9,11 @@ import {
   TouchableOpacity,
   FlatList,
   ScrollView,
-  StatusBar,
   Dimensions,
 } from "react-native";
 import { useFonts } from "expo-font";
 
-const API_URL = "http://localhost:3000";
+const API_URL = "http://localhost:8080";
 
 export default function SpecificSearchScreen({ navigation }) {
   const [fontsLoaded] = useFonts({
@@ -24,98 +23,78 @@ export default function SpecificSearchScreen({ navigation }) {
   });
 
   const [errorMessage, setErrorMessage] = useState(null);
-  const [courses, setCourses] = useState([]);
-  const [semesters, setSemesters] = useState([]);
-  const [teachers, setTeachers] = useState([]);
-  const [disciplines, setDisciplines] = useState([]);
-  const [rooms, setRooms] = useState([]);
   const [timetable, setTimetable] = useState([]);
-
-  const [selectedCourse, setSelectedCourse] = useState(null);
-  const [selectedSemester, setSelectedSemester] = useState(null);
+  const [teachers, setTeachers] = useState([]);
+  const [courses, setCourses] = useState([]);
+  const [subjects, setSubjects] = useState([]);
+  const [semesters, setSemesters] = useState([]);
+  const [rooms, setRooms] = useState([]);
   const [selectedTeacher, setSelectedTeacher] = useState(null);
-  const [selectedDiscipline, setSelectedDiscipline] = useState(null);
+  const [selectedCourse, setSelectedCourse] = useState(null);
+  const [selectedSubject, setSelectedSubject] = useState(null);
+  const [selectedSemester, setSelectedSemester] = useState(null);
   const [selectedRoom, setSelectedRoom] = useState(null);
-  
   const [currentDayIndex, setCurrentDayIndex] = useState(0);
 
-  const daysOfWeek = ["Segunda", "Terça", "Quarta", "Quinta", "Sexta", "Sabado"];
+  const daysOfWeek = ["Segunda", "Terça", "Quarta", "Quinta", "Sexta", "Sábado"];
 
   useEffect(() => {
     fetchData();
+    fetchFilters();
   }, []);
-
-  useEffect(() => {
-    handleSearch();
-  }, [selectedCourse, selectedSemester, selectedTeacher, selectedDiscipline, selectedRoom]);
 
   const fetchData = async () => {
     try {
-      const coursesResponse = await axios.get(`${API_URL}/courses`);
-      const semestersResponse = await axios.get(`${API_URL}/semesters`);
-      const teachersResponse = await axios.get(`${API_URL}/teachers`);
-      const disciplinesResponse = await axios.get(`${API_URL}/disciplines`);
-      const roomsResponse = await axios.get(`${API_URL}/rooms`);
-      const timetableResponse = await axios.get(`${API_URL}/timetable`);
-
-      setCourses(coursesResponse.data);
-      setSemesters(semestersResponse.data);
-      setTeachers(teachersResponse.data);
-      setDisciplines(disciplinesResponse.data);
-      setRooms(roomsResponse.data);
+      const timetableResponse = await axios.get(`${API_URL}/schedule/`);
       setTimetable(timetableResponse.data);
     } catch (error) {
       console.error(error);
+      setErrorMessage("Erro ao carregar os dados. Tente novamente mais tarde.");
     }
   };
 
-  const handleSearch = () => {
-    let filteredTimetable = timetable;
+  const fetchFilters = async () => {
+    try {
+      const teachersResponse = await axios.get(`${API_URL}/teacher/`);
+      const coursesResponse = await axios.get(`${API_URL}/course/`);
+      const subjectsResponse = await axios.get(`${API_URL}/subject/`);
+      const semestersResponse = await axios.get(`${API_URL}/year_semester/`);
+      const roomsResponse = await axios.get(`${API_URL}/room/`);
 
-    if (selectedCourse) {
-      filteredTimetable = filteredTimetable.filter(
-        (item) => item.courseId === selectedCourse
-      );
-    }
-    if (selectedSemester) {
-      filteredTimetable = filteredTimetable.filter(
-        (item) => item.semesterId === selectedSemester
-      );
-    }
-    if (selectedTeacher) {
-      filteredTimetable = filteredTimetable.filter(
-        (item) => item.teacherId === selectedTeacher
-      );
-    }
-    if (selectedDiscipline) {
-      filteredTimetable = filteredTimetable.filter(
-        (item) => item.disciplineId === selectedDiscipline
-      );
-    }
-    if (selectedRoom) {
-      filteredTimetable = filteredTimetable.filter(
-        (item) => item.roomId === selectedRoom
-      );
-    }
+      const formattedTeachers = teachersResponse.data.map((teacher) => ({
+        label: teacher.teacher_name,
+        value: teacher.teacher_name, // Ajustar conforme o retorno da API
+      }));
 
-    if (filteredTimetable.length === 0) {
-      setErrorMessage(
-        "Nenhum resultado encontrado para os filtros selecionados."
-      );
-    } else {
-      setErrorMessage(null);
+      const formattedCourses = coursesResponse.data.map((course) => ({
+        label: course.name,
+        value: course.id, // Ajustar conforme o retorno da API
+      }));
+
+      const formattedSubjects = subjectsResponse.data.map((subject) => ({
+        label: subject.name,
+        value: subject.id, // Ajustar conforme o retorno da API
+      }));
+
+      const formattedSemesters = semestersResponse.data.map((semester) => ({
+        label: semester.name,
+        value: semester.id, // Ajustar conforme o retorno da API
+      }));
+
+      const formattedRooms = roomsResponse.data.map((room) => ({
+        label: room.name,
+        value: room.id, // Ajustar conforme o retorno da API
+      }));
+
+      // Atualize os estados com os dados formatados
+      setTeachers(formattedTeachers);
+      setCourses(formattedCourses);
+      setSubjects(formattedSubjects);
+      setSemesters(formattedSemesters);
+      setRooms(formattedRooms);
+    } catch (error) {
+      console.error("Erro ao carregar os filtros", error);
     }
-
-    setTimetable(filteredTimetable);
-  };
-
-  const resetFilters = () => {
-    setSelectedCourse(null);
-    setSelectedSemester(null);
-    setSelectedTeacher(null);
-    setSelectedDiscipline(null);
-    setSelectedRoom(null);
-    fetchData();
   };
 
   const handleDayChange = (direction) => {
@@ -131,30 +110,13 @@ export default function SpecificSearchScreen({ navigation }) {
   };
 
   const getDayTimetable = (day) => {
-    return timetable.filter((item) => item.day === day);
+    return timetable.filter((item) => item.time.includes(day));
   };
 
   const renderTimetableItem = ({ item }) => (
     <View style={styles.tableRow}>
-      <Text style={styles.tableCell}>{item.id}</Text>
-      <Text style={styles.tableCell}>
-        {courses.find((course) => course.id === item.courseId)?.name}
-      </Text>
-      <Text style={styles.tableCell}>
-        {semesters.find((semester) => semester.id === item.semesterId)?.name}
-      </Text>
-      <Text style={styles.tableCell}>
-        {teachers.find((teacher) => teacher.id === item.teacherId)?.name}
-      </Text>
-      <Text style={styles.tableCell}>
-        {
-          disciplines.find((discipline) => discipline.id === item.disciplineId)
-            ?.name
-        }
-      </Text>
-      <Text style={styles.tableCell}>
-        {rooms.find((room) => room.id === item.roomId)?.name}
-      </Text>
+      <Text style={styles.tableCell}>{item.teacher}</Text>
+      <Text style={styles.tableCell}>{item.subject}</Text>
       <Text style={styles.tableCell}>{item.time}</Text>
     </View>
   );
@@ -167,87 +129,63 @@ export default function SpecificSearchScreen({ navigation }) {
   const dayTimetable = getDayTimetable(currentDay);
 
   return (
-    <View style={styles.container}>
+    <ScrollView style={styles.container}>
       <Image source={require("../assets/fatec-logo.png")} style={styles.logo} />
       <Text style={styles.title}>Filtro Específico</Text>
 
-      <ScrollView style={styles.filtersContainer}>
-        <RNPickerSelect
-          placeholder={{ label: "Selecione seu curso", value: null }}
-          value={selectedCourse}
-          onValueChange={(value) => setSelectedCourse(value)}
-          items={courses.map((course) => ({
-            label: course.name,
-            value: course.id,
-          }))}
-          style={pickerSelectStyles}
-        />
+      <RNPickerSelect
+        onValueChange={(value) => setSelectedTeacher(value)}
+        items={teachers}
+        placeholder={{ label: "Selecione um Professor", value: undefined }}
+        value={selectedTeacher || undefined}
+        style={pickerSelectStyles}
+      />
 
-        <RNPickerSelect
-          placeholder={{ label: "Selecione um semestre", value: null }}
-          value={selectedSemester}
-          onValueChange={(value) => setSelectedSemester(value)}
-          items={semesters.map((semester) => ({
-            label: semester.name,
-            value: semester.id,
-          }))}
-          style={pickerSelectStyles}
-        />
+      <RNPickerSelect
+        onValueChange={(value) => setSelectedCourse(value)}
+        items={courses.map((course) => ({ label: course.name, value: course.id }))}
+        placeholder={{ label: "Selecione um Curso", value: undefined }}
+        value={selectedCourse || undefined} // ou use "" se preferir
+        style={pickerSelectStyles}
+      />
 
-        <RNPickerSelect
-          placeholder={{ label: "Selecione um professor", value: null }}
-          value={selectedTeacher}
-          onValueChange={(value) => setSelectedTeacher(value)}
-          items={teachers.map((teacher) => ({
-            label: teacher.name,
-            value: teacher.id,
-          }))}
-          style={pickerSelectStyles}
-        />
+      <RNPickerSelect
+        onValueChange={(value) => setSelectedSubject(value)}
+        items={subjects.map((subject) => ({ label: subject.name, value: subject.id }))}
+        placeholder={{ label: "Selecione uma Disciplina", value: undefined }}
+        value={selectedSubject || undefined} // ou use "" se preferir
+        style={pickerSelectStyles}
+      />
 
-        <RNPickerSelect
-          placeholder={{ label: "Selecione uma disciplina", value: null }}
-          value={selectedDiscipline}
-          onValueChange={(value) => setSelectedDiscipline(value)}
-          items={disciplines.map((discipline) => ({
-            label: discipline.name,
-            value: discipline.id,
-          }))}
-          style={pickerSelectStyles}
-        />
+      <RNPickerSelect
+        onValueChange={(value) => setSelectedSemester(value)}
+        items={semesters.map((semester) => ({ label: semester.name, value: semester.id }))}
+        placeholder={{ label: "Selecione um Semestre", value: undefined }}
+        value={selectedSemester || undefined} // ou use "" se preferir
+        style={pickerSelectStyles}
+      />
 
-        <RNPickerSelect
-          placeholder={{ label: "Selecione uma sala", value: null }}
-          value={selectedRoom}
-          onValueChange={(value) => setSelectedRoom(value)}
-          items={rooms.map((room) => ({ label: room.name, value: room.id }))}
-          style={pickerSelectStyles}
-        />
-      </ScrollView>
-
-      <TouchableOpacity style={styles.searchButton} onPress={handleSearch}>
-        <Text style={styles.searchButtonText}>Pesquisar</Text>
-      </TouchableOpacity>
-
-      <TouchableOpacity style={styles.resetButton} onPress={resetFilters}>
-        <Text style={styles.resetButtonText}>Redefinir Filtros</Text>
-      </TouchableOpacity>
+      <RNPickerSelect
+        onValueChange={(value) => setSelectedRoom(value)}
+        items={rooms.map((room) => ({ label: room.name, value: room.id }))}
+        placeholder={{ label: "Selecione uma Sala", value: undefined }}
+        value={selectedRoom || undefined} // ou use "" se preferir
+        style={pickerSelectStyles}
+      />
 
       <View style={styles.table}>
         <View style={styles.tableHeader}>
-          <Text style={styles.tableHeaderText}>ID</Text>
           <Text style={styles.tableHeaderText}>Curso</Text>
           <Text style={styles.tableHeaderText}>Semestre</Text>
           <Text style={styles.tableHeaderText}>Professor</Text>
           <Text style={styles.tableHeaderText}>Disciplina</Text>
-          <Text style={styles.tableHeaderText}>Sala</Text>
           <Text style={styles.tableHeaderText}>Horário</Text>
         </View>
         {dayTimetable.length > 0 ? (
           <FlatList
             data={dayTimetable}
             renderItem={renderTimetableItem}
-            keyExtractor={(item) => item.id.toString()}
+            keyExtractor={(item) => item.scheduleId.toString()}
           />
         ) : (
           <Text style={styles.emptyMessage}>Nenhum item encontrado para {currentDay}</Text>
@@ -263,7 +201,7 @@ export default function SpecificSearchScreen({ navigation }) {
           <Text style={styles.navigationText}>{">"}</Text>
         </TouchableOpacity>
       </View>
-    </View>
+    </ScrollView>
   );
 }
 
@@ -284,31 +222,6 @@ const styles = StyleSheet.create({
     fontFamily: "Roboto-Medium",
     textAlign: "center",
     marginBottom: 20,
-  },
-  filtersContainer: {
-    marginBottom: 20,
-  },
-  searchButton: {
-    backgroundColor: "#4CAF50",
-    padding: 10,
-    borderRadius: 5,
-    marginBottom: 10,
-  },
-  searchButtonText: {
-    color: "#fff",
-    textAlign: "center",
-    fontFamily: "Roboto-Regular",
-  },
-  resetButton: {
-    backgroundColor: "#f44336",
-    padding: 10,
-    borderRadius: 5,
-    marginBottom: 20,
-  },
-  resetButtonText: {
-    color: "#fff",
-    textAlign: "center",
-    fontFamily: "Roboto-Regular",
   },
   table: {
     marginBottom: 20,
@@ -346,18 +259,24 @@ const styles = StyleSheet.create({
 const pickerSelectStyles = StyleSheet.create({
   inputIOS: {
     fontSize: 16,
-    padding: 12,
-    borderColor: "#ddd",
+    paddingVertical: 12,
+    paddingHorizontal: 10,
     borderWidth: 1,
-    borderRadius: 5,
+    borderColor: "gray",
+    borderRadius: 4,
+    color: "black",
+    paddingRight: 30, // to ensure the text is never behind the icon
     marginBottom: 10,
   },
   inputAndroid: {
     fontSize: 16,
-    padding: 12,
-    borderColor: "#ddd",
-    borderWidth: 1,
-    borderRadius: 5,
+    paddingVertical: 8,
+    paddingHorizontal: 10,
+    borderWidth: 0.5,
+    borderColor: "gray",
+    borderRadius: 8,
+    color: "black",
+    paddingRight: 30, // to ensure the text is never behind the icon
     marginBottom: 10,
   },
 });

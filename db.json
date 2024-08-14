@@ -247,7 +247,7 @@
       "name": "Laboratório 8"
     }
   ],
-  "timetable": [
+  "reservations": [
     {
       "id": "11",
       "courseId": 3,
@@ -255,8 +255,8 @@
       "teacherId": 3,
       "disciplineId": 3,
       "roomId": 9,
-      "time": "13:00 - 15:00",
-      "day": "Segunda"
+      "time": 3,
+      "day_id": 1
     },
     {
       "id": "12",
@@ -265,8 +265,8 @@
       "teacherId": 4,
       "disciplineId": 4,
       "roomId": 8,
-      "time": "10:00 - 12:00",
-      "day": "Terça"
+      "time": 2,
+      "day_id": 2
     },
     {
       "id": "13",
@@ -275,8 +275,8 @@
       "teacherId": 6,
       "disciplineId": 1,
       "roomId": 5,
-      "time": "13:00 - 15:00",
-      "day": "Quarta"
+      "time": 1,
+      "day_id": 3
     },
     {
       "id": "14",
@@ -285,8 +285,8 @@
       "teacherId": 1,
       "disciplineId": 2,
       "roomId": 10,
-      "time": "15:00 - 17:00",
-      "day": "Quinta"
+      "time": 4,
+      "day_id": 5
     },
     {
       "id": "15",
@@ -295,8 +295,8 @@
       "teacherId": 1,
       "disciplineId": 2,
       "roomId": 10,
-      "time": "08:00 - 10:00",
-      "day": "Sexta"
+      "time": 2,
+      "day_id": 6
     },
     {
       "id": "16",
@@ -305,8 +305,8 @@
       "teacherId": 2,
       "disciplineId": 6,
       "roomId": 13,
-      "time": "15:00 - 17:00",
-      "day": "Segunda"
+      "time": 3,
+      "day_id": 1
     },
     {
       "id": "17",
@@ -315,8 +315,8 @@
       "teacherId": 2,
       "disciplineId": 6,
       "roomId": 14,
-      "time": "08:00 - 10:00",
-      "day": "Terça"
+      "time": 2,
+      "day_id": 2
     },
     {
       "id": "18",
@@ -325,8 +325,8 @@
       "teacherId": 6,
       "disciplineId": 5,
       "roomId": 4,
-      "time": "13:00 - 15:00",
-      "day": "Quarta"
+      "time": 1,
+      "day_id": 3
     },
     {
       "id": "19",
@@ -335,8 +335,8 @@
       "teacherId": 6,
       "disciplineId": 5,
       "roomId": 5,
-      "time": "08:00 - 10:00",
-      "day": "Quinta"
+      "time": 4,
+      "day_id": 5
     },
     {
       "id": "20",
@@ -345,8 +345,8 @@
       "teacherId": 5,
       "disciplineId": 1,
       "roomId": 2,
-      "time": "15:00 - 17:00",
-      "day": "Sexta"
+      "time": 1,
+      "day_id": 6
     },
     {
       "id": "21",
@@ -355,8 +355,8 @@
       "teacherId": 3,
       "disciplineId": 3,
       "roomId": 9,
-      "time": "10:00 - 12:00",
-      "day": "Segunda"
+      "time": 2,
+      "day_id": 1
     },
     {
       "id": "22",
@@ -365,8 +365,8 @@
       "teacherId": 4,
       "disciplineId": 4,
       "roomId": 8,
-      "time": "08:00 - 10:00",
-      "day": "Terça"
+      "time": 4,
+      "day_id": 2
     },
     {
       "id": "23",
@@ -375,8 +375,8 @@
       "teacherId": 6,
       "disciplineId": 1,
       "roomId": 5,
-      "time": "15:00 - 17:00",
-      "day": "Quarta"
+      "time": 1,
+      "day_id": 3
     },
     {
       "id": "24",
@@ -385,8 +385,8 @@
       "teacherId": 1,
       "disciplineId": 2,
       "roomId": 10,
-      "time": "13:00 - 15:00",
-      "day": "Quinta"
+      "time": 2,
+      "day_id": 5
     },
     {
       "id": "25",
@@ -395,8 +395,8 @@
       "teacherId": 1,
       "disciplineId": 2,
       "roomId": 10,
-      "time": "15:00 - 17:00",
-      "day": "Sexta"
+      "time": 4,
+      "day_id": 6
     },
     {
       "id": "26",
@@ -405,8 +405,8 @@
       "teacherId": 2,
       "disciplineId": 6,
       "roomId": 13,
-      "time": "13:00 - 15:00",
-      "day": "Segunda"
+      "time": 3,
+      "day_id": 1
     },
     {
       "id": "27",
@@ -415,8 +415,8 @@
       "teacherId": 2,
       "disciplineId": 6,
       "roomId": 14,
-      "time": "15:00 - 17:00",
-      "day": "Terça"
+      "time": 1,
+      "day_id": 2
     },
     {
       "id": "28",
@@ -425,8 +425,8 @@
       "teacherId": 6,
       "disciplineId": 5,
       "roomId": 4,
-      "time": "10:00 - 12:00",
-      "day": "Quarta"
+      "time": 2,
+      "day_id": 3
     },
     {
       "id": "29",
@@ -435,8 +435,8 @@
       "teacherId": 6,
       "disciplineId": 5,
       "roomId": 5,
-      "time": "13:00 - 15:00",
-      "day": "Quinta"
+      "time": 4,
+      "day_id": 5
     },
     {
       "id": "30",
@@ -445,8 +445,8 @@
       "teacherId": 5,
       "disciplineId": 1,
       "roomId": 2,
-      "time": "15:00 - 17:00",
-      "day": "Sexta"
+      "time": 3,
+      "day_id": 6
     },
     {
       "id": "31",
@@ -455,8 +455,8 @@
       "teacherId": 3,
       "disciplineId": 3,
       "roomId": 9,
-      "time": "15:00 - 17:00",
-      "day": "Segunda"
+      "time": 1,
+      "day_id": 1
     },
     {
       "id": "32",
@@ -465,8 +465,8 @@
       "teacherId": 4,
       "disciplineId": 4,
       "roomId": 8,
-      "time": "13:00 - 15:00",
-      "day": "Terça"
+      "time": 2,
+      "day_id": 2
     },
     {
       "id": "33",
@@ -475,8 +475,8 @@
       "teacherId": 6,
       "disciplineId": 1,
       "roomId": 5,
-      "time": "08:00 - 10:00",
-      "day": "Quarta"
+      "time": 4,
+      "day_id": 3
     },
     {
       "id": "34",
@@ -485,8 +485,8 @@
       "teacherId": 1,
       "disciplineId": 2,
       "roomId": 10,
-      "time": "13:00 - 15:00",
-      "day": "Quinta"
+      "time": 1,
+      "day_id": 5
     },
     {
       "id": "35",
@@ -495,8 +495,8 @@
       "teacherId": 1,
       "disciplineId": 2,
       "roomId": 10,
-      "time": "08:00 - 10:00",
-      "day": "Sexta"
+      "time": 2,
+      "day_id": 6
     },
     {
       "id": "36",
@@ -505,8 +505,8 @@
       "teacherId": 2,
       "disciplineId": 6,
       "roomId": 13,
-      "time": "13:00 - 15:00",
-      "day": "Segunda"
+      "time": 3,
+      "day_id": 1
     },
     {
       "id": "37",
@@ -515,8 +515,8 @@
       "teacherId": 2,
       "disciplineId": 6,
       "roomId": 14,
-      "time": "08:00 - 10:00",
-      "day": "Terça"
+      "time": 4,
+      "day_id": 2
     },
     {
       "id": "38",
@@ -525,8 +525,8 @@
       "teacherId": 6,
       "disciplineId": 5,
       "roomId": 4,
-      "time": "13:00 - 15:00",
-      "day": "Quarta"
+      "time": 3,
+      "day_id": 3
     },
     {
       "id": "39",
@@ -535,8 +535,8 @@
       "teacherId": 6,
       "disciplineId": 5,
       "roomId": 5,
-      "time": "15:00 - 17:00",
-      "day": "Quinta"
+      "time": 1,
+      "day_id": 5
     },
     {
       "id": "40",
@@ -545,8 +545,8 @@
       "teacherId": 5,
       "disciplineId": 1,
       "roomId": 2,
-      "time": "08:00 - 10:00",
-      "day": "Sexta"
+      "time": 2,
+      "day_id": 6
     },
     {
       "id": "41",
@@ -555,8 +555,8 @@
       "teacherId": 3,
       "disciplineId": 3,
       "roomId": 9,
-      "time": "08:00 - 10:00",
-      "day": "Segunda"
+      "time": 3,
+      "day_id": 1
     },
     {
       "id": "42",
@@ -565,8 +565,8 @@
       "teacherId": 4,
       "disciplineId": 4,
       "roomId": 8,
-      "time": "15:00 - 17:00",
-      "day": "Terça"
+      "time": 1,
+      "day_id": 2
     },
     {
       "id": "43",
@@ -575,8 +575,8 @@
       "teacherId": 6,
       "disciplineId": 1,
       "roomId": 5,
-      "time": "10:00 - 12:00",
-      "day": "Quarta"
+      "time": 2,
+      "day_id": 3
     },
     {
       "id": "44",
@@ -585,8 +585,8 @@
       "teacherId": 1,
       "disciplineId": 2,
       "roomId": 10,
-      "time": "15:00 - 17:00",
-      "day": "Quinta"
+      "time": 3,
+      "day_id": 5
     },
     {
       "id": "45",
@@ -595,8 +595,8 @@
       "teacherId": 1,
       "disciplineId": 2,
       "roomId": 10,
-      "time": "10:00 - 12:00",
-      "day": "Sexta"
+      "time": 1,
+      "day_id": 6
     },
     {
       "id": "46",
@@ -605,8 +605,8 @@
       "teacherId": 2,
       "disciplineId": 6,
       "roomId": 13,
-      "time": "10:00 - 12:00",
-      "day": "Segunda"
+      "time": 2,
+      "day_id": 1
     },
     {
       "id": "47",
@@ -615,8 +615,8 @@
       "teacherId": 2,
       "disciplineId": 6,
       "roomId": 14,
-      "time": "13:00 - 15:00",
-      "day": "Terça"
+      "time": 4,
+      "day_id": 2
     },
     {
       "id": "48",
@@ -625,8 +625,8 @@
       "teacherId": 6,
       "disciplineId": 5,
       "roomId": 4,
-      "time": "08:00 - 10:00",
-      "day": "Quarta"
+      "time": 3,
+      "day_id": 3
     },
     {
       "id": "49",
@@ -635,8 +635,8 @@
       "teacherId": 6,
       "disciplineId": 5,
       "roomId": 5,
-      "time": "10:00 - 12:00",
-      "day": "Quinta"
+      "time": 2,
+      "day_id": 5
     },
     {
       "id": "50",
@@ -645,8 +645,56 @@
       "teacherId": 5,
       "disciplineId": 1,
       "roomId": 2,
-      "time": "13:00 - 15:00",
-      "day": "Sexta"
+      "time_id": 1,
+      "day_id": 6
     }
+  ],
+  "time": [
+    {
+      "id": "1",
+      "time_info": "08:00 - 10:00"
+    },
+    {
+      "id": "2",
+      "time_info": "10:00 - 12:00"
+    },
+    {
+      "id": "3",
+      "time_info": "13:20 - 15:00"
+    },
+    {
+      "id": "4",
+      "time_info": "15:10 - 16:50"
+    },
+    {
+      "id": "5",
+      "time_info": "17:00 - 18:40"
+    }
+  ],
+  "day": [
+    {
+     "id": 1,
+     "day_name": "Segunda"
+    },
+    {
+      "id": 2,
+      "day_name": "Terça"
+     },
+     {
+      "id": 3,
+      "day_name": "Quarta"
+     },
+     {
+      "id": 4,
+      "day_name": "Quinta"
+     },
+     {
+      "id": 1,
+      "day_name": "Sexta"
+     },
+     {
+      "id": 1,
+      "day_name": "Sábado"
+     }
   ]
 }
