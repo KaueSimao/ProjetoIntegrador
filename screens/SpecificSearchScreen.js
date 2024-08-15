@@ -9,7 +9,6 @@ import {
   TouchableOpacity,
   FlatList,
   ScrollView,
-  Dimensions,
 } from "react-native";
 import { useFonts } from "expo-font";
 
@@ -27,20 +26,16 @@ export default function SpecificSearchScreen({ navigation }) {
   const [teachers, setTeachers] = useState([]);
   const [courses, setCourses] = useState([]);
   const [subjects, setSubjects] = useState([]);
-  const [semesters, setSemesters] = useState([]);
-  const [rooms, setRooms] = useState([]);
   const [selectedTeacher, setSelectedTeacher] = useState(null);
   const [selectedCourse, setSelectedCourse] = useState(null);
   const [selectedSubject, setSelectedSubject] = useState(null);
-  const [selectedSemester, setSelectedSemester] = useState(null);
-  const [selectedRoom, setSelectedRoom] = useState(null);
   const [currentDayIndex, setCurrentDayIndex] = useState(0);
 
   const daysOfWeek = ["Segunda", "Terça", "Quarta", "Quinta", "Sexta", "Sábado"];
 
   useEffect(() => {
-    fetchData();
     fetchFilters();
+    fetchData(); // Fetch all data initially
   }, []);
 
   const fetchData = async () => {
@@ -56,45 +51,39 @@ export default function SpecificSearchScreen({ navigation }) {
   const fetchFilters = async () => {
     try {
       const teachersResponse = await axios.get(`${API_URL}/teacher/`);
-      const coursesResponse = await axios.get(`${API_URL}/course/`);
       const subjectsResponse = await axios.get(`${API_URL}/subject/`);
-      const semestersResponse = await axios.get(`${API_URL}/year_semester/`);
-      const roomsResponse = await axios.get(`${API_URL}/room/`);
+      const coursesResponse = await axios.get(`${API_URL}/course/`);
 
       const formattedTeachers = teachersResponse.data.map((teacher) => ({
-        label: teacher.teacher_name,
-        value: teacher.teacher_name, // Ajustar conforme o retorno da API
+        label: teacher.teacherName,
+        value: teacher.teacherName,
       }));
 
       const formattedCourses = coursesResponse.data.map((course) => ({
-        label: course.name,
-        value: course.id, // Ajustar conforme o retorno da API
+        label: course.courseName,
+        value: course.courseName,
       }));
 
       const formattedSubjects = subjectsResponse.data.map((subject) => ({
-        label: subject.name,
-        value: subject.id, // Ajustar conforme o retorno da API
+        label: subject.subjectName,
+        value: subject.subjectName,
       }));
 
-      const formattedSemesters = semestersResponse.data.map((semester) => ({
-        label: semester.name,
-        value: semester.id, // Ajustar conforme o retorno da API
-      }));
-
-      const formattedRooms = roomsResponse.data.map((room) => ({
-        label: room.name,
-        value: room.id, // Ajustar conforme o retorno da API
-      }));
-
-      // Atualize os estados com os dados formatados
       setTeachers(formattedTeachers);
       setCourses(formattedCourses);
       setSubjects(formattedSubjects);
-      setSemesters(formattedSemesters);
-      setRooms(formattedRooms);
     } catch (error) {
       console.error("Erro ao carregar os filtros", error);
     }
+  };
+
+  const filterTimetable = () => {
+    return timetable.filter((item) => {
+      const matchesTeacher = selectedTeacher ? item.teacher === selectedTeacher : true;
+      const matchesCourse = selectedCourse ? item.course === selectedCourse : true;
+      const matchesSubject = selectedSubject ? item.subject === selectedSubject : true;
+      return matchesTeacher && matchesCourse && matchesSubject;
+    });
   };
 
   const handleDayChange = (direction) => {
@@ -110,11 +99,13 @@ export default function SpecificSearchScreen({ navigation }) {
   };
 
   const getDayTimetable = (day) => {
-    return timetable.filter((item) => item.time.includes(day));
+    return filterTimetable().filter((item) => item.time.includes(day));
   };
 
   const renderTimetableItem = ({ item }) => (
     <View style={styles.tableRow}>
+      <Text style={styles.tableCell}>{item.course}</Text>
+      <Text style={styles.tableCell}>{item.semester}</Text>
       <Text style={styles.tableCell}>{item.teacher}</Text>
       <Text style={styles.tableCell}>{item.subject}</Text>
       <Text style={styles.tableCell}>{item.time}</Text>
@@ -134,42 +125,32 @@ export default function SpecificSearchScreen({ navigation }) {
       <Text style={styles.title}>Filtro Específico</Text>
 
       <RNPickerSelect
-        onValueChange={(value) => setSelectedTeacher(value)}
+        onValueChange={(value) => {
+          setSelectedTeacher(value);
+        }}
         items={teachers}
-        placeholder={{ label: "Selecione um Professor", value: undefined }}
-        value={selectedTeacher || undefined}
+        placeholder={{ label: "Selecione um Professor", value: null }}
+        value={selectedTeacher}
         style={pickerSelectStyles}
       />
 
       <RNPickerSelect
-        onValueChange={(value) => setSelectedCourse(value)}
-        items={courses.map((course) => ({ label: course.name, value: course.id }))}
-        placeholder={{ label: "Selecione um Curso", value: undefined }}
-        value={selectedCourse || undefined} // ou use "" se preferir
+        onValueChange={(value) => {
+          setSelectedCourse(value);
+        }}
+        items={courses}
+        placeholder={{ label: "Selecione um curso", value: null }}
+        value={selectedCourse}
         style={pickerSelectStyles}
       />
 
       <RNPickerSelect
-        onValueChange={(value) => setSelectedSubject(value)}
-        items={subjects.map((subject) => ({ label: subject.name, value: subject.id }))}
-        placeholder={{ label: "Selecione uma Disciplina", value: undefined }}
-        value={selectedSubject || undefined} // ou use "" se preferir
-        style={pickerSelectStyles}
-      />
-
-      <RNPickerSelect
-        onValueChange={(value) => setSelectedSemester(value)}
-        items={semesters.map((semester) => ({ label: semester.name, value: semester.id }))}
-        placeholder={{ label: "Selecione um Semestre", value: undefined }}
-        value={selectedSemester || undefined} // ou use "" se preferir
-        style={pickerSelectStyles}
-      />
-
-      <RNPickerSelect
-        onValueChange={(value) => setSelectedRoom(value)}
-        items={rooms.map((room) => ({ label: room.name, value: room.id }))}
-        placeholder={{ label: "Selecione uma Sala", value: undefined }}
-        value={selectedRoom || undefined} // ou use "" se preferir
+        onValueChange={(value) => {
+          setSelectedSubject(value);
+        }}
+        items={subjects}
+        placeholder={{ label: "Selecione uma Disciplina", value: null }}
+        value={selectedSubject}
         style={pickerSelectStyles}
       />
 
@@ -188,7 +169,7 @@ export default function SpecificSearchScreen({ navigation }) {
             keyExtractor={(item) => item.scheduleId.toString()}
           />
         ) : (
-          <Text style={styles.emptyMessage}>Nenhum item encontrado para {currentDay}</Text>
+          <Text style={styles.emptyMessage}>Nenhum horário encontrado para {currentDay}</Text>
         )}
       </View>
 
@@ -265,7 +246,7 @@ const pickerSelectStyles = StyleSheet.create({
     borderColor: "gray",
     borderRadius: 4,
     color: "black",
-    paddingRight: 30, // to ensure the text is never behind the icon
+    paddingRight: 30,
     marginBottom: 10,
   },
   inputAndroid: {
@@ -276,7 +257,7 @@ const pickerSelectStyles = StyleSheet.create({
     borderColor: "gray",
     borderRadius: 8,
     color: "black",
-    paddingRight: 30, // to ensure the text is never behind the icon
+    paddingRight: 30,
     marginBottom: 10,
   },
 });
