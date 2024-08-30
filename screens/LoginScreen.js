@@ -9,11 +9,11 @@ import {
   CheckBox,
   Alert,
 } from "react-native";
-import AwesomeAlert from 'react-native-awesome-alerts';
 import { useFonts } from "expo-font";
+import Checkbox from 'expo-checkbox';
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
-const API_URL = "http://localhost:3000"; // Endpoint da API simulada
+const API_URL = "http://192.168.15.49:3000/students";
 
 export default function LoginScreen({ navigation }) {
   const [fontsLoaded] = useFonts({
@@ -25,8 +25,6 @@ export default function LoginScreen({ navigation }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [rememberLogin, setRememberLogin] = useState(false);
-  const [alertVisible, setAlertVisible] = useState(false);
-  const [alertMessage, setAlertMessage] = useState("");
 
   useEffect(() => {
     // Ao carregar a tela, verificar se há um login lembrado
@@ -50,17 +48,18 @@ export default function LoginScreen({ navigation }) {
   const login = async () => {
     try {
       // Buscar o estudante correspondente ao email fornecido
-      const response = await fetch(`${API_URL}/students`);
+      const response = await fetch(API_URL);
       const students = await response.json();
       const user = students.find((student) => student.email === email);
 
       if (!user || user.password !== password) {
-        setAlertMessage("Erro, email ou senha incorretos.");
-        setAlertVisible(true);
+        alert("Erro, email ou senha incorretos.");
         return;
       }
 
       // Login bem-sucedido
+      alert("Sucesso, login bem-sucedido!");
+
       if (rememberLogin) {
         // Salvar o estado de lembrar login localmente
         await AsyncStorage.setItem("rememberedLogin", JSON.stringify(user));
@@ -74,8 +73,7 @@ export default function LoginScreen({ navigation }) {
 
     } catch (error) {
       console.error("Erro ao tentar fazer login", error);
-      setAlertMessage("Erro ao tentar fazer login.");
-      setAlertVisible(true);
+      alert("Erro ao tentar fazer login.");
     }
   };
 
@@ -107,8 +105,9 @@ export default function LoginScreen({ navigation }) {
       />
 
       <View style={styles.optionsContainer}>
-        <View style={styles.checkboxContainer}>
-          <CheckBox value={rememberLogin} onValueChange={setRememberLogin} />
+        <View style={styles.section}>
+          <Checkbox style={styles.checkbox} value={rememberLogin} onValueChange={setRememberLogin} />
+
           <Text style={styles.rememberLogin}>Lembrar meu login?</Text>
         </View>
         <TouchableOpacity onPress={() => navigation.navigate("ForgotPassword")}>
@@ -123,28 +122,6 @@ export default function LoginScreen({ navigation }) {
       <TouchableOpacity onPress={() => navigation.navigate("Register")}>
         <Text style={styles.signUp}>Não tem uma conta? Cadastre-se</Text>
       </TouchableOpacity>
-
-      <AwesomeAlert
-        show={alertVisible}
-        showProgress={false}
-        title="Atenção"
-        message={alertMessage}
-        closeOnTouchOutside={false}
-        closeOnHardwareBackPress={false}
-        showCancelButton={false}
-        showConfirmButton={true}
-        confirmText="OK"
-        confirmButtonColor="#000"
-        onConfirmPressed={() => {
-          setAlertVisible(false);
-          if (redirectToLogin) {
-            navigation.navigate("Login"); // Redirecionar para a tela de login
-          }
-        }}
-        titleStyle={styles.alertTitle}
-        messageStyle={styles.alertMessage}
-        confirmButtonTextStyle={styles.alertButtonText}
-      />
     </View>
   );
 }

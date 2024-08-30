@@ -120,8 +120,12 @@ export default function SpecificSearchScreen({ navigation }) {
   const dayTimetable = getDayTimetable(currentDay);
 
   return (
+    
     <ScrollView style={styles.container}>
       <Image source={require("../assets/fatec-logo.png")} style={styles.logo} />
+      <TouchableOpacity style={styles.button} onPress={() => navigation.navigate("HomeScreen")}>
+        <Text style={styles.voltar}>Voltar</Text>
+      </TouchableOpacity>
       <Text style={styles.title}>Filtro Específico</Text>
 
       <RNPickerSelect
@@ -197,6 +201,7 @@ const styles = StyleSheet.create({
     height: 50,
     alignSelf: "center",
     marginVertical: 20,
+    marginTop: 50,
   },
   title: {
     fontSize: 24,
@@ -206,6 +211,9 @@ const styles = StyleSheet.create({
   },
   table: {
     marginBottom: 20,
+  },
+  voltar:{   
+    color: "#f1f1f1",
   },
   tableHeader: {
     flexDirection: "row",
@@ -226,6 +234,17 @@ const styles = StyleSheet.create({
   emptyMessage: {
     textAlign: "center",
     marginTop: 20,
+  },
+  button: {
+    width: "100%",
+    height: 40,
+    backgroundColor: "#B20000",
+    justifyContent: "center",
+   
+    alignItems: "center",
+    borderRadius: 5,
+    width: 100, 
+    margintop: 50,
   },
   navigation: {
     flexDirection: "row",
