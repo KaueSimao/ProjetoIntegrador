@@ -12,8 +12,9 @@ import {
 import { useFonts } from "expo-font";
 import Checkbox from 'expo-checkbox';
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { Ionicons } from '@expo/vector-icons';  // Importar ícones
 
-const API_URL = "http://192.168.15.49:3000/students";
+const API_URL = "http://192.168.11.174:3000/students";
 
 export default function LoginScreen({ navigation }) {
   const [fontsLoaded] = useFonts({
@@ -25,9 +26,9 @@ export default function LoginScreen({ navigation }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [rememberLogin, setRememberLogin] = useState(false);
+  const [showPassword, setShowPassword] = useState(false); // Novo estado
 
   useEffect(() => {
-    // Ao carregar a tela, verificar se há um login lembrado
     checkRememberedLogin();
   }, []);
 
@@ -47,7 +48,6 @@ export default function LoginScreen({ navigation }) {
 
   const login = async () => {
     try {
-      // Buscar o estudante correspondente ao email fornecido
       const response = await fetch(API_URL);
       const students = await response.json();
       const user = students.find((student) => student.email === email);
@@ -57,18 +57,14 @@ export default function LoginScreen({ navigation }) {
         return;
       }
 
-      // Login bem-sucedido
       alert("Sucesso, login bem-sucedido!");
 
       if (rememberLogin) {
-        // Salvar o estado de lembrar login localmente
         await AsyncStorage.setItem("rememberedLogin", JSON.stringify(user));
       } else {
-        // Remover o estado de lembrar login se a opção não estiver selecionada
         await AsyncStorage.removeItem("rememberedLogin");
       }
 
-      // Navegar para a tela Home ou outra tela necessária após o login
       navigation.navigate("HomeScreen", { user });
 
     } catch (error) {
@@ -96,18 +92,29 @@ export default function LoginScreen({ navigation }) {
       />
 
       <Text style={styles.label}>Senha</Text>
-      <TextInput
-        style={styles.input}
-        placeholder="Digite sua senha"
-        secureTextEntry
-        value={password}
-        onChangeText={setPassword}
-      />
+      <View style={styles.passwordContainer}>
+        <TextInput
+          style={styles.input}
+          placeholder="Digite sua senha"
+          secureTextEntry={!showPassword} // Alterado aqui
+          value={password}
+          onChangeText={setPassword}
+        />
+        <TouchableOpacity
+          onPress={() => setShowPassword(!showPassword)}
+          style={styles.eyeButton}
+        >
+          <Ionicons
+            name={showPassword ? "eye-off" : "eye"} // Ícone de olho
+            size={24}
+            color="gray"
+          />
+        </TouchableOpacity>
+      </View>
 
       <View style={styles.optionsContainer}>
         <View style={styles.section}>
           <Checkbox style={styles.checkbox} value={rememberLogin} onValueChange={setRememberLogin} />
-
           <Text style={styles.rememberLogin}>Lembrar meu login?</Text>
         </View>
         <TouchableOpacity onPress={() => navigation.navigate("ForgotPassword")}>
@@ -159,6 +166,15 @@ const styles = StyleSheet.create({
     marginBottom: 15,
     fontSize: 16,
     fontFamily: "Roboto-Regular",
+  },
+  passwordContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    width: '100%',
+  },
+  eyeButton: {
+    position: 'absolute',
+    right: 10,
   },
   optionsContainer: {
     flexDirection: "row",

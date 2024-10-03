@@ -12,7 +12,7 @@ import {
 } from "react-native";
 import { useFonts } from "expo-font";
 
-const API_URL = "http://localhost:8080";
+const API_URL = "http://192.168.11.174:8080";
 
 export default function SpecificSearchScreen({ navigation }) {
   const [fontsLoaded] = useFonts({
