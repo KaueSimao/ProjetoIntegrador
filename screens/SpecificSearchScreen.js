@@ -186,6 +186,14 @@ export default function SpecificSearchScreen({ navigation }) {
           <Text style={styles.navigationText}>{">"}</Text>
         </TouchableOpacity>
       </View>
+      <View style={styles.navbar}>
+        <TouchableOpacity
+          style={styles.navItem}
+          onPress={() => navigation.navigate("HomeScreen")}
+        >
+          <Text style={styles.navText}>Home</Text>
+        </TouchableOpacity>
+      </View>
     </ScrollView>
   );
 }
@@ -250,6 +258,26 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
+  },
+  navbar: {
+    flexDirection: "row",
+    justifyContent: "space-around",
+    alignItems: "center",
+    backgroundColor: "#B20000",
+    width: "100%",
+    position: "absolute",
+    bottom: 0,
+    height: 60,
+  },
+  navItem: {
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  navText: {
+    color: "#fff",
+    fontFamily: "Roboto-Regular",
+    fontSize: 16,
   },
   navigationText: {
     fontSize: 20,

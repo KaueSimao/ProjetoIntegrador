@@ -117,7 +117,7 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 24,
     fontFamily: 'Roboto-Regular',
-    marginTop: 20,
+    marginTop: 10,
   },
   subtitle: {
     fontSize: 18,
@@ -125,7 +125,7 @@ const styles = StyleSheet.create({
     marginTop: 10,
   },
   loadingScreen: {
-    flex: 1,
+   
     alignItems: 'center',
     justifyContent: 'center',
   },

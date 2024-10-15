@@ -1,6 +1,13 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, Image} from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, Image, Alert } from 'react-native';
 import { useFonts } from 'expo-font';
+
+// Simulação do banco de dados JSON
+const usersDatabase = [
+  { id: 1, email: 'user1@example.com', password: 'password123' },
+  { id: 2, email: 'user2@example.com', password: 'mypassword' },
+  // Outros usuários podem ser adicionados aqui
+];
 
 const ForgotPasswordScreen = ({ navigation }) => {
   const [email, setEmail] = useState('');
@@ -16,7 +23,15 @@ const ForgotPasswordScreen = ({ navigation }) => {
   }
 
   const handleForgotPassword = () => {
-    alert(`Email de recuperação enviado para ${email}`);
+    // Verifica se o e-mail existe no banco de dados
+    const userExists = usersDatabase.some(user => user.email === email);
+
+    if (userExists) {
+      Alert.alert('Sucesso', `Email de recuperação enviado para ${email}`);
+      // Lógica de envio de email de recuperação
+    } else {
+      Alert.alert('Erro', 'Email não encontrado. Verifique e tente novamente.');
+    }
   };
 
   return (

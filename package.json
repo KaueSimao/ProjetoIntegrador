@@ -21,6 +21,7 @@
     "expo": "~51.0.28",
     "expo-checkbox": "~3.0.0",
     "expo-status-bar": "~1.12.1",
+    "firebase": "^10.14.1",
     "json-server": "^1.0.0-beta.0",
     "navbar-native": "^1.6.1",
     "projetointegrador": "file:",
@@ -34,6 +35,7 @@
     "react-native-safe-area-context": "^4.10.5",
     "react-native-screens": "^3.31.1",
     "react-native-select-dropdown": "^4.0.1",
+    "react-native-swiper": "^1.6.0",
     "react-native-vector-icons": "^10.1.0",
     "react-native-web": "~0.19.10"
   },

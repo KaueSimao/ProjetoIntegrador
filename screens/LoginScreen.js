@@ -14,7 +14,7 @@ import Checkbox from 'expo-checkbox';
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Ionicons } from '@expo/vector-icons';  // Importar ícones
 
-const API_URL = "http://192.168.11.174:3000/students";
+const API_URL = "http://192.168.15.49:3000/students";
 
 export default function LoginScreen({ navigation }) {
   const [fontsLoaded] = useFonts({
@@ -96,7 +96,7 @@ export default function LoginScreen({ navigation }) {
         <TextInput
           style={styles.input}
           placeholder="Digite sua senha"
-          secureTextEntry={!showPassword} // Alterado aqui
+          secureTextEntry={!showPassword} 
           value={password}
           onChangeText={setPassword}
         />
@@ -148,7 +148,7 @@ const styles = StyleSheet.create({
   logo: {
     width: 150,
     height: 150,
-    marginBottom: 20,
+    marginBottom: 10,
   },
   label: {
     fontSize: 18,
@@ -157,7 +157,7 @@ const styles = StyleSheet.create({
     marginBottom: 5,
   },
   input: {
-    width: "100%",
+    width: 300,
     height: 40,
     borderWidth: 1,
     borderColor: "#ccc",
@@ -198,7 +198,7 @@ const styles = StyleSheet.create({
     textDecorationLine: "underline",
   },
   button: {
-    width: "100%",
+    width: 90,
     height: 40,
     backgroundColor: "#B20000",
     justifyContent: "center",
@@ -216,5 +216,6 @@ const styles = StyleSheet.create({
     fontFamily: "Roboto-Regular",
     color: "red",
     textDecorationLine: "underline",
+    marginBottom: 85,
   },
 });
