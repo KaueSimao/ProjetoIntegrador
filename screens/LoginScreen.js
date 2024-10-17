@@ -14,7 +14,7 @@ import Checkbox from 'expo-checkbox';
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Ionicons } from '@expo/vector-icons';  // Importar ícones
 
-const API_URL = "http://192.168.15.49:3000/students";
+const API_URL = "http://192.168.11.159:3000/students";
 
 export default function LoginScreen({ navigation }) {
   const [fontsLoaded] = useFonts({

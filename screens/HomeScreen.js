@@ -211,10 +211,12 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     borderRadius: 5,
+    marginBottom: 50,
   },
   buttonText: {
     fontSize: 18,
     fontFamily: "Roboto-Medium",
     color: "white",
+   
   },
 });
