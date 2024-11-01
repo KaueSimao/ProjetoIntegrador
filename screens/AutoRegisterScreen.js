@@ -7,10 +7,10 @@ import {
   Text,
   TouchableOpacity
 } from "react-native";
-import RNPickerSelect from "react-native-picker-select";
 import AwesomeAlert from 'react-native-awesome-alerts';
 import { useFonts } from "expo-font";
 import { useFocusEffect } from "@react-navigation/native";
+import { registerStudent } from '../api/apiService'; // Verifique o caminho
 
 export default function AutoRegisterScreen({ navigation }) {
   const [fontsLoaded] = useFonts({
@@ -19,27 +19,17 @@ export default function AutoRegisterScreen({ navigation }) {
     "Roboto-Medium": require("../assets/fonts/Roboto-Medium.ttf"),
   });
 
-  const [nome, setNome] = useState("");
-  const [email, setEmail] = useState("");
-  const [senha, setSenha] = useState("");
-  const [confirmaSenha, setConfirmaSenha] = useState("");
-  const [selectedCourse, setSelectedCourse] = useState(null);
+  const [studentName, setNome] = useState("");
+  const [institutionalEmail, setEmail] = useState("");
+  const [studentPassword, setSenha] = useState("");
   const [alertVisible, setAlertVisible] = useState(false);
   const [alertMessage, setAlertMessage] = useState("");
   const [redirectToLogin, setRedirectToLogin] = useState(false);
 
-  const courses = [
-    { label: "Engenharia", value: "engenharia" },
-    { label: "Medicina", value: "medicina" },
-    { label: "Direito", value: "direito" },
-    { label: "Administração", value: "administracao" },
-  ];
-
   const validateFields = () => {
-    const trimmedNome = nome.trim();
-    const trimmedEmail = email.trim();
-    const trimmedSenha = senha.trim();
-    const trimmedConfirmaSenha = confirmaSenha.trim();
+    const trimmedNome = studentName.trim();
+    const trimmedEmail = institutionalEmail.trim(); // Corrigido aqui
+    const trimmedSenha = studentPassword.trim();
     const regex = /^[\s]+$/;
 
     const nameRegex = /^[A-Za-z\s]+$/;
@@ -55,14 +45,8 @@ export default function AutoRegisterScreen({ navigation }) {
       return false;
     }
 
-    if (trimmedSenha === "" && trimmedConfirmaSenha === "") {
+    if (trimmedSenha === "") {
       setAlertMessage("Erro, digite uma senha.");
-      setAlertVisible(true);
-      return false;
-    }
-
-    if (trimmedSenha !== trimmedConfirmaSenha) {
-      setAlertMessage("Erro, as senhas não coincidem.");
       setAlertVisible(true);
       return false;
     }
@@ -76,30 +60,16 @@ export default function AutoRegisterScreen({ navigation }) {
     }
 
     const data = {
-      name: nome.trim(),
-      email: email.trim(),
-      password: senha,
-      courseId: selectedCourse,
+      studentName: studentName.trim(),
+      institutionalEmail: institutionalEmail.trim(),
+      studentPassword: studentPassword,
     };
 
     try {
-      const response = await fetch('http://localhost:3000/students', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(data),
-      });
-
-      if (response.ok) {
-        setAlertMessage("Sucesso, cadastro realizado com sucesso!");
-        setAlertVisible(true);
-        setRedirectToLogin(true); // Defina para redirecionar após a confirmação
-      } else {
-        const responseData = await response.json();
-        setAlertMessage(responseData.message || "Erro ao tentar realizar o cadastro.");
-        setAlertVisible(true);
-      }
+      const response = await registerStudent(data);
+      setAlertMessage("Sucesso, cadastro realizado com sucesso!");
+      setAlertVisible(true);
+      setRedirectToLogin(true);
     } catch (error) {
       console.error(error);
       setAlertMessage("Erro ao tentar realizar o cadastro.");
@@ -112,8 +82,6 @@ export default function AutoRegisterScreen({ navigation }) {
       setNome("");
       setEmail("");
       setSenha("");
-      setConfirmaSenha("");
-      setSelectedCourse(null);
     }, [])
   );
 
@@ -130,14 +98,14 @@ export default function AutoRegisterScreen({ navigation }) {
           style={styles.input}
           placeholder="Digite seu nome:"
           onChangeText={(text) => setNome(text)}
-          value={nome}
+          value={studentName}
         />
         <Text style={styles.label}>Email institucional</Text>
         <TextInput
           style={styles.input}
           placeholder="Digite seu email:"
           onChangeText={(text) => setEmail(text.trim())}
-          value={email}
+          value={institutionalEmail}
         />
         <Text style={styles.label}>Senha</Text>
         <TextInput
@@ -145,24 +113,9 @@ export default function AutoRegisterScreen({ navigation }) {
           placeholder="Digite sua senha:"
           secureTextEntry={true}
           onChangeText={(text) => setSenha(text.trim())}
-          value={senha}
+          value={studentPassword}
         />
-        <Text style={styles.label}>Repita a senha</Text>
-        <TextInput
-          style={styles.input}
-          placeholder="Repita sua senha:"
-          secureTextEntry={true}
-          onChangeText={(text) => setConfirmaSenha(text.trim())}
-          value={confirmaSenha}
-        />
-        <Text style={styles.label}>Curso</Text>
-        <RNPickerSelect
-          onValueChange={(value) => setSelectedCourse(value)}
-          items={courses}
-          placeholder={{ label: "Escolha seu curso:", value: null }}
-          style={pickerSelectStyles}
-          value={selectedCourse}
-        />
+        
         <TouchableOpacity
           style={styles.button}
           onPress={cadastro}
@@ -190,7 +143,7 @@ export default function AutoRegisterScreen({ navigation }) {
         onConfirmPressed={() => {
           setAlertVisible(false);
           if (redirectToLogin) {
-            navigation.navigate("Login"); // Redirecionar para a tela de login
+            navigation.navigate("Login");
           }
         }}
         titleStyle={styles.alertTitle}
@@ -268,30 +221,5 @@ const styles = StyleSheet.create({
     fontFamily: "Roboto-Medium",
     fontSize: 16,
     color: "#fff",
-  },
-});
-
-const pickerSelectStyles = StyleSheet.create({
-  inputIOS: {
-    fontSize: 16,
-    fontFamily: "Roboto-Regular",
-    height: 40,
-    borderColor: "#ccc",
-    borderWidth: 1,
-    borderRadius: 5,
-    paddingHorizontal: 10,
-    marginBottom: 10,
-    color: "#333",
-  },
-  inputAndroid: {
-    fontSize: 16,
-    fontFamily: "Roboto-Regular",
-    height: 40,
-    borderColor: "#ccc",
-    borderWidth: 1,
-    borderRadius: 5,
-    paddingHorizontal: 10,
-    marginBottom: 10,
-    color: "#333",
   },
 });

@@ -1,13 +1,7 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Image, Alert } from 'react-native';
 import { useFonts } from 'expo-font';
-
-// Simulação do banco de dados JSON
-const usersDatabase = [
-  { id: 1, email: 'user1@example.com', password: 'password123' },
-  { id: 2, email: 'user2@example.com', password: 'mypassword' },
-  // Outros usuários podem ser adicionados aqui
-];
+import { forgotPassword } from '../api/apiService';
 
 const ForgotPasswordScreen = ({ navigation }) => {
   const [email, setEmail] = useState('');
@@ -22,15 +16,22 @@ const ForgotPasswordScreen = ({ navigation }) => {
     return null;
   }
 
-  const handleForgotPassword = () => {
-    // Verifica se o e-mail existe no banco de dados
-    const userExists = usersDatabase.some(user => user.email === email);
+  const handleForgotPassword = async () => {
+    if (!email.endsWith("@fatec.sp.gov.br")) {
+      Alert.alert('Erro', 'Por favor, insira um email institucional válido.');
+      return;
+    }
 
-    if (userExists) {
-      Alert.alert('Sucesso', `Email de recuperação enviado para ${email}`);
-      // Lógica de envio de email de recuperação
-    } else {
-      Alert.alert('Erro', 'Email não encontrado. Verifique e tente novamente.');
+    try {
+      const response = await forgotPassword(email); // Chama a função da API
+
+      if (response.success) { // Ajuste isso de acordo com a estrutura da resposta
+        Alert.alert('Sucesso', `Email de recuperação enviado para ${email}`);
+      } else {
+        Alert.alert('Erro', response.message || 'Erro ao enviar o email.');
+      }
+    } catch (error) {
+      Alert.alert('Erro', error.message);
     }
   };
 
@@ -44,7 +45,7 @@ const ForgotPasswordScreen = ({ navigation }) => {
           style={styles.inputEmail}
           placeholder="Digite seu email: "
           value={email}
-          onChangeText={(text) => setEmail(text)}
+          onChangeText={setEmail}
           keyboardType="email-address"
           autoCapitalize="none"
           autoCorrect={false}

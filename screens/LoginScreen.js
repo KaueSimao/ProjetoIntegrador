@@ -6,15 +6,12 @@ import {
   StyleSheet,
   Text,
   TouchableOpacity,
-  CheckBox,
-  Alert,
 } from "react-native";
 import { useFonts } from "expo-font";
 import Checkbox from 'expo-checkbox';
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { Ionicons } from '@expo/vector-icons';  // Importar ícones
-
-const API_URL = "http://192.168.11.159:3000/students";
+import { Ionicons } from '@expo/vector-icons';  
+import { loginStudent } from '../api/apiService'; // Alterado para importar fetchStudents
 
 export default function LoginScreen({ navigation }) {
   const [fontsLoaded] = useFonts({
@@ -23,47 +20,46 @@ export default function LoginScreen({ navigation }) {
     "Roboto-Medium": require("../assets/fonts/Roboto-Medium.ttf"),
   });
 
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const [institutionalEmail, setEmail] = useState("");
+  const [studentPassword, setPassword] = useState("");
   const [rememberLogin, setRememberLogin] = useState(false);
-  const [showPassword, setShowPassword] = useState(false); // Novo estado
+  const [showPassword, setShowPassword] = useState(false); 
 
   useEffect(() => {
     checkRememberedLogin();
   }, []);
 
-  const checkRememberedLogin = async () => {
-    try {
-      const rememberedLogin = await AsyncStorage.getItem("rememberedLogin");
-      if (rememberedLogin) {
-        const user = JSON.parse(rememberedLogin);
-        setEmail(user.email);
-        setPassword(user.password);
-        setRememberLogin(true);
-      }
-    } catch (error) {
-      console.error("Erro ao recuperar o estado de lembrar login", error);
-    }
-  };
+  // const checkRememberedLogin = async () => {
+  //   try {
+  //     const rememberedLogin = await AsyncStorage.getItem("rememberedLogin");
+  //     if (rememberedLogin) {
+  //       const user = JSON.parse(rememberedLogin);
+  //       setEmail(user.institutionalEmail);
+  //       setPassword(user.password);
+  //       setRememberLogin(true);
+  //     }
+  //   } catch (error) {
+  //     console.error("Erro ao recuperar o estado de lembrar login", error);
+  //   }
+  // };
 
   const login = async () => {
     try {
-      const response = await fetch(API_URL);
-      const students = await response.json();
-      const user = students.find((student) => student.email === email);
+      const response = await loginStudent(); // Alterado para fetchStudents
+      const user = response.find((student) => student.institutionalEmail === institutionalEmail);
 
-      if (!user || user.password !== password) {
-        alert("Erro, email ou senha incorretos.");
+      if (!user || user.studentPassword !== studentPassword) {
+        alert("Erro, email ou senha incorretos.");1
         return;
       }
 
       alert("Sucesso, login bem-sucedido!");
 
-      if (rememberLogin) {
-        await AsyncStorage.setItem("rememberedLogin", JSON.stringify(user));
-      } else {
-        await AsyncStorage.removeItem("rememberedLogin");
-      }
+      // if (rememberLogin) {
+      //   await AsyncStorage.setItem("rememberedLogin", JSON.stringify(user));
+      // } else {
+      //   await AsyncStorage.removeItem("rememberedLogin");
+      // }
 
       navigation.navigate("HomeScreen", { user });
 
@@ -85,7 +81,7 @@ export default function LoginScreen({ navigation }) {
       <TextInput
         style={styles.input}
         placeholder="Digite seu email"
-        value={email}
+        value={institutionalEmail}
         onChangeText={setEmail}
         autoCapitalize="none"
         keyboardType="email-address"
@@ -97,7 +93,7 @@ export default function LoginScreen({ navigation }) {
           style={styles.input}
           placeholder="Digite sua senha"
           secureTextEntry={!showPassword} 
-          value={password}
+          value={studentPassword}
           onChangeText={setPassword}
         />
         <TouchableOpacity
@@ -105,7 +101,7 @@ export default function LoginScreen({ navigation }) {
           style={styles.eyeButton}
         >
           <Ionicons
-            name={showPassword ? "eye-off" : "eye"} // Ícone de olho
+            name={showPassword ? "eye-off" : "eye"}
             size={24}
             color="gray"
           />
@@ -181,10 +177,6 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     width: "100%",
     marginBottom: 15,
-  },
-  checkboxContainer: {
-    flexDirection: "row",
-    alignItems: "center",
   },
   rememberLogin: {
     fontSize: 16,
