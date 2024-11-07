@@ -2,11 +2,10 @@ import React, { useState, useEffect } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { View, Image, StyleSheet, Text, Dimensions, TouchableOpacity, ScrollView } from "react-native";
 import { useFonts } from "expo-font";
-import Swiper from 'react-native-swiper';
 import AwesomeAlert from "react-native-awesome-alerts";
-import { Ionicons } from '@expo/vector-icons';
 
 const { width } = Dimensions.get('window');
+
 export default function HomeScreen({ navigation, route }) {
   const [fontsLoaded] = useFonts({
     "Roboto-Light": require("../assets/fonts/Roboto-Light.ttf"),
@@ -14,14 +13,30 @@ export default function HomeScreen({ navigation, route }) {
     "Roboto-Medium": require("../assets/fonts/Roboto-Medium.ttf"),
   });
 
-  const [user, setUser] = useState(null); 
+  const [user, setUser] = useState(null);
   const [showAlert, setShowAlert] = useState(false);
 
   useEffect(() => {
-    if (route.params && route.params.user) {
-      setUser(route.params.user);
-    }
-  }, [route.params]);
+    const loadUser = async () => {
+      // Verifique se o usuário foi passado pela navegação
+      console.log("route.params?.user:", route.params?.user);
+  
+      if (route.params?.user) {
+        setUser(route.params.user);  // Usando os dados passados pela navegação
+      } else {
+        // Carregue o usuário do AsyncStorage
+        const rememberedUser = await AsyncStorage.getItem("rememberedLogin");
+        console.log("Usuário do AsyncStorage:", rememberedUser);
+  
+        if (rememberedUser) {
+          setUser(JSON.parse(rememberedUser));  // Carregando o usuário do AsyncStorage
+        }
+      }
+    };
+  
+    loadUser();
+  }, [route.params]);  // Recarrega quando a navegação muda (ou quando params mudam)
+  
 
   const logout = async () => {
     try {
@@ -45,9 +60,15 @@ export default function HomeScreen({ navigation, route }) {
     setShowAlert(false);
   };
 
-  if (!fontsLoaded || !user) {
-    return null;
-  }
+  // Verifique se user ou fontsLoaded são falsos
+if (!fontsLoaded || !user) {
+  console.log("Carregando... fontsLoaded:", fontsLoaded, "user:", user);
+  return (
+    <View style={styles.container}>
+      <Text>Carregando...</Text>
+    </View>
+  );
+}
 
   return (
     <View style={styles.container}>
@@ -59,11 +80,9 @@ export default function HomeScreen({ navigation, route }) {
           <Image source={require("../assets/fatec-logo.png")} style={styles.logo} />
         </View>
 
-        <Text style={styles.title}>Seja Bem-Vindo, {user.name}</Text>
+        <Text style={styles.title}>Seja Bem-Vindo, {user?.studentName || 'Usuário'}</Text>
 
         <Text style={styles.textnovidade}>Destaques</Text>
-
-      
 
         {/* Cards com informações */}
         <View style={styles.cardContainer}>
@@ -152,26 +171,11 @@ const styles = StyleSheet.create({
     marginBottom: 20,
     color: "#333",
   },
-  swiper: {
-    height: 200,
-  },
   textnovidade: {
     marginTop: 30,
     fontSize: 28,
     fontFamily: "Roboto-Medium",
     color: "black",
-  },
-  swiperImage: {
-    width: width * 0.9,
-    height: 200,
-    borderRadius: 10,
-  },
-  buttonWrapper: {
-    backgroundColor: 'transparent',
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    paddingHorizontal: 10,
-    paddingVertical: 20,
   },
   cardContainer: {
     marginTop: 30,
@@ -217,6 +221,5 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontFamily: "Roboto-Medium",
     color: "white",
-   
   },
 });

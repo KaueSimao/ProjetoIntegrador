@@ -2,13 +2,13 @@ import axios from 'axios';
 
 const API_URL = 'https://projeto-integrador-1v4i.onrender.com/student/';
 
-// Função para buscar todos os estudantes
-export const fetchStudents = async () => {
+// Função para buscar um estudante pelo ID
+export const fetchStudentById = async (id) => {
   try {
-    const response = await axios.get(API_URL);
-    return response.data; // Retorna a lista de estudantes
+    const response = await axios.get(`${API_URL}${id}`); // Adiciona o ID na URL
+    return response.data; // Retorna os dados do estudante
   } catch (error) {
-    throw new Error('Erro ao buscar estudantes: ' + error.message);
+    throw new Error('Erro ao buscar estudante: ' + error.message);
   }
 };
 
@@ -25,7 +25,7 @@ export const registerStudent = async (data) => {
 // Função para login
 export const loginStudent = async (credentials) => {
   try {
-    const response = await axios.post(`${API_URL}/auth`, credentials);
+    const response = await axios.post(`${API_URL}auth`, credentials);
     return response.data; // Retorna os dados do estudante logado
   } catch (error) {
     throw new Error('Erro ao realizar login: ' + error.message);

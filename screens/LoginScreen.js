@@ -11,7 +11,7 @@ import { useFonts } from "expo-font";
 import Checkbox from 'expo-checkbox';
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Ionicons } from '@expo/vector-icons';  
-import { loginStudent } from '../api/apiService'; // Alterado para importar fetchStudents
+import { loginStudent } from '../api/apiService'; // Importando a função que faz o login
 
 export default function LoginScreen({ navigation }) {
   const [fontsLoaded] = useFonts({
@@ -24,51 +24,58 @@ export default function LoginScreen({ navigation }) {
   const [studentPassword, setPassword] = useState("");
   const [rememberLogin, setRememberLogin] = useState(false);
   const [showPassword, setShowPassword] = useState(false); 
+  const [alertMessage, setAlertMessage] = useState(""); // Mensagem de alerta
+  const [alertVisible, setAlertVisible] = useState(false); // Controle de visibilidade do alerta
 
-  useEffect(() => {
-    checkRememberedLogin();
-  }, []);
+  // Função de validação dos campos
+  const validateLoginFields = () => {
+    if (!institutionalEmail || !studentPassword) {
+      setAlertMessage("Por favor, preencha o e-mail e a senha.");
+      setAlertVisible(true);
+      return false;
+    }
+    return true;
+  };
 
-  // const checkRememberedLogin = async () => {
-  //   try {
-  //     const rememberedLogin = await AsyncStorage.getItem("rememberedLogin");
-  //     if (rememberedLogin) {
-  //       const user = JSON.parse(rememberedLogin);
-  //       setEmail(user.institutionalEmail);
-  //       setPassword(user.password);
-  //       setRememberLogin(true);
-  //     }
-  //   } catch (error) {
-  //     console.error("Erro ao recuperar o estado de lembrar login", error);
-  //   }
-  // };
-
+  // Função de login
   const login = async () => {
+    if (!validateLoginFields()) {
+      return;
+    }
+
+    const credentials = {
+      institutionalEmail: institutionalEmail,
+      studentPassword: studentPassword,
+    };
+
     try {
-      const response = await loginStudent(); // Alterado para fetchStudents
-      const user = response.find((student) => student.institutionalEmail === institutionalEmail);
+      const response = await loginStudent(credentials); // Envia as credenciais para a API
 
-      if (!user || user.studentPassword !== studentPassword) {
-        alert("Erro, email ou senha incorretos.");1
-        return;
+      console.log("Resposta da API:", response);  // Verifique o que está sendo retornado
+
+      if (response) {
+        setAlertMessage("Sucesso, login bem-sucedido!");
+        setAlertVisible(true);
+
+        // Salva o login se a opção "Lembrar login" estiver marcada
+        if (rememberLogin) {
+          console.log("Salvando login no AsyncStorage", response);
+          await AsyncStorage.setItem("rememberedLogin", JSON.stringify(response));
+        } else {
+          await AsyncStorage.removeItem("rememberedLogin");
+        }
+
+        // Navega para a tela principal com as informações do usuário
+        navigation.navigate("HomeScreen", { user: response }); // Passando 'user' para HomeScreen
       }
-
-      alert("Sucesso, login bem-sucedido!");
-
-      // if (rememberLogin) {
-      //   await AsyncStorage.setItem("rememberedLogin", JSON.stringify(user));
-      // } else {
-      //   await AsyncStorage.removeItem("rememberedLogin");
-      // }
-
-      navigation.navigate("HomeScreen", { user });
-
     } catch (error) {
       console.error("Erro ao tentar fazer login", error);
-      alert("Erro ao tentar fazer login.");
+      setAlertMessage("Erro ao tentar fazer login.");
+      setAlertVisible(true);
     }
   };
 
+  // Aguarda o carregamento das fontes
   if (!fontsLoaded) {
     return null;
   }
@@ -77,6 +84,14 @@ export default function LoginScreen({ navigation }) {
     <View style={styles.container}>
       <Text style={styles.textLogin}>Login</Text>
       <Image source={require("../assets/profile.png")} style={styles.logo} />
+      
+      {/* Alerta de erro ou sucesso */}
+      {alertVisible && (
+        <View style={styles.alertContainer}>
+          <Text style={styles.alertMessage}>{alertMessage}</Text>
+        </View>
+      )}
+
       <Text style={styles.label}>Email institucional</Text>
       <TextInput
         style={styles.input}
@@ -210,4 +225,15 @@ const styles = StyleSheet.create({
     textDecorationLine: "underline",
     marginBottom: 85,
   },
+  alertContainer: {
+    backgroundColor: "#f8d7da",
+    padding: 10,
+    borderRadius: 5,
+    marginBottom: 15,
+  },
+  alertMessage: {
+    color: "#721c24",
+    fontSize: 16,
+    fontFamily: "Roboto-Regular",
+  }
 });

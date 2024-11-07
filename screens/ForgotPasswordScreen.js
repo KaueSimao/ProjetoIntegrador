@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, Image, Alert } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, Image, Alert, ActivityIndicator } from 'react-native';
 import { useFonts } from 'expo-font';
 import { forgotPassword } from '../api/apiService';
 
 const ForgotPasswordScreen = ({ navigation }) => {
   const [email, setEmail] = useState('');
-
+  const [isLoading, setIsLoading] = useState(false); // Estado para controlar o carregamento
   const [fontsLoaded] = useFonts({
     'Roboto-Light': require('../assets/fonts/Roboto-Light.ttf'),
     'Roboto-Regular': require('../assets/fonts/Roboto-Regular.ttf'),
@@ -17,28 +17,32 @@ const ForgotPasswordScreen = ({ navigation }) => {
   }
 
   const handleForgotPassword = async () => {
-    if (!email.endsWith("@fatec.sp.gov.br")) {
-      Alert.alert('Erro', 'Por favor, insira um email institucional válido.');
+    if (!email.endsWith('@fatec.sp.gov.br')) {
+      Alert.alert('Erro', 'Por favor, insira um e-mail institucional válido.');
       return;
     }
+
+    setIsLoading(true); // Inicia o carregamento
 
     try {
       const response = await forgotPassword(email); // Chama a função da API
 
-      if (response.success) { // Ajuste isso de acordo com a estrutura da resposta
-        Alert.alert('Sucesso', `Email de recuperação enviado para ${email}`);
+      if (response.success) {
+        Alert.alert('Sucesso', `E-mail de recuperação enviado para ${email}`);
       } else {
-        Alert.alert('Erro', response.message || 'Erro ao enviar o email.');
+        Alert.alert('Erro', response.message || 'Erro ao enviar o e-mail.');
       }
     } catch (error) {
-      Alert.alert('Erro', error.message);
+      Alert.alert('Erro', error.message || 'Erro ao tentar recuperar a senha.');
+    } finally {
+      setIsLoading(false); // Finaliza o carregamento
     }
   };
 
   return (
     <View style={styles.container}>
       <Text style={styles.textRecoverPassword}>RECUPERAR SENHA</Text>
-      <Image source={require("../assets/profile.png")} style={styles.logo} />
+      <Image source={require('../assets/profile.png')} style={styles.logo} />
       <View style={styles.groupInputs}>
         <Text style={styles.emailInstitucional}>Email institucional</Text>
         <TextInput
@@ -50,16 +54,14 @@ const ForgotPasswordScreen = ({ navigation }) => {
           autoCapitalize="none"
           autoCorrect={false}
         />
-        <TouchableOpacity
-          onPress={handleForgotPassword}
-          style={styles.button1}
-        >
-          <Text style={styles.buttonText}>ENVIAR</Text>
+        <TouchableOpacity onPress={handleForgotPassword} style={styles.button1} disabled={isLoading}>
+          {isLoading ? (
+            <ActivityIndicator size="small" color="white" />
+          ) : (
+            <Text style={styles.buttonText}>ENVIAR</Text>
+          )}
         </TouchableOpacity>
-        <TouchableOpacity
-          onPress={() => navigation.goBack()}
-          style={styles.button2}
-        >
+        <TouchableOpacity onPress={() => navigation.goBack()} style={styles.button2}>
           <Text style={styles.buttonText}>VOLTAR</Text>
         </TouchableOpacity>
       </View>
