@@ -21,12 +21,12 @@ const ForgotPasswordScreen = ({ navigation }) => {
       Alert.alert('Erro', 'Por favor, insira um e-mail institucional válido.');
       return;
     }
-
+  
     setIsLoading(true); // Inicia o carregamento
-
+  
     try {
       const response = await forgotPassword(email); // Chama a função da API
-
+  
       if (response.success) {
         Alert.alert('Sucesso', `E-mail de recuperação enviado para ${email}`);
       } else {
@@ -38,6 +38,7 @@ const ForgotPasswordScreen = ({ navigation }) => {
       setIsLoading(false); // Finaliza o carregamento
     }
   };
+  
 
   return (
     <View style={styles.container}>
