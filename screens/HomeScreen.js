@@ -186,11 +186,9 @@ const styles = StyleSheet.create({
     padding: 15,
     borderRadius: 10,
     marginBottom: 15,
-    shadowColor: "#000",
-    shadowOpacity: 0.2,
-    shadowOffset: { width: 0, height: 2 },
-    shadowRadius: 5,
-    elevation: 3,
+    // A sombra no iOS
+    boxShadow: "0px 2px 5px rgba(0, 0, 0, 0.2)", // Adicionando boxShadow
+    elevation: 3, // Mantém a sombra no Android com o elevation
   },
   cardTitle: {
     fontSize: 18,

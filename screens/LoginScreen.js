@@ -99,7 +99,7 @@ export default function LoginScreen({ navigation }) {
         value={institutionalEmail}
         onChangeText={setEmail}
         autoCapitalize="none"
-        keyboardType="email-address"
+        inputMode="email-address"
       />
 
       <Text style={styles.label}>Senha</Text>

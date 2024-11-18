@@ -41,14 +41,13 @@ export const loginStudent = async (credentials) => {
 //       throw new Error('Erro ao tentar recuperar a senha: ' + error.message);
 //     }
 //   };
-  
+
 
 export const forgotPassword = async (email) => {
-  try {
-    // Envia o email como objeto JSON
-    const response = await axios.post(`${API_URL}forgot-password`, { email });
-    return response.data; // Retorna os dados da resposta
-  } catch (error) {
-    throw new Error('Erro ao tentar recuperar a senha: ' + error.message);
-  }
+  // Envia o email como objeto JSON
+  const response = await axios.post(`https://projeto-integrador-1v4i.onrender.com/student/forgot-password`, { 'institutionalEmail': email },
+    { validateStatus: () => true }
+  );
+  console.log(response.data)
+  return response.data; // Retorna os dados da resposta
 };

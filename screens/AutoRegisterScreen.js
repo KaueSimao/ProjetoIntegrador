@@ -5,12 +5,13 @@ import {
   TextInput,
   StyleSheet,
   Text,
-  TouchableOpacity
+  PressableOpacity
 } from "react-native";
 import AwesomeAlert from 'react-native-awesome-alerts';
 import { useFonts } from "expo-font";
 import { useFocusEffect } from "@react-navigation/native";
 import { registerStudent } from '../api/apiService'; // Verifique o caminho
+
 
 export default function AutoRegisterScreen({ navigation }) {
   const [fontsLoaded] = useFonts({
@@ -116,18 +117,18 @@ export default function AutoRegisterScreen({ navigation }) {
           value={studentPassword}
         />
         
-        <TouchableOpacity
+        <PressableOpacity
           style={styles.button}
           onPress={cadastro}
         >
           <Text style={styles.buttonText}>CADASTRAR</Text>
-        </TouchableOpacity>
-        <TouchableOpacity
+        </PressableOpacity>
+        <PressableOpacity
           style={styles.buttonVoltar}
           onPress={() => navigation.navigate("Login")}
         >
           <Text style={styles.buttonText}>VOLTAR</Text>
-        </TouchableOpacity>
+        </PressableOpacity>
       </View>
       <AwesomeAlert
         show={alertVisible}

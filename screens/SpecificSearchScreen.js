@@ -12,7 +12,7 @@ import {
 } from "react-native";
 import { useFonts } from "expo-font";
 
-const API_URL = "http://192.168.11.174:8080";
+const API_URL = "https://projeto-integrador-1v4i.onrender.com";
 
 export default function SpecificSearchScreen({ navigation }) {
   const [fontsLoaded] = useFonts({
@@ -31,6 +31,7 @@ export default function SpecificSearchScreen({ navigation }) {
   const [selectedSubject, setSelectedSubject] = useState(null);
   const [selectedWeek, setSelectedWeek] = useState(0);
   const [selectedMonth, setSelectedMonth] = useState(new Date().getMonth());
+  const [accessToken, setAccessToken] = useState(null); // Token de acesso
 
   const daysOfWeek = ["Segunda", "Terça", "Quarta", "Quinta", "Sexta", "Sábado"];
   const weeks = Array.from({ length: 4 }, (_, i) => `Semana ${i + 1}`);
@@ -40,13 +41,25 @@ export default function SpecificSearchScreen({ navigation }) {
   }));
 
   useEffect(() => {
+    // Simulação do login, onde o token é obtido
+    const storedToken = "seu_token_aqui"; // Suponha que o token seja armazenado após o login
+    setAccessToken(storedToken);  // Armazenando o token
+
     fetchFilters();
     fetchData();
   }, []);
 
   const fetchData = async () => {
+    if (!accessToken) {
+      return setErrorMessage("Token não encontrado. Por favor, faça login novamente.");
+    }
+
     try {
-      const timetableResponse = await axios.get(`${API_URL}/schedule/`);
+      const timetableResponse = await axios.get(`${API_URL}/schedule/`, {
+        headers: {
+          Authorization: `Bearer ${accessToken}`, // Adicionando o token nas requisições
+        }
+      });
       setTimetable(timetableResponse.data);
     } catch (error) {
       console.error(error);
@@ -55,10 +68,26 @@ export default function SpecificSearchScreen({ navigation }) {
   };
 
   const fetchFilters = async () => {
+    if (!accessToken) {
+      return setErrorMessage("Token não encontrado. Por favor, faça login novamente.");
+    }
+
     try {
-      const teachersResponse = await axios.get(`${API_URL}/teacher/`);
-      const subjectsResponse = await axios.get(`${API_URL}/subject/`);
-      const coursesResponse = await axios.get(`${API_URL}/course/`);
+      const teachersResponse = await axios.get(`${API_URL}/teacher/`, {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      });
+      const subjectsResponse = await axios.get(`${API_URL}/subject/`, {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      });
+      const coursesResponse = await axios.get(`${API_URL}/course/`, {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      });
 
       const formattedTeachers = teachersResponse.data.map((teacher) => ({
         label: teacher.teacherName,
@@ -130,48 +159,43 @@ export default function SpecificSearchScreen({ navigation }) {
       <RNPickerSelect
         onValueChange={(value) => setSelectedMonth(value)}
         items={months}
-        placeholder={{ label: "Selecione um Mês", value: null }}
-        value={selectedMonth}
+        placeholder={{ label: "Selecione um Mês", value: undefined }} // Use undefined ao invés de null
+        value={selectedMonth || ""} // Garantir que o valor não seja null
         style={pickerSelectStyles}
       />
 
       <RNPickerSelect
         onValueChange={(value) => setSelectedWeek(value)}
         items={weeks.map((week, index) => ({ label: week, value: index }))}
-        placeholder={{ label: "Selecione uma Semana", value: null }}
-        value={selectedWeek}
+        placeholder={{ label: "Selecione uma Semana", value: undefined }} // Use undefined ao invés de null
+        value={selectedWeek || ""} // Garantir que o valor não seja null
         style={pickerSelectStyles}
       />
 
       <RNPickerSelect
-        onValueChange={(value) => {
-          setSelectedTeacher(value);
-        }}
+        onValueChange={(value) => setSelectedTeacher(value)}
         items={teachers}
-        placeholder={{ label: "Selecione um Professor", value: null }}
-        value={selectedTeacher}
+        placeholder={{ label: "Selecione um Professor", value: undefined }} // Use undefined ao invés de null
+        value={selectedTeacher || ""} // Garantir que o valor não seja null
         style={pickerSelectStyles}
       />
 
       <RNPickerSelect
-        onValueChange={(value) => {
-          setSelectedCourse(value);
-        }}
+        onValueChange={(value) => setSelectedCourse(value)}
         items={courses}
-        placeholder={{ label: "Selecione um Curso", value: null }}
-        value={selectedCourse}
+        placeholder={{ label: "Selecione um Curso", value: undefined }} // Use undefined ao invés de null
+        value={selectedCourse || ""} // Garantir que o valor não seja null
         style={pickerSelectStyles}
       />
 
       <RNPickerSelect
-        onValueChange={(value) => {
-          setSelectedSubject(value);
-        }}
+        onValueChange={(value) => setSelectedSubject(value)}
         items={subjects}
-        placeholder={{ label: "Selecione uma Disciplina", value: null }}
-        value={selectedSubject}
+        placeholder={{ label: "Selecione uma Disciplina", value: undefined }} // Use undefined ao invés de null
+        value={selectedSubject || ""} // Garantir que o valor não seja null
         style={pickerSelectStyles}
       />
+
 
       <View style={styles.table}>
         <View style={styles.tableHeader}>

@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Image, Alert, ActivityIndicator } from 'react-native';
 import { useFonts } from 'expo-font';
 import { forgotPassword } from '../api/apiService';
+import axios from 'axios';
 
 const ForgotPasswordScreen = ({ navigation }) => {
   const [email, setEmail] = useState('');
@@ -21,24 +22,18 @@ const ForgotPasswordScreen = ({ navigation }) => {
       Alert.alert('Erro', 'Por favor, insira um e-mail institucional válido.');
       return;
     }
-  
+
     setIsLoading(true); // Inicia o carregamento
-  
+
     try {
-      const response = await forgotPassword(email); // Chama a função da API
-  
-      if (response.success) {
-        Alert.alert('Sucesso', `E-mail de recuperação enviado para ${email}`);
-      } else {
-        Alert.alert('Erro', response.message || 'Erro ao enviar o e-mail.');
-      }
+      await forgotPassword(email)
     } catch (error) {
-      Alert.alert('Erro', error.message || 'Erro ao tentar recuperar a senha.');
+      throw new Error('Erro ao tentar recuperar a senha: ' + error.message);
     } finally {
       setIsLoading(false); // Finaliza o carregamento
     }
   };
-  
+
 
   return (
     <View style={styles.container}>
@@ -51,7 +46,7 @@ const ForgotPasswordScreen = ({ navigation }) => {
           placeholder="Digite seu email: "
           value={email}
           onChangeText={setEmail}
-          keyboardType="email-address"
+          inputMode="email-address"
           autoCapitalize="none"
           autoCorrect={false}
         />
