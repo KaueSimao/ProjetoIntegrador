@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import RNPickerSelect from "react-native-picker-select";
 import axios from "axios";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import {
   View,
   Image,
@@ -31,7 +32,7 @@ export default function SpecificSearchScreen({ navigation }) {
   const [selectedSubject, setSelectedSubject] = useState(null);
   const [selectedWeek, setSelectedWeek] = useState(0);
   const [selectedMonth, setSelectedMonth] = useState(new Date().getMonth());
-  const [accessToken, setAccessToken] = useState(null); // Token de acesso
+  const [accessToken, setAccessToken] = useState(null);
 
   const daysOfWeek = ["Segunda", "Terça", "Quarta", "Quinta", "Sexta", "Sábado"];
   const weeks = Array.from({ length: 4 }, (_, i) => `Semana ${i + 1}`);
@@ -41,23 +42,30 @@ export default function SpecificSearchScreen({ navigation }) {
   }));
 
   useEffect(() => {
-    // Simulação do login, onde o token é obtido
-    const storedToken = "seu_token_aqui"; // Suponha que o token seja armazenado após o login
-    setAccessToken(storedToken);  // Armazenando o token
 
+    const getToken = async () => {
+      const token = await AsyncStorage.getItem("userToken");
+      console.log('teste', token);
+      setAccessToken(token);  // Armazenando o token
+    }
+
+
+    getToken();
     fetchFilters();
     fetchData();
-  }, []);
+  }, [accessToken]);
 
   const fetchData = async () => {
+    console.log('fera', accessToken)
     if (!accessToken) {
       return setErrorMessage("Token não encontrado. Por favor, faça login novamente.");
     }
 
     try {
       const timetableResponse = await axios.get(`${API_URL}/schedule/`, {
+
         headers: {
-          Authorization: `Bearer ${accessToken}`, // Adicionando o token nas requisições
+          'Authorization': `Bearer ${accessToken}`, // Adicionando o token nas requisições
         }
       });
       setTimetable(timetableResponse.data);
@@ -75,17 +83,17 @@ export default function SpecificSearchScreen({ navigation }) {
     try {
       const teachersResponse = await axios.get(`${API_URL}/teacher/`, {
         headers: {
-          Authorization: `Bearer ${accessToken}`,
+          'Authorization': `Bearer ${accessToken}`,
         },
       });
       const subjectsResponse = await axios.get(`${API_URL}/subject/`, {
         headers: {
-          Authorization: `Bearer ${accessToken}`,
+          'Authorization': `Bearer ${accessToken}`,
         },
       });
       const coursesResponse = await axios.get(`${API_URL}/course/`, {
         headers: {
-          Authorization: `Bearer ${accessToken}`,
+          'Authorization': `Bearer ${accessToken}`,
         },
       });
 

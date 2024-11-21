@@ -13,7 +13,6 @@ import Checkbox from 'expo-checkbox';
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Ionicons } from '@expo/vector-icons';  
 import { loginStudent } from '../api/apiService'; // Importando a função que faz o login
-import jwtDecode from 'jwt-decode';
 
 export default function LoginScreen({ navigation }) {
   const [fontsLoaded] = useFonts({
@@ -67,13 +66,7 @@ export default function LoginScreen({ navigation }) {
       if (response) {
         showAlert("Sucesso, login bem-sucedido!");
 
-        // Salva o login se a opção "Lembrar login" estiver marcada
-        if (rememberLogin) {
-          console.log("Salvando login no AsyncStorage", response);
-          await AsyncStorage.setItem("userToken", response.token);
-        } else {
-          await AsyncStorage.removeItem("rememberedLogin");
-        }
+        await AsyncStorage.setItem("userToken", response.access_token);
 
         // Navega para a tela principal com as informações do usuário
         navigation.navigate("HomeScreen"); // Passando 'user' para HomeScreen
@@ -135,10 +128,6 @@ export default function LoginScreen({ navigation }) {
       </View>
 
       <View style={styles.optionsContainer}>
-        <View style={styles.section}>
-          <Checkbox style={styles.checkbox} value={rememberLogin} onValueChange={setRememberLogin} />
-          <Text style={styles.rememberLogin}>Lembrar meu login?</Text>
-        </View>
         <TouchableOpacity onPress={() => navigation.navigate("ForgotPassword")}>
           <Text style={styles.forgotPassword}>Esqueci minha senha</Text>
         </TouchableOpacity>

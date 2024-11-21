@@ -51,17 +51,17 @@ export default function AutoRegisterScreen({ navigation }) {
     const nameRegex = /^[A-Za-zÀ-ÿ\s]+$/;
 
     if (!trimmedNome || !nameRegex.test(trimmedNome)) {
-      showAlert("Erro: o nome deve conter apenas letras, espaços e acentos.");
+      showAlert("Por favor, o nome deve conter apenas letras, espaços e acentos.");
       return false;
     }
 
     if (!trimmedEmail.endsWith("@fatec.sp.gov.br")) {
-      showAlert("Erro: o email precisa ser institucional.");
+      showAlert("Por favor, o email precisa ser institucional.");
       return false;
     }
 
     if (trimmedSenha === "") {
-      showAlert("Erro: digite uma senha.");
+      showAlert("Por favor, digite uma senha.");
       return false;
     }
 

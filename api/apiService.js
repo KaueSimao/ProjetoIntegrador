@@ -1,5 +1,4 @@
 import axios from 'axios';
-import jwtDecode from 'jwt-decode';
 
 const API_URL = 'https://projeto-integrador-1v4i.onrender.com/student/';
 
@@ -47,7 +46,11 @@ export const loginStudent = async (credentials) => {
 export const forgotPassword = async (email) => {
   // Envia o email como objeto JSON
   try {
-    const response = await axios.post(`${API_URL}forgot-password`, { 'institutionalEmail': email });
+    const response = await axios.post(`${API_URL}forgot-password`,
+       {
+         'institutionalEmail': email,
+         'origin': 'mobile'
+       });
     return response.data;
   } catch (error){
     throw new Error('Erro ao tentar enviar email de recuperação de senha: ' + error.message);

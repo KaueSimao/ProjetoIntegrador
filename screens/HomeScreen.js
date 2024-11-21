@@ -3,7 +3,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { View, Image, StyleSheet, Text, Dimensions, TouchableOpacity, ScrollView } from "react-native";
 import { useFonts } from "expo-font";
 import AwesomeAlert from "react-native-awesome-alerts";
-import jwtDecode from "jwt-decode";
+import axios from "axios";
 
 
 
@@ -22,15 +22,24 @@ export default function HomeScreen({ navigation, route }) {
   useEffect(() => {
     const fetchUserName = async () => {
       try {
+        
         const token = await AsyncStorage.getItem("userToken");
-        if (token) {
-          const decodedToken = jwtDecode(token);
-          setUserName(decodedToken.sub || "Usuário");
+
+        const response = await axios.get('https://projeto-integrador-1v4i.onrender.com/student/',{
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        })
+
+        username = response.data.studentName;
+
+        if (response.status === 200) {
+          setUserName(username);
         } else {
-          setUserName("Usuário");
+          setUserName('Usuário');
         }
       } catch (error) {
-        console.error("Erro ao recuperar token:", error);
+        console.error("Erro ao obter nome de usuário: ", error);
         setUserName("Usuário");
       }
     };
