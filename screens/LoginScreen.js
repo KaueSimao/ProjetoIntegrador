@@ -6,12 +6,14 @@ import {
   StyleSheet,
   Text,
   TouchableOpacity,
+  ActivityIndicator
 } from "react-native";
 import { useFonts } from "expo-font";
 import Checkbox from 'expo-checkbox';
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Ionicons } from '@expo/vector-icons';  
 import { loginStudent } from '../api/apiService'; // Importando a função que faz o login
+import jwtDecode from 'jwt-decode';
 
 export default function LoginScreen({ navigation }) {
   const [fontsLoaded] = useFonts({
@@ -23,6 +25,7 @@ export default function LoginScreen({ navigation }) {
   const [institutionalEmail, setEmail] = useState("");
   const [studentPassword, setPassword] = useState("");
   const [rememberLogin, setRememberLogin] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false); 
   const [alertMessage, setAlertMessage] = useState(""); // Mensagem de alerta
   const [alertVisible, setAlertVisible] = useState(false); // Controle de visibilidade do alerta
@@ -30,11 +33,17 @@ export default function LoginScreen({ navigation }) {
   // Função de validação dos campos
   const validateLoginFields = () => {
     if (!institutionalEmail || !studentPassword) {
-      setAlertMessage("Por favor, preencha o e-mail e a senha.");
-      setAlertVisible(true);
+      showAlert("Por favor, preencha o e-mail e a senha.");
       return false;
     }
     return true;
+  };
+
+   // Função para exibir mensagens de alerta e ocultá-las após 3 segundos
+   const showAlert = (message) => {
+    setAlertMessage(message);
+    setAlertVisible(true);
+    setTimeout(() => setAlertVisible(false), 3000); // Alerta desaparece após 3 segundos
   };
 
   // Função de login
@@ -42,6 +51,8 @@ export default function LoginScreen({ navigation }) {
     if (!validateLoginFields()) {
       return;
     }
+
+    setIsLoading(true);
 
     const credentials = {
       institutionalEmail: institutionalEmail,
@@ -54,24 +65,24 @@ export default function LoginScreen({ navigation }) {
       console.log("Resposta da API:", response);  // Verifique o que está sendo retornado
 
       if (response) {
-        setAlertMessage("Sucesso, login bem-sucedido!");
-        setAlertVisible(true);
+        showAlert("Sucesso, login bem-sucedido!");
 
         // Salva o login se a opção "Lembrar login" estiver marcada
         if (rememberLogin) {
           console.log("Salvando login no AsyncStorage", response);
-          await AsyncStorage.setItem("rememberedLogin", JSON.stringify(response));
+          await AsyncStorage.setItem("userToken", response.token);
         } else {
           await AsyncStorage.removeItem("rememberedLogin");
         }
 
         // Navega para a tela principal com as informações do usuário
-        navigation.navigate("HomeScreen", { user: response }); // Passando 'user' para HomeScreen
+        navigation.navigate("HomeScreen"); // Passando 'user' para HomeScreen
       }
     } catch (error) {
       console.error("Erro ao tentar fazer login", error);
-      setAlertMessage("Erro ao tentar fazer login.");
-      setAlertVisible(true);
+      showAlert("Erro ao tentar fazer login.");
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -133,8 +144,12 @@ export default function LoginScreen({ navigation }) {
         </TouchableOpacity>
       </View>
 
-      <TouchableOpacity style={styles.button} onPress={login}>
-        <Text style={styles.buttonText}>ENTRAR</Text>
+      <TouchableOpacity style={styles.button} onPress={login} disabled={isLoading}>
+      {isLoading ? (
+            <ActivityIndicator size="small" color="white" />
+          ) : (
+            <Text style={styles.buttonText}>ENTRAR</Text>
+          )}
       </TouchableOpacity>
 
       <TouchableOpacity onPress={() => navigation.navigate("Register")}>

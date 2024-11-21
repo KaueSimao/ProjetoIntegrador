@@ -23,6 +23,7 @@
     "expo-status-bar": "~1.12.1",
     "firebase": "^10.14.1",
     "json-server": "^1.0.0-beta.0",
+    "jwt-decode": "^4.0.0",
     "navbar-native": "^1.6.1",
     "projetointegrador": "file:",
     "react": "18.2.0",

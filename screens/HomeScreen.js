@@ -3,6 +3,9 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { View, Image, StyleSheet, Text, Dimensions, TouchableOpacity, ScrollView } from "react-native";
 import { useFonts } from "expo-font";
 import AwesomeAlert from "react-native-awesome-alerts";
+import jwtDecode from "jwt-decode";
+
+
 
 const { width } = Dimensions.get('window');
 
@@ -13,38 +16,32 @@ export default function HomeScreen({ navigation, route }) {
     "Roboto-Medium": require("../assets/fonts/Roboto-Medium.ttf"),
   });
 
-  const [user, setUser] = useState(null);
+  const [userName, setUserName] = useState("");
   const [showAlert, setShowAlert] = useState(false);
 
   useEffect(() => {
-    const loadUser = async () => {
-      // Verifique se o usuário foi passado pela navegação
-      console.log("route.params?.user:", route.params?.user);
-  
-      if (route.params?.user) {
-        setUser(route.params.user);  // Usando os dados passados pela navegação
-      } else {
-        // Carregue o usuário do AsyncStorage
-        const rememberedUser = await AsyncStorage.getItem("rememberedLogin");
-        console.log("Usuário do AsyncStorage:", rememberedUser);
-  
-        if (rememberedUser) {
-          setUser(JSON.parse(rememberedUser));  // Carregando o usuário do AsyncStorage
+    const fetchUserName = async () => {
+      try {
+        const token = await AsyncStorage.getItem("userToken");
+        if (token) {
+          const decodedToken = jwtDecode(token);
+          setUserName(decodedToken.sub || "Usuário");
+        } else {
+          setUserName("Usuário");
         }
+      } catch (error) {
+        console.error("Erro ao recuperar token:", error);
+        setUserName("Usuário");
       }
     };
-  
-    loadUser();
-  }, [route.params]);  // Recarrega quando a navegação muda (ou quando params mudam)
+
+    fetchUserName();
+  }, []);
   
 
   const logout = async () => {
-    try {
-      await AsyncStorage.removeItem("rememberedLogin");
-      navigation.navigate("Login");
-    } catch (error) {
-      console.error("Erro ao tentar fazer logout", error);
-    }
+    await AsyncStorage.removeItem("userToken");
+    navigation.navigate("Login");
   };
 
   const handleLogout = () => {
@@ -61,8 +58,8 @@ export default function HomeScreen({ navigation, route }) {
   };
 
   // Verifique se user ou fontsLoaded são falsos
-if (!fontsLoaded || !user) {
-  console.log("Carregando... fontsLoaded:", fontsLoaded, "user:", user);
+if (!fontsLoaded || !userName) {
+  console.log("Carregando... fontsLoaded:", fontsLoaded, "user:", userName);
   return (
     <View style={styles.container}>
       <Text>Carregando...</Text>
@@ -80,7 +77,7 @@ if (!fontsLoaded || !user) {
           <Image source={require("../assets/fatec-logo.png")} style={styles.logo} />
         </View>
 
-        <Text style={styles.title}>Seja Bem-Vindo, {user?.studentName || 'Usuário'}</Text>
+        <Text style={styles.title}>Seja Bem-Vindo, {userName}!</Text>
 
         <Text style={styles.textnovidade}>Destaques</Text>
 

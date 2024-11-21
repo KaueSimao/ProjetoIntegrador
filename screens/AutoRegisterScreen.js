@@ -5,13 +5,13 @@ import {
   TextInput,
   StyleSheet,
   Text,
-  PressableOpacity
+  Pressable,
+  ActivityIndicator,
 } from "react-native";
-import AwesomeAlert from 'react-native-awesome-alerts';
 import { useFonts } from "expo-font";
 import { useFocusEffect } from "@react-navigation/native";
-import { registerStudent } from '../api/apiService'; // Verifique o caminho
-
+import { registerStudent } from "../api/apiService";
+import axios from "axios";
 
 export default function AutoRegisterScreen({ navigation }) {
   const [fontsLoaded] = useFonts({
@@ -23,32 +23,45 @@ export default function AutoRegisterScreen({ navigation }) {
   const [studentName, setNome] = useState("");
   const [institutionalEmail, setEmail] = useState("");
   const [studentPassword, setSenha] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
   const [alertVisible, setAlertVisible] = useState(false);
   const [alertMessage, setAlertMessage] = useState("");
-  const [redirectToLogin, setRedirectToLogin] = useState(false);
+
+  // Função para exibir mensagens de alerta e ocultá-las após 3 segundos
+  const showAlert = (message, isSuccess = false) => {
+    setAlertMessage(message);
+    setAlertVisible(true);
+
+    if (isSuccess) {
+      setTimeout(() => {
+        setAlertVisible(false);
+        navigation.navigate("Login"); // Navega para a tela de login após o sucesso
+      }, 3000); // Alerta desaparece após 3 segundos
+    } else {
+      setTimeout(() => setAlertVisible(false), 3000);
+    }
+  };
 
   const validateFields = () => {
     const trimmedNome = studentName.trim();
-    const trimmedEmail = institutionalEmail.trim(); // Corrigido aqui
+    const trimmedEmail = institutionalEmail.trim();
     const trimmedSenha = studentPassword.trim();
-    const regex = /^[\s]+$/;
 
-    const nameRegex = /^[A-Za-z\s]+$/;
+    // Regex para permitir letras, espaços, acentos e cedilha
+    const nameRegex = /^[A-Za-zÀ-ÿ\s]+$/;
+
     if (!trimmedNome || !nameRegex.test(trimmedNome)) {
-      setAlertMessage("Erro, o nome deve conter apenas letras e espaços.");
-      setAlertVisible(true);
+      showAlert("Erro: o nome deve conter apenas letras, espaços e acentos.");
       return false;
     }
 
-    if (!trimmedEmail.endsWith("@fatec.sp.gov.br") && !regex.test(trimmedEmail)) {
-      setAlertMessage("Erro, o email precisa ser institucional.");
-      setAlertVisible(true);
+    if (!trimmedEmail.endsWith("@fatec.sp.gov.br")) {
+      showAlert("Erro: o email precisa ser institucional.");
       return false;
     }
 
     if (trimmedSenha === "") {
-      setAlertMessage("Erro, digite uma senha.");
-      setAlertVisible(true);
+      showAlert("Erro: digite uma senha.");
       return false;
     }
 
@@ -60,21 +73,34 @@ export default function AutoRegisterScreen({ navigation }) {
       return;
     }
 
+    setIsLoading(true);
+
     const data = {
       studentName: studentName.trim(),
       institutionalEmail: institutionalEmail.trim(),
       studentPassword: studentPassword,
     };
 
+    console.log("Dados a serem enviados:", data);
+
     try {
       const response = await registerStudent(data);
-      setAlertMessage("Sucesso, cadastro realizado com sucesso!");
-      setAlertVisible(true);
-      setRedirectToLogin(true);
+      console.log("Resposta da API:", response);
+
+      if (response) {
+        showAlert("Cadastro realizado com sucesso!", true); // Passa `true` para indicar sucesso
+      }
     } catch (error) {
-      console.error(error);
-      setAlertMessage("Erro ao tentar realizar o cadastro.");
-      setAlertVisible(true);
+      console.error("Erro na requisição:", error);
+      if (axios.isAxiosError(error) && error.response?.status === 404) {
+        showAlert("Erro: não foi possível realizar o cadastro.");
+      } else {
+        showAlert(
+          "Ocorreu um erro ao tentar cadastrar o aluno. Tente novamente mais tarde."
+        );
+      }
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -93,64 +119,76 @@ export default function AutoRegisterScreen({ navigation }) {
   return (
     <View style={styles.container}>
       <Image source={require("../assets/fatec-logo.png")} style={styles.logo} />
+
+      {/* Alerta de erro ou sucesso */}
+      {alertVisible && (
+        <View
+          style={[
+            styles.alertContainer,
+            {
+              backgroundColor: alertMessage.startsWith("Cadastro")
+                ? "#d4edda"
+                : "#f8d7da",
+            },
+          ]}
+        >
+          <Text
+            style={[
+              styles.alertMessage,
+              {
+                color: alertMessage.startsWith("Cadastro")
+                  ? "#155724"
+                  : "#721c24",
+              },
+            ]}
+          >
+            {alertMessage}
+          </Text>
+        </View>
+      )}
+
       <View style={styles.groupInputs}>
         <Text style={styles.label}>Nome Completo</Text>
         <TextInput
           style={styles.input}
-          placeholder="Digite seu nome:"
+          placeholder="Digite seu nome"
           onChangeText={(text) => setNome(text)}
           value={studentName}
         />
         <Text style={styles.label}>Email institucional</Text>
         <TextInput
           style={styles.input}
-          placeholder="Digite seu email:"
+          placeholder="Digite seu email"
           onChangeText={(text) => setEmail(text.trim())}
           value={institutionalEmail}
         />
         <Text style={styles.label}>Senha</Text>
         <TextInput
           style={styles.input}
-          placeholder="Digite sua senha:"
-          secureTextEntry={true}
+          placeholder="Digite sua senha"
+          secureTextEntry
           onChangeText={(text) => setSenha(text.trim())}
           value={studentPassword}
         />
-        
-        <PressableOpacity
+
+        <Pressable
           style={styles.button}
           onPress={cadastro}
+          disabled={isLoading}
         >
-          <Text style={styles.buttonText}>CADASTRAR</Text>
-        </PressableOpacity>
-        <PressableOpacity
+          {isLoading ? (
+            <ActivityIndicator size="small" color="white" />
+          ) : (
+            <Text style={styles.buttonText}>CADASTRAR</Text>
+          )}
+        </Pressable>
+        <Pressable
           style={styles.buttonVoltar}
           onPress={() => navigation.navigate("Login")}
         >
           <Text style={styles.buttonText}>VOLTAR</Text>
-        </PressableOpacity>
+        </Pressable>
       </View>
-      <AwesomeAlert
-        show={alertVisible}
-        showProgress={false}
-        title="Atenção"
-        message={alertMessage}
-        closeOnTouchOutside={false}
-        closeOnHardwareBackPress={false}
-        showCancelButton={false}
-        showConfirmButton={true}
-        confirmText="OK"
-        confirmButtonColor="#000"
-        onConfirmPressed={() => {
-          setAlertVisible(false);
-          if (redirectToLogin) {
-            navigation.navigate("Login");
-          }
-        }}
-        titleStyle={styles.alertTitle}
-        messageStyle={styles.alertMessage}
-        confirmButtonTextStyle={styles.alertButtonText}
-      />
     </View>
   );
 }
@@ -208,19 +246,13 @@ const styles = StyleSheet.create({
     fontFamily: "Roboto-Medium",
     fontSize: 16,
   },
-  alertTitle: {
-    fontFamily: "Roboto-Medium",
-    fontSize: 18,
-    color: "#B20000",
+  alertContainer: {
+    padding: 10,
+    borderRadius: 5,
+    marginBottom: 15,
   },
   alertMessage: {
+    fontSize: 16,
     fontFamily: "Roboto-Regular",
-    fontSize: 16,
-    color: "#333",
-  },
-  alertButtonText: {
-    fontFamily: "Roboto-Medium",
-    fontSize: 16,
-    color: "#fff",
   },
 });
