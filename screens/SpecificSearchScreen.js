@@ -68,6 +68,7 @@ export default function SpecificSearchScreen({ navigation }) {
           'Authorization': `Bearer ${accessToken}`, // Adicionando o token nas requisições
         }
       });
+
       setTimetable(timetableResponse.data);
     } catch (error) {
       console.error(error);
@@ -81,9 +82,10 @@ export default function SpecificSearchScreen({ navigation }) {
     }
 
     try {
+      console.log('marcio: ', accessToken);
       const teachersResponse = await axios.get(`${API_URL}/teacher/`, {
         headers: {
-          'Authorization': `Bearer ${accessToken}`,
+          'Authorization': `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJqYXZhZ2FzIiwiZXhwIjoxNzMyMjQ0OTA1LCJzdWIiOiIyIiwicm9sZXMiOlsiQURNSU4iXX0.oakpsPY38p8JK2VO_jNiHp5axs1OUhmMu41i34OSptE`,
         },
       });
       const subjectsResponse = await axios.get(`${API_URL}/subject/`, {

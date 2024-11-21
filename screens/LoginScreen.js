@@ -42,7 +42,7 @@ export default function LoginScreen({ navigation }) {
    const showAlert = (message) => {
     setAlertMessage(message);
     setAlertVisible(true);
-    setTimeout(() => setAlertVisible(false), 3000); // Alerta desaparece após 3 segundos
+    setTimeout(() => setAlertVisible(false), 10000); // Alerta desaparece após 3 segundos
   };
 
   // Função de login
@@ -66,6 +66,7 @@ export default function LoginScreen({ navigation }) {
       if (response) {
         showAlert("Sucesso, login bem-sucedido!");
 
+        console.log(response.access_token)
         await AsyncStorage.setItem("userToken", response.access_token);
 
         // Navega para a tela principal com as informações do usuário
@@ -86,7 +87,7 @@ export default function LoginScreen({ navigation }) {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.textLogin}>Login</Text>
+      <Text style={styles.textLogin}>LOGIN</Text>
       <Image source={require("../assets/profile.png")} style={styles.logo} />
       
       {/* Alerta de erro ou sucesso */}
@@ -99,7 +100,7 @@ export default function LoginScreen({ navigation }) {
       <Text style={styles.label}>Email institucional</Text>
       <TextInput
         style={styles.input}
-        placeholder="Digite seu email"
+        placeholder="Digite seu email:"
         value={institutionalEmail}
         onChangeText={setEmail}
         autoCapitalize="none"
@@ -110,7 +111,7 @@ export default function LoginScreen({ navigation }) {
       <View style={styles.passwordContainer}>
         <TextInput
           style={styles.input}
-          placeholder="Digite sua senha"
+          placeholder="Digite sua senha:"
           secureTextEntry={!showPassword} 
           value={studentPassword}
           onChangeText={setPassword}
@@ -120,6 +121,7 @@ export default function LoginScreen({ navigation }) {
           style={styles.eyeButton}
         >
           <Ionicons
+          style={styles.icon}
             name={showPassword ? "eye-off" : "eye"}
             size={24}
             color="gray"
@@ -209,7 +211,7 @@ const styles = StyleSheet.create({
     textDecorationLine: "underline",
   },
   button: {
-    width: 90,
+    width: 120,
     height: 40,
     backgroundColor: "#B20000",
     justifyContent: "center",
@@ -239,5 +241,8 @@ const styles = StyleSheet.create({
     color: "#721c24",
     fontSize: 16,
     fontFamily: "Roboto-Regular",
+  },
+  icon:{
+    marginBottom : 15
   }
 });
