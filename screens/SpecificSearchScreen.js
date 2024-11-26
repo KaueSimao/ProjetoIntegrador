@@ -42,13 +42,10 @@ export default function SpecificSearchScreen({ navigation }) {
   }));
 
   useEffect(() => {
-
     const getToken = async () => {
       const token = await AsyncStorage.getItem("userToken");
-      console.log('teste', token);
-      setAccessToken(token);  // Armazenando o token
-    }
-
+      setAccessToken(token);
+    };
 
     getToken();
     fetchFilters();
@@ -56,17 +53,15 @@ export default function SpecificSearchScreen({ navigation }) {
   }, [accessToken]);
 
   const fetchData = async () => {
-    console.log('fera', accessToken)
     if (!accessToken) {
       return setErrorMessage("Token não encontrado. Por favor, faça login novamente.");
     }
 
     try {
       const timetableResponse = await axios.get(`${API_URL}/schedule/`, {
-
         headers: {
-          'Authorization': `Bearer ${accessToken}`, // Adicionando o token nas requisições
-        }
+          Authorization: `Bearer ${accessToken}`,
+        },
       });
 
       setTimetable(timetableResponse.data);
@@ -76,49 +71,65 @@ export default function SpecificSearchScreen({ navigation }) {
     }
   };
 
+
   const fetchFilters = async () => {
     if (!accessToken) {
       return setErrorMessage("Token não encontrado. Por favor, faça login novamente.");
     }
 
     try {
-      console.log('marcio: ', accessToken);
       const teachersResponse = await axios.get(`${API_URL}/teacher/`, {
         headers: {
-          'Authorization': `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJqYXZhZ2FzIiwiZXhwIjoxNzMyMjQ0OTA1LCJzdWIiOiIyIiwicm9sZXMiOlsiQURNSU4iXX0.oakpsPY38p8JK2VO_jNiHp5axs1OUhmMu41i34OSptE`,
+          Authorization: `Bearer ${accessToken}`,
         },
       });
       const subjectsResponse = await axios.get(`${API_URL}/subject/`, {
         headers: {
-          'Authorization': `Bearer ${accessToken}`,
+          Authorization: `Bearer ${accessToken}`,
         },
       });
       const coursesResponse = await axios.get(`${API_URL}/course/`, {
         headers: {
-          'Authorization': `Bearer ${accessToken}`,
+          Authorization: `Bearer ${accessToken}`,
         },
       });
 
-      const formattedTeachers = teachersResponse.data.map((teacher) => ({
-        label: teacher.teacherName,
-        value: teacher.teacherName,
-      }));
+      const formattedTeachers = Array.isArray(teachersResponse.data)
+        ? teachersResponse.data.map((teacher, index) => ({
+          label: teacher.teacherName,
+          value: teacher.teacherId,
+          key: `${teacher.teacherId}-${index}`,
+        }))
+        : [teachersResponse.data].map((teacher, index) => ({
+          label: teacher.teacherName,
+          value: teacher.teacherId,
+          key: `${teacher.teacherId}-${index}`,
+        }));
 
-      const formattedCourses = coursesResponse.data.map((course) => ({
-        label: course.courseName,
-        value: course.courseName,
-      }));
+      console.log("Professor Formatado:", JSON.stringify(formattedTeachers, null, 2));
 
-      const formattedSubjects = subjectsResponse.data.map((subject) => ({
-        label: subject.subjectName,
-        value: subject.subjectName,
-      }));
+      const formattedCourses = Array.isArray(coursesResponse.data)
+        ? coursesResponse.data.map((course, index) => ({
+          label: course.courseName,
+          value: course.courseName,
+          key: `${course.courseName}-${index}`,
+        }))
+        : [];
+
+      const formattedSubjects = Array.isArray(subjectsResponse.data)
+        ? subjectsResponse.data.map((subject, index) => ({
+          label: subject.subjectName,
+          value: subject.subjectName,
+          key: `${subject.subjectName}-${index}`,
+        }))
+        : [];
 
       setTeachers(formattedTeachers);
       setCourses(formattedCourses);
       setSubjects(formattedSubjects);
     } catch (error) {
       console.error("Erro ao carregar os filtros", error);
+      setErrorMessage("Erro ao carregar os filtros. Tente novamente mais tarde.");
     }
   };
 
@@ -156,6 +167,7 @@ export default function SpecificSearchScreen({ navigation }) {
   const weekTimetable = getWeekTimetable();
 
   return (
+
     <ScrollView style={styles.container}>
       <View style={styles.header}>
         <TouchableOpacity style={styles.button} onPress={() => navigation.navigate("HomeScreen")}>
@@ -169,43 +181,42 @@ export default function SpecificSearchScreen({ navigation }) {
       <RNPickerSelect
         onValueChange={(value) => setSelectedMonth(value)}
         items={months}
-        placeholder={{ label: "Selecione um Mês", value: undefined }} // Use undefined ao invés de null
-        value={selectedMonth || ""} // Garantir que o valor não seja null
+        placeholder={{ label: "Selecione um Mês", value: undefined }}
+        value={selectedMonth || ""}
         style={pickerSelectStyles}
       />
 
       <RNPickerSelect
         onValueChange={(value) => setSelectedWeek(value)}
         items={weeks.map((week, index) => ({ label: week, value: index }))}
-        placeholder={{ label: "Selecione uma Semana", value: undefined }} // Use undefined ao invés de null
-        value={selectedWeek || ""} // Garantir que o valor não seja null
+        placeholder={{ label: "Selecione uma Semana", value: undefined }}
+        value={selectedWeek || ""}
         style={pickerSelectStyles}
       />
 
       <RNPickerSelect
-        onValueChange={(value) => setSelectedTeacher(value)}
+        onValueChange={(value) => setSelectedTeacher(value)}  // O value agora é o teacherId
         items={teachers}
-        placeholder={{ label: "Selecione um Professor", value: undefined }} // Use undefined ao invés de null
-        value={selectedTeacher || ""} // Garantir que o valor não seja null
+        placeholder={{ label: "Selecione um Professor", value: undefined }}
+        value={selectedTeacher || ""}
         style={pickerSelectStyles}
       />
 
       <RNPickerSelect
         onValueChange={(value) => setSelectedCourse(value)}
         items={courses}
-        placeholder={{ label: "Selecione um Curso", value: undefined }} // Use undefined ao invés de null
-        value={selectedCourse || ""} // Garantir que o valor não seja null
+        placeholder={{ label: "Selecione um Curso", value: undefined }}
+        value={selectedCourse || ""}
         style={pickerSelectStyles}
       />
 
       <RNPickerSelect
         onValueChange={(value) => setSelectedSubject(value)}
         items={subjects}
-        placeholder={{ label: "Selecione uma Disciplina", value: undefined }} // Use undefined ao invés de null
-        value={selectedSubject || ""} // Garantir que o valor não seja null
+        placeholder={{ label: "Selecione uma Disciplina", value: undefined }}
+        value={selectedSubject || ""}
         style={pickerSelectStyles}
       />
-
 
       <View style={styles.table}>
         <View style={styles.tableHeader}>
@@ -277,46 +288,38 @@ const styles = StyleSheet.create({
   tableCell: {
     flex: 1,
     textAlign: "center",
-    paddingVertical: 5,
   },
   emptyMessage: {
+    padding: 20,
     textAlign: "center",
-    marginTop: 20,
-  },
-  button: {
-    width: 100,
-    height: 40,
-    backgroundColor: "#B20000",
-    justifyContent: "center",
-    alignItems: "center",
-    borderRadius: 5,
+    color: "#999",
   },
   voltar: {
-    color: "#fff",
+    textDecorationLine: "underline",
+    fontSize: 13,
+    fontFamily: "Roboto-Medium",
+    marginTop: 25,
+    color: "#B20000",
   },
 });
 
-const pickerSelectStyles = StyleSheet.create({
+const pickerSelectStyles = {
   inputIOS: {
     fontSize: 16,
-    paddingVertical: 12,
-    paddingHorizontal: 10,
+    padding: 10,
     borderWidth: 1,
-    borderColor: "gray",
-    borderRadius: 4,
-    color: "black",
-    paddingRight: 30,
-    marginBottom: 10,
+    borderColor: "#ccc",
+    borderRadius: 5,
+    color: "#000",
+    marginBottom: 20,
   },
   inputAndroid: {
     fontSize: 16,
-    paddingVertical: 8,
-    paddingHorizontal: 10,
-    borderWidth: 0.5,
-    borderColor: "gray",
-    borderRadius: 8,
-    color: "black",
-    paddingRight: 30,
-    marginBottom: 10,
+    padding: 10,
+    borderWidth: 1,
+    borderColor: "#ccc",
+    borderRadius: 5,
+    color: "#000",
+    marginBottom: 20,
   },
-});
+};
