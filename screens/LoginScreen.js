@@ -135,6 +135,12 @@ export default function LoginScreen({ navigation }) {
         </TouchableOpacity>
       </View>
 
+      <View style={styles.optionsContainer}>
+        <TouchableOpacity onPress={() => navigation.navigate("ConfirmPassword")}>
+          <Text style={styles.ConfirmPassword}>Esqueci minha senha</Text>
+        </TouchableOpacity>
+      </View>
+
       <TouchableOpacity style={styles.button} onPress={login} disabled={isLoading}>
       {isLoading ? (
             <ActivityIndicator size="small" color="white" />

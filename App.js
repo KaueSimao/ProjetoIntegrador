@@ -6,6 +6,7 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import axios from 'axios'; // Importar Axios para fazer requisições HTTP
 import Checkbox from 'expo-checkbox';
 
+import ConfirmPassword from './screens/ConfirmPassword';
 import LoginScreen from './screens/LoginScreen';
 import HomeScreen from './screens/HomeScreen';
 import SearchScreen from './screens/SearchScreen';
@@ -97,6 +98,7 @@ function App() {
         <Stack.Screen name="Login" component={LoginScreen} />
         <Stack.Screen name="HomeScreen" component={HomeScreen} />
         <Stack.Screen name="SearchScreen" component={SearchScreen} />
+        <Stack.Screen name="ConfirmPassword" component={ConfirmPassword} />
         <Stack.Screen
           name="ForgotPassword"
           component={ForgotPasswordScreen}
