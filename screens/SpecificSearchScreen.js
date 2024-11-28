@@ -4,8 +4,8 @@ import axios from "axios";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { StyleSheet, View, Image, Text, TouchableOpacity, FlatList, ScrollView } from "react-native";
 import { useFonts } from "expo-font";
-import { Calendar } from "react-native-calendars";
-import * as Localization from "react-native-localize"; // Importando o pacote
+import { Calendar, LocaleConfig } from "react-native-calendars";
+
 
 const API_URL = "https://projeto-integrador-1v4i.onrender.com";
 
@@ -46,52 +46,120 @@ export default function SpecificSearchScreen({ navigation }) {
     }
   }, [isTokenLoaded, accessToken]);
 
-  const getCalendarLocale = () => {
-    const locales = Localization.getLocales();
-    if (locales && locales[0].languageTag === "pt-BR") {
-      return "pt-br";
-    }
-    return "en";
+  LocaleConfig.locales['pt-br'] = {
+    monthNames: [
+      'Janeiro',
+      'Fevereiro',
+      'Março',
+      'Abril',
+      'Maio',
+      'Junho',
+      'Julho',
+      'Agosto',
+      'Setembro',
+      'Outubro',
+      'Novembro',
+      'Dezembro'
+    ],
+    monthNamesShort: ['Jan.', 'Fev.', 'Mar.', 'Abr.', 'Mai.', 'Jun.', 'Jul.', 'Ago.', 'Set.', 'Out.', 'Nov.', 'Dez.'],
+    dayNames: ['Domingo', 'Segunda-feira', 'Terça-feira', 'Quarta-feira', 'Quinta-feira', 'Sexta-feira', 'Sábado'],
+    dayNamesShort: ['Dom.', 'Seg.', 'Ter.', 'Qua.', 'Qui.', 'Sex.', 'Sáb.'],
+    today: 'Hoje'
   };
 
+  LocaleConfig.defaultLocale = 'pt-br';
   const fetchFilteredTimetable = async () => {
     if (!accessToken) {
       return setErrorMessage("Token não encontrado. Por favor, faça login novamente.");
     }
-
+  
     try {
-      const selectedDay = selectedDate?.toISOString().split("T")[0]; // Formata a data
+      // Converter a data selecionada para o formato 'YYYY-MM-DD' sem a hora
+      const selectedDay = selectedDate?.toISOString().split("T")[0]; // Formata apenas a data (sem a hora)
+      const selectedWeekDay = selectedDate.toLocaleString('pt-BR', { weekday: 'long' }).toLowerCase();
+  
+      console.log("Selected Day:", selectedDay);
+      console.log("Selected Week Day:", selectedWeekDay);
+  
+      // Buscar as reservas
       const reservationResponse = await axios.get(`${API_URL}/reservation/`, {
         headers: {
           Authorization: `Bearer ${accessToken}`,
         },
       });
-
-      // Filtrando reservas para a data selecionada
-      const filteredReservations = reservationResponse.data.filter(
-        (item) => item.date === selectedDay
-      );
-
-      if (filteredReservations.length > 0) {
-        setReservations(filteredReservations); // Exibe as reservas
-        setTimetable(filteredReservations); // Exibe a tabela com as reservas
+      console.log("Reservation Response:", reservationResponse.data);
+  
+      // Filtrar as reservas com base na data selecionada (sem hora) ou no dia da semana
+      const filteredReservations = reservationResponse.data.filter((item) => {
+        const reservationDate = item.date; // Data sem hora
+        const reservationWeekDay = item.weekDay.toLowerCase(); // O dia da semana da reserva
+        console.log("Reservation Date:", reservationDate);
+        console.log("Reservation Week Day:", reservationWeekDay);
+  
+        // Verifica se a data da reserva é igual à data selecionada ou se o dia da semana é igual
+        return reservationDate === selectedDay || reservationWeekDay === selectedWeekDay;
+      });
+      console.log("Filtered Reservations:", filteredReservations);
+  
+      // Buscar os horários fixos
+      const scheduleResponse = await axios.get(`${API_URL}/schedule/`, {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      });
+      console.log("Schedule Response:", scheduleResponse.data);
+  
+      // Filtrar os horários fixos com base no dia da semana selecionado
+      const filteredSchedule = scheduleResponse.data.filter((schedule) => {
+        const scheduleDay = schedule.weekday.toLowerCase(); // Dia da semana do horário fixo
+        console.log("Filtered Schedule Day:", scheduleDay);
+  
+        return scheduleDay === selectedWeekDay;
+      });
+  
+      console.log("Filtered Schedule:", filteredSchedule);
+  
+      // Se não houver reservas, use os horários fixos
+      if (filteredReservations.length === 0) {
+        setTimetable(filteredSchedule);
       } else {
-        const scheduleResponse = await axios.get(`${API_URL}/schedule/`, {
-          headers: {
-            Authorization: `Bearer ${accessToken}`,
-          },
+        // Processar os horários, substituindo pelos horários de reserva quando a data coincidir
+        const timetable = filteredSchedule.map((schedule) => {
+          // Verifica se existe uma reserva para o mesmo horário no dia da semana
+          const reservationForSchedule = filteredReservations.find((reservation) => {
+            const reservationTime = reservation.time.split(" - ")[1].split(" ")[0]; // Extraí o horário da reserva (ex: "13:00")
+            const scheduleTime = schedule.time.split(" - ")[0]; // Extraí o horário fixo (ex: "08:00")
+  
+            console.log("Reservation Time:", reservationTime);
+            console.log("Schedule Time:", scheduleTime);
+  
+            return reservationTime === scheduleTime; // Comparar os horários
+          });
+  
+          if (reservationForSchedule) {
+            // Se a reserva existir, substitui pelo horário da reserva
+            return {
+              ...schedule,
+              status: 'reserved',
+              reservation: reservationForSchedule,
+            };
+          } else {
+            // Caso contrário, exibe o horário fixo como disponível
+            return {
+              ...schedule,
+              status: 'available',
+            };
+          }
         });
-
-        // Exibe os horários fixos caso não haja reservas
-        setReservations(scheduleResponse.data); 
-        setTimetable(scheduleResponse.data); 
+  
+        setTimetable(timetable);
       }
     } catch (error) {
       console.error(error);
       setErrorMessage("Erro ao carregar os dados. Tente novamente mais tarde.");
     }
   };
-
+  
   const fetchFilters = async () => {
     if (!accessToken) {
       return setErrorMessage("Token não encontrado. Por favor, faça login novamente.");
@@ -117,7 +185,7 @@ export default function SpecificSearchScreen({ navigation }) {
       // Organizando os filtros (professores, cursos, disciplinas)
       if (Array.isArray(teachersResponse.data)) {
         const formattedTeachers = teachersResponse.data.map((teacher) => ({
-          label: teacher.teacherName,
+          label: teacher.teacherName || "Professor não disponível", // Garantir que o label nunca seja undefined
           value: teacher.teacherId,
         }));
         setTeachers(formattedTeachers);
@@ -125,7 +193,7 @@ export default function SpecificSearchScreen({ navigation }) {
 
       if (Array.isArray(subjectsResponse.data)) {
         const formattedSubjects = subjectsResponse.data.map((subject) => ({
-          label: subject.subjectName,
+          label: subject.subjectName || "Disciplina não disponível", // Garantir que o label nunca seja undefined
           value: subject.subjectName,
         }));
         setSubjects(formattedSubjects);
@@ -133,7 +201,7 @@ export default function SpecificSearchScreen({ navigation }) {
 
       if (Array.isArray(coursesResponse.data)) {
         const formattedCourses = coursesResponse.data.map((course) => ({
-          label: course.courseName,
+          label: course.courseName || "Curso não disponível", // Garantir que o label nunca seja undefined
           value: course.courseName,
         }));
         setCourses(formattedCourses);
@@ -177,51 +245,68 @@ export default function SpecificSearchScreen({ navigation }) {
       </View>
 
       <Text style={styles.title}>Filtro Específico</Text>
-
       <Calendar
-        onDayPress={(day) => setSelectedDate(new Date(day.dateString))}
-        markedDates={{
-          [selectedDate?.toISOString().split("T")[0]]: {
-            selected: true,
-            marked: true,
-            selectedColor: "#B20000",
-          },
-        }}
-        theme={{
-          selectedDayBackgroundColor: "#B20000",
-          todayTextColor: "#B20000",
-          arrowColor: "#B20000",
-        }}
-        locale={getCalendarLocale()}
-      />
+  onDayPress={(day) => {
+    const newSelectedDate = new Date(day.dateString); // cria a data correta
+    setSelectedDate(newSelectedDate);
+    console.log("Selected Date on Day Press:", newSelectedDate); // Verificar o novo valor
+  }}
+  markedDates={{
+    [selectedDate?.toISOString().split("T")[0]]: {
+      selected: true,
+      marked: true,
+      selectedColor: "#B20000",
+    },
+  }}
+  theme={{
+    selectedDayBackgroundColor: "#B20000",
+    todayTextColor: "#B20000",
+    arrowColor: "#B20000",
+  }}
+/>
 
       <RNPickerSelect
         onValueChange={(value) => setSelectedTeacher(value)}
-        items={teachers}
+        items={teachers && teachers.length > 0
+          ? teachers.map((teacher, index) => ({
+            label: teacher.label || "Curso não disponível",
+            value: teacher.value || "defaultTeacher",
+            key: `${teacher.value}-${index}`
+          }))
+          : [{ label: "Nenhum professor disponível", value: "defaultTeacher" }]}
         placeholder={{ label: "Selecione um Professor", value: undefined }}
-        value={selectedTeacher || ""}
+        value={selectedTeacher || "defaultTeacher"}
         style={pickerSelectStyles}
       />
 
       <RNPickerSelect
         onValueChange={(value) => setSelectedCourse(value)}
-        items={courses}
+        items={courses && courses.length > 0
+          ? courses.map((course, index) => ({
+            label: course.label || "Curso não disponível",
+            value: course.value || "defaultCourse",
+            key: `${course.value}-${index}`
+          }))
+          : [{ label: "Nenhum curso disponível", value: "defaultCourse" }]}
         placeholder={{ label: "Selecione um Curso", value: undefined }}
-        value={selectedCourse || ""}
+        value={selectedCourse || "deafultCourse"}
         style={pickerSelectStyles}
       />
 
+
+
       <RNPickerSelect
         onValueChange={(value) => setSelectedSubject(value)}
-        items={subjects.map((subject) => ({
-          label: subject.name,
-          value: subject.id,  // Usando 'id' para garantir que a chave seja única
-          key: subject.id,    // Adicionando 'key' com um identificador único
-        }))}
+        items={subjects && subjects.length > 0 ? subjects.map((subject, index) => ({
+          label: subject.label || "Disciplina não disponível",
+          value: subject.value || "defaultSubject", // Valor padrão
+          key: `${subject.value}-${index}`
+        })) : [{ label: "Nenhuma disciplina disponível", value: "defaultSubject" }]} // Valor padrão caso a lista esteja vazia
         placeholder={{ label: "Selecione uma Disciplina", value: undefined }}
-        value={selectedSubject || ""}
+        value={selectedSubject || "defaultSubject"} // Valor padrão
         style={pickerSelectStyles}
       />
+
 
       <View style={styles.table}>
         <View style={styles.tableHeader}>
@@ -302,25 +387,25 @@ const styles = StyleSheet.create({
   },
 });
 
-  const pickerSelectStyles = StyleSheet.create({
-    inputIOS: {
-        fontSize: 16,
-        paddingVertical: 12,
-        paddingHorizontal: 10,
-        borderWidth: 1,
-        borderColor: 'gray',
-        borderRadius: 4,
-        color: 'black',
-        paddingRight: 30, // para ícones à direita
-    },
-    inputAndroid: {
-        fontSize: 16,
-        paddingHorizontal: 10,
-        paddingVertical: 8,
-        borderWidth: 1,
-        borderColor: 'gray',
-        borderRadius: 4,
-        color: 'black',
-        paddingRight: 30,
-    },
+const pickerSelectStyles = StyleSheet.create({
+  inputIOS: {
+    fontSize: 16,
+    paddingVertical: 12,
+    paddingHorizontal: 10,
+    borderWidth: 1,
+    borderColor: 'gray',
+    borderRadius: 4,
+    color: 'black',
+    paddingRight: 30, // para ícones à direita
+  },
+  inputAndroid: {
+    fontSize: 16,
+    paddingHorizontal: 10,
+    paddingVertical: 8,
+    borderWidth: 1,
+    borderColor: 'gray',
+    borderRadius: 4,
+    color: 'black',
+    paddingRight: 30,
+  },
 });
