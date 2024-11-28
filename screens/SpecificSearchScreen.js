@@ -2,16 +2,10 @@ import React, { useState, useEffect } from "react";
 import RNPickerSelect from "react-native-picker-select";
 import axios from "axios";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import {
-  View,
-  Image,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  FlatList,
-  ScrollView,
-} from "react-native";
+import { StyleSheet, View, Image, Text, TouchableOpacity, FlatList, ScrollView } from "react-native";
 import { useFonts } from "expo-font";
+import { Calendar } from "react-native-calendars";
+import * as Localization from "react-native-localize"; // Importando o pacote
 
 const API_URL = "https://projeto-integrador-1v4i.onrender.com";
 
@@ -23,54 +17,80 @@ export default function SpecificSearchScreen({ navigation }) {
   });
 
   const [errorMessage, setErrorMessage] = useState(null);
-  const [timetable, setTimetable] = useState([]);
+  const [timetable, setTimetable] = useState([]); // Para armazenar o horário que será exibido
   const [teachers, setTeachers] = useState([]);
   const [courses, setCourses] = useState([]);
   const [subjects, setSubjects] = useState([]);
   const [selectedTeacher, setSelectedTeacher] = useState(null);
   const [selectedCourse, setSelectedCourse] = useState(null);
   const [selectedSubject, setSelectedSubject] = useState(null);
-  const [selectedWeek, setSelectedWeek] = useState(0);
-  const [selectedMonth, setSelectedMonth] = useState(new Date().getMonth());
   const [accessToken, setAccessToken] = useState(null);
-
-  const daysOfWeek = ["Segunda", "Terça", "Quarta", "Quinta", "Sexta", "Sábado"];
-  const weeks = Array.from({ length: 4 }, (_, i) => `Semana ${i + 1}`);
-  const months = Array.from({ length: 12 }, (_, i) => ({
-    label: new Date(0, i).toLocaleString('default', { month: 'long' }),
-    value: i,
-  }));
+  const [selectedDate, setSelectedDate] = useState(new Date()); // Data atual
+  const [reservations, setReservations] = useState([]); // Dados de reservas
+  const [isTokenLoaded, setIsTokenLoaded] = useState(false); // Estado que indica se o token foi carregado
 
   useEffect(() => {
     const getToken = async () => {
       const token = await AsyncStorage.getItem("userToken");
       setAccessToken(token);
+      setIsTokenLoaded(true); // Marca que o token foi carregado
     };
 
     getToken();
-    fetchFilters();
-    fetchData();
-  }, [accessToken]);
+  }, []);
 
-  const fetchData = async () => {
+  useEffect(() => {
+    if (isTokenLoaded) {
+      fetchFilters();
+      fetchFilteredTimetable();
+    }
+  }, [isTokenLoaded, accessToken]);
+
+  const getCalendarLocale = () => {
+    const locales = Localization.getLocales();
+    if (locales && locales[0].languageTag === "pt-BR") {
+      return "pt-br";
+    }
+    return "en";
+  };
+
+  const fetchFilteredTimetable = async () => {
     if (!accessToken) {
       return setErrorMessage("Token não encontrado. Por favor, faça login novamente.");
     }
 
     try {
-      const timetableResponse = await axios.get(`${API_URL}/schedule/`, {
+      const selectedDay = selectedDate?.toISOString().split("T")[0]; // Formata a data
+      const reservationResponse = await axios.get(`${API_URL}/reservation/`, {
         headers: {
           Authorization: `Bearer ${accessToken}`,
         },
       });
 
-      setTimetable(timetableResponse.data);
+      // Filtrando reservas para a data selecionada
+      const filteredReservations = reservationResponse.data.filter(
+        (item) => item.date === selectedDay
+      );
+
+      if (filteredReservations.length > 0) {
+        setReservations(filteredReservations); // Exibe as reservas
+        setTimetable(filteredReservations); // Exibe a tabela com as reservas
+      } else {
+        const scheduleResponse = await axios.get(`${API_URL}/schedule/`, {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        });
+
+        // Exibe os horários fixos caso não haja reservas
+        setReservations(scheduleResponse.data); 
+        setTimetable(scheduleResponse.data); 
+      }
     } catch (error) {
       console.error(error);
       setErrorMessage("Erro ao carregar os dados. Tente novamente mais tarde.");
     }
   };
-
 
   const fetchFilters = async () => {
     if (!accessToken) {
@@ -94,80 +114,60 @@ export default function SpecificSearchScreen({ navigation }) {
         },
       });
 
-      const formattedTeachers = Array.isArray(teachersResponse.data)
-        ? teachersResponse.data.map((teacher, index) => ({
+      // Organizando os filtros (professores, cursos, disciplinas)
+      if (Array.isArray(teachersResponse.data)) {
+        const formattedTeachers = teachersResponse.data.map((teacher) => ({
           label: teacher.teacherName,
           value: teacher.teacherId,
-          key: `${teacher.teacherId}-${index}`,
-        }))
-        : [teachersResponse.data].map((teacher, index) => ({
-          label: teacher.teacherName,
-          value: teacher.teacherId,
-          key: `${teacher.teacherId}-${index}`,
         }));
+        setTeachers(formattedTeachers);
+      }
 
-      console.log("Professor Formatado:", JSON.stringify(formattedTeachers, null, 2));
-
-      const formattedCourses = Array.isArray(coursesResponse.data)
-        ? coursesResponse.data.map((course, index) => ({
-          label: course.courseName,
-          value: course.courseName,
-          key: `${course.courseName}-${index}`,
-        }))
-        : [];
-
-      const formattedSubjects = Array.isArray(subjectsResponse.data)
-        ? subjectsResponse.data.map((subject, index) => ({
+      if (Array.isArray(subjectsResponse.data)) {
+        const formattedSubjects = subjectsResponse.data.map((subject) => ({
           label: subject.subjectName,
           value: subject.subjectName,
-          key: `${subject.subjectName}-${index}`,
-        }))
-        : [];
+        }));
+        setSubjects(formattedSubjects);
+      }
 
-      setTeachers(formattedTeachers);
-      setCourses(formattedCourses);
-      setSubjects(formattedSubjects);
+      if (Array.isArray(coursesResponse.data)) {
+        const formattedCourses = coursesResponse.data.map((course) => ({
+          label: course.courseName,
+          value: course.courseName,
+        }));
+        setCourses(formattedCourses);
+      }
+
     } catch (error) {
       console.error("Erro ao carregar os filtros", error);
       setErrorMessage("Erro ao carregar os filtros. Tente novamente mais tarde.");
     }
   };
 
-  const filterTimetable = () => {
-    return timetable.filter((item) => {
-      const matchesTeacher = selectedTeacher ? item.teacher === selectedTeacher : true;
-      const matchesCourse = selectedCourse ? item.course === selectedCourse : true;
-      const matchesSubject = selectedSubject ? item.subject === selectedSubject : true;
-      return matchesTeacher && matchesCourse && matchesSubject;
-    });
+  const renderTable = () => {
+    if (timetable.length === 0) {
+      return <Text style={styles.emptyMessage}>Não há horários disponíveis para a data selecionada.</Text>;
+    }
+
+    return (
+      <FlatList
+        data={timetable}
+        renderItem={({ item }) => (
+          <View style={styles.tableRow}>
+            <Text style={styles.tableCell}>{item.course || "Curso Indisponível"}</Text>
+            <Text style={styles.tableCell}>{item.weekDay || "Dia não especificado"}</Text>
+            <Text style={styles.tableCell}>{item.teacher}</Text>
+            <Text style={styles.tableCell}>{item.subject}</Text>
+            <Text style={styles.tableCell}>{item.time}</Text>
+          </View>
+        )}
+        keyExtractor={(item, index) => item.id ? item.id.toString() : index.toString()}
+      />
+    );
   };
-
-  const getWeekTimetable = () => {
-    const startOfWeek = selectedWeek * 7;
-    return filterTimetable().filter((item) => {
-      const dayIndex = new Date(item.date).getDay();
-      return dayIndex >= startOfWeek && dayIndex < startOfWeek + 7;
-    });
-  };
-
-  const renderTimetableItem = ({ item }) => (
-    <View style={styles.tableRow}>
-      <Text style={styles.tableCell}>{item.course}</Text>
-      <Text style={styles.tableCell}>{item.semester}</Text>
-      <Text style={styles.tableCell}>{item.teacher}</Text>
-      <Text style={styles.tableCell}>{item.subject}</Text>
-      <Text style={styles.tableCell}>{item.time}</Text>
-    </View>
-  );
-
-  if (!fontsLoaded) {
-    return null;
-  }
-
-  const weekTimetable = getWeekTimetable();
 
   return (
-
     <ScrollView style={styles.container}>
       <View style={styles.header}>
         <TouchableOpacity style={styles.button} onPress={() => navigation.navigate("HomeScreen")}>
@@ -178,24 +178,25 @@ export default function SpecificSearchScreen({ navigation }) {
 
       <Text style={styles.title}>Filtro Específico</Text>
 
-      <RNPickerSelect
-        onValueChange={(value) => setSelectedMonth(value)}
-        items={months}
-        placeholder={{ label: "Selecione um Mês", value: undefined }}
-        value={selectedMonth || ""}
-        style={pickerSelectStyles}
+      <Calendar
+        onDayPress={(day) => setSelectedDate(new Date(day.dateString))}
+        markedDates={{
+          [selectedDate?.toISOString().split("T")[0]]: {
+            selected: true,
+            marked: true,
+            selectedColor: "#B20000",
+          },
+        }}
+        theme={{
+          selectedDayBackgroundColor: "#B20000",
+          todayTextColor: "#B20000",
+          arrowColor: "#B20000",
+        }}
+        locale={getCalendarLocale()}
       />
 
       <RNPickerSelect
-        onValueChange={(value) => setSelectedWeek(value)}
-        items={weeks.map((week, index) => ({ label: week, value: index }))}
-        placeholder={{ label: "Selecione uma Semana", value: undefined }}
-        value={selectedWeek || ""}
-        style={pickerSelectStyles}
-      />
-
-      <RNPickerSelect
-        onValueChange={(value) => setSelectedTeacher(value)}  // O value agora é o teacherId
+        onValueChange={(value) => setSelectedTeacher(value)}
         items={teachers}
         placeholder={{ label: "Selecione um Professor", value: undefined }}
         value={selectedTeacher || ""}
@@ -212,7 +213,11 @@ export default function SpecificSearchScreen({ navigation }) {
 
       <RNPickerSelect
         onValueChange={(value) => setSelectedSubject(value)}
-        items={subjects}
+        items={subjects.map((subject) => ({
+          label: subject.name,
+          value: subject.id,  // Usando 'id' para garantir que a chave seja única
+          key: subject.id,    // Adicionando 'key' com um identificador único
+        }))}
         placeholder={{ label: "Selecione uma Disciplina", value: undefined }}
         value={selectedSubject || ""}
         style={pickerSelectStyles}
@@ -221,21 +226,15 @@ export default function SpecificSearchScreen({ navigation }) {
       <View style={styles.table}>
         <View style={styles.tableHeader}>
           <Text style={styles.tableHeaderText}>Curso</Text>
-          <Text style={styles.tableHeaderText}>Semestre</Text>
+          <Text style={styles.tableHeaderText}>Dia</Text>
           <Text style={styles.tableHeaderText}>Professor</Text>
           <Text style={styles.tableHeaderText}>Disciplina</Text>
           <Text style={styles.tableHeaderText}>Horário</Text>
         </View>
-        {weekTimetable.length > 0 ? (
-          <FlatList
-            data={weekTimetable}
-            renderItem={renderTimetableItem}
-            keyExtractor={(item) => item.scheduleId.toString()}
-          />
-        ) : (
-          <Text style={styles.emptyMessage}>Nenhum horário encontrado para a semana selecionada.</Text>
-        )}
+        {renderTable()}
       </View>
+
+      {errorMessage && <Text style={styles.errorMessage}>{errorMessage}</Text>}
     </ScrollView>
   );
 }
@@ -244,82 +243,84 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 20,
-    backgroundColor: "#fff",
   },
   header: {
     flexDirection: "row",
-    alignItems: "center",
-    marginVertical: 20,
+    justifyContent: "space-between",
+    marginBottom: 20,
   },
   logo: {
     width: 100,
     height: 50,
-    marginLeft: 150,
+    resizeMode: "contain",
+  },
+  voltar: {
+    fontSize: 16,
+    fontWeight: "bold",
+    color: "#B20000",
   },
   title: {
-    fontSize: 24,
-    fontFamily: "Roboto-Medium",
-    textAlign: "center",
-    marginBottom: 20,
+    fontSize: 20,
+    fontWeight: "bold",
+    color: "#333",
+    marginBottom: 10,
   },
   table: {
-    borderWidth: 1,
-    borderColor: "#ccc",
-    borderRadius: 5,
-    overflow: "hidden",
+    marginTop: 20,
   },
   tableHeader: {
     flexDirection: "row",
     backgroundColor: "#B20000",
-    padding: 10,
+    paddingVertical: 10,
   },
   tableHeaderText: {
     flex: 1,
-    fontWeight: "bold",
     color: "#fff",
     textAlign: "center",
   },
   tableRow: {
     flexDirection: "row",
-    padding: 10,
+    paddingVertical: 10,
     borderBottomWidth: 1,
-    borderBottomColor: "#ccc",
+    borderBottomColor: "#ddd",
   },
   tableCell: {
     flex: 1,
     textAlign: "center",
   },
   emptyMessage: {
-    padding: 20,
     textAlign: "center",
-    color: "#999",
-  },
-  voltar: {
-    textDecorationLine: "underline",
-    fontSize: 13,
-    fontFamily: "Roboto-Medium",
-    marginTop: 25,
+    marginTop: 20,
+    fontSize: 16,
     color: "#B20000",
+  },
+  errorMessage: {
+    textAlign: "center",
+    marginTop: 20,
+    fontSize: 16,
+    color: "red",
   },
 });
 
-const pickerSelectStyles = {
-  inputIOS: {
-    fontSize: 16,
-    padding: 10,
-    borderWidth: 1,
-    borderColor: "#ccc",
-    borderRadius: 5,
-    color: "#000",
-    marginBottom: 20,
-  },
-  inputAndroid: {
-    fontSize: 16,
-    padding: 10,
-    borderWidth: 1,
-    borderColor: "#ccc",
-    borderRadius: 5,
-    color: "#000",
-    marginBottom: 20,
-  },
-};
+  const pickerSelectStyles = StyleSheet.create({
+    inputIOS: {
+        fontSize: 16,
+        paddingVertical: 12,
+        paddingHorizontal: 10,
+        borderWidth: 1,
+        borderColor: 'gray',
+        borderRadius: 4,
+        color: 'black',
+        paddingRight: 30, // para ícones à direita
+    },
+    inputAndroid: {
+        fontSize: 16,
+        paddingHorizontal: 10,
+        paddingVertical: 8,
+        borderWidth: 1,
+        borderColor: 'gray',
+        borderRadius: 4,
+        color: 'black',
+        paddingRight: 30,
+    },
+});
