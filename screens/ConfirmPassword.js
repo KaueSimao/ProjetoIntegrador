@@ -42,7 +42,6 @@ const ConfirmPassword = ({ navigation }) => {
     }
 
     // Aqui você pode adicionar a lógica para enviar a senha ou outro processo
-    console.log("Senha confirmada:", password);
     showAlert("Senha resetada com sucesso.", true);
   };
   useFocusEffect(

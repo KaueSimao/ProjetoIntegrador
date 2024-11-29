@@ -5,6 +5,8 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { StyleSheet, View, Image, Text, TouchableOpacity, FlatList, ScrollView } from "react-native";
 import { useFonts } from "expo-font";
 import { Calendar, LocaleConfig } from "react-native-calendars";
+import { format, parseISO } from "date-fns";
+import { ptBR } from "date-fns/locale";
 
 
 const API_URL = "https://projeto-integrador-1v4i.onrender.com";
@@ -25,7 +27,9 @@ export default function SpecificSearchScreen({ navigation }) {
   const [selectedCourse, setSelectedCourse] = useState(null);
   const [selectedSubject, setSelectedSubject] = useState(null);
   const [accessToken, setAccessToken] = useState(null);
-  const [selectedDate, setSelectedDate] = useState(new Date()); // Data atual
+  const [selectedDate, setSelectedDate] = useState(null);
+  const [formattedDate, setFormattedDate] = useState(null);
+  const [weekDay, setWeekDay] = useState(null);
   const [reservations, setReservations] = useState([]); // Dados de reservas
   const [isTokenLoaded, setIsTokenLoaded] = useState(false); // Estado que indica se o token foi carregado
 
@@ -44,7 +48,14 @@ export default function SpecificSearchScreen({ navigation }) {
       fetchFilters();
       fetchFilteredTimetable();
     }
-  }, [isTokenLoaded, accessToken]);
+  }, [isTokenLoaded, accessToken]);  // Mantém a lógica original
+
+  // Este useEffect agora será chamado toda vez que algum filtro ou data for alterado
+  useEffect(() => {
+    if (isTokenLoaded) {
+      fetchFilteredTimetable();  // Recarregar a tabela quando qualquer filtro ou data for alterado
+    }
+  }, [selectedTeacher, selectedCourse, selectedSubject, selectedDate, weekDay]);
 
   LocaleConfig.locales['pt-br'] = {
     monthNames: [
@@ -67,91 +78,87 @@ export default function SpecificSearchScreen({ navigation }) {
     today: 'Hoje'
   };
 
+
+  const handleDayPress = (day) => {
+    const newSelectedDate = parseISO(day.dateString);
+
+    // Formatar data e dia da semana
+    const formattedDate = format(newSelectedDate, "yyyy-MM-dd");
+    const weekDay = format(newSelectedDate, "EEEE", { locale: ptBR });
+
+    console.log("Data selecionada:", formattedDate);
+    console.log("Dia da semana:", weekDay);
+
+    // Atualizar estado
+    setSelectedDate(newSelectedDate);
+    setFormattedDate(formattedDate);
+    setWeekDay(weekDay.toLowerCase());
+  };
+
   LocaleConfig.defaultLocale = 'pt-br';
   const fetchFilteredTimetable = async () => {
     if (!accessToken) {
       return setErrorMessage("Token não encontrado. Por favor, faça login novamente.");
     }
-  
+
     try {
-      // Converter a data selecionada para o formato 'YYYY-MM-DD' sem a hora
-      const selectedDay = selectedDate?.toISOString().split("T")[0]; // Formata apenas a data (sem a hora)
-      const selectedWeekDay = selectedDate.toLocaleString('pt-BR', { weekday: 'long' }).toLowerCase();
-  
-      console.log("Selected Day:", selectedDay);
-      console.log("Selected Week Day:", selectedWeekDay);
-  
+      console.log("Data formatada para comparação:", formattedDate);
+      console.log("Dia da semana formatado para comparação:", weekDay);
+
       // Buscar as reservas
       const reservationResponse = await axios.get(`${API_URL}/reservation/`, {
         headers: {
           Authorization: `Bearer ${accessToken}`,
         },
       });
-      console.log("Reservation Response:", reservationResponse.data);
-  
-      // Filtrar as reservas com base na data selecionada (sem hora) ou no dia da semana
+
       const filteredReservations = reservationResponse.data.filter((item) => {
-        const reservationDate = item.date; // Data sem hora
-        const reservationWeekDay = item.weekDay.toLowerCase(); // O dia da semana da reserva
-        console.log("Reservation Date:", reservationDate);
-        console.log("Reservation Week Day:", reservationWeekDay);
-  
-        // Verifica se a data da reserva é igual à data selecionada ou se o dia da semana é igual
-        return reservationDate === selectedDay || reservationWeekDay === selectedWeekDay;
+        const reservationDate = item.date; // Data da reserva
+        const reservationWeekDay = item.weekDay.toLowerCase(); // Dia da semana da reserva
+
+        // Verificando a comparação
+        console.log("Data da reserva:", reservationDate);
+        console.log("Data formatada para comparação:", formattedDate);
+        console.log("Dia da semana da reserva:", reservationWeekDay);
+        console.log("Dia da semana formatado para comparação:", weekDay);
+
+        const isDateMatch = reservationDate === formattedDate;
+        const isWeekDayMatch = reservationWeekDay === weekDay;
+
+        // Mostra o resultado da comparação
+        console.log("Resultado da comparação (data ou dia da semana):", isDateMatch || isWeekDayMatch);
+
+        return isDateMatch || isWeekDayMatch;
       });
-      console.log("Filtered Reservations:", filteredReservations);
-  
+
+
       // Buscar os horários fixos
       const scheduleResponse = await axios.get(`${API_URL}/schedule/`, {
         headers: {
           Authorization: `Bearer ${accessToken}`,
         },
       });
-      console.log("Schedule Response:", scheduleResponse.data);
-  
-      // Filtrar os horários fixos com base no dia da semana selecionado
+
       const filteredSchedule = scheduleResponse.data.filter((schedule) => {
-        const scheduleDay = schedule.weekday.toLowerCase(); // Dia da semana do horário fixo
-        console.log("Filtered Schedule Day:", scheduleDay);
-  
-        return scheduleDay === selectedWeekDay;
+        const scheduleDay = schedule.weekday.toLowerCase();
+        return scheduleDay === weekDay;
       });
-  
-      console.log("Filtered Schedule:", filteredSchedule);
-  
-      // Se não houver reservas, use os horários fixos
+
       if (filteredReservations.length === 0) {
         setTimetable(filteredSchedule);
       } else {
-        // Processar os horários, substituindo pelos horários de reserva quando a data coincidir
         const timetable = filteredSchedule.map((schedule) => {
-          // Verifica se existe uma reserva para o mesmo horário no dia da semana
           const reservationForSchedule = filteredReservations.find((reservation) => {
-            const reservationTime = reservation.time.split(" - ")[1].split(" ")[0]; // Extraí o horário da reserva (ex: "13:00")
-            const scheduleTime = schedule.time.split(" - ")[0]; // Extraí o horário fixo (ex: "08:00")
-  
-            console.log("Reservation Time:", reservationTime);
-            console.log("Schedule Time:", scheduleTime);
-  
-            return reservationTime === scheduleTime; // Comparar os horários
+            const reservationTime = reservation.time.split(" - ")[1].split(" ")[0];
+            const scheduleTime = schedule.time.split(" - ")[0];
+            return reservationTime === scheduleTime;
           });
-  
-          if (reservationForSchedule) {
-            // Se a reserva existir, substitui pelo horário da reserva
-            return {
-              ...schedule,
-              status: 'reserved',
-              reservation: reservationForSchedule,
-            };
-          } else {
-            // Caso contrário, exibe o horário fixo como disponível
-            return {
-              ...schedule,
-              status: 'available',
-            };
-          }
+
+          return reservationForSchedule
+            ? { ...schedule, status: "reserved", reservation: reservationForSchedule }
+            : { ...schedule, status: "available" };
         });
-  
+
         setTimetable(timetable);
       }
     } catch (error) {
@@ -159,7 +166,7 @@ export default function SpecificSearchScreen({ navigation }) {
       setErrorMessage("Erro ao carregar os dados. Tente novamente mais tarde.");
     }
   };
-  
+
   const fetchFilters = async () => {
     if (!accessToken) {
       return setErrorMessage("Token não encontrado. Por favor, faça login novamente.");
@@ -246,24 +253,21 @@ export default function SpecificSearchScreen({ navigation }) {
 
       <Text style={styles.title}>Filtro Específico</Text>
       <Calendar
-  onDayPress={(day) => {
-    const newSelectedDate = new Date(day.dateString); // cria a data correta
-    setSelectedDate(newSelectedDate);
-    console.log("Selected Date on Day Press:", newSelectedDate); // Verificar o novo valor
-  }}
-  markedDates={{
-    [selectedDate?.toISOString().split("T")[0]]: {
-      selected: true,
-      marked: true,
-      selectedColor: "#B20000",
-    },
-  }}
-  theme={{
-    selectedDayBackgroundColor: "#B20000",
-    todayTextColor: "#B20000",
-    arrowColor: "#B20000",
-  }}
-/>
+        onDayPress={handleDayPress}
+        markedDates={{
+          [selectedDate?.toISOString().split("T")[0]]: {
+            selected: true,
+            marked: true,
+            selectedColor: "#B20000",
+          },
+        }}
+        theme={{
+          selectedDayBackgroundColor: "#B20000",
+          todayTextColor: "#B20000",
+          arrowColor: "#B20000",
+        }}
+      />
+
 
       <RNPickerSelect
         onValueChange={(value) => setSelectedTeacher(value)}

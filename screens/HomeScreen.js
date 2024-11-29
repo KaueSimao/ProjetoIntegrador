@@ -95,7 +95,6 @@ export default function HomeScreen({ navigation, route }) {
 
   // Verifique se user ou fontsLoaded são falsos
 if (!fontsLoaded || !userName) {
-  console.log("Carregando... fontsLoaded:", fontsLoaded, "user:", userName);
   return (
     <View style={styles.container}>
       <Text>Carregando...</Text>

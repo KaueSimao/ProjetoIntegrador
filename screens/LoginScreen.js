@@ -61,12 +61,10 @@ export default function LoginScreen({ navigation }) {
     try {
       const response = await loginStudent(credentials); // Envia as credenciais para a API
 
-      console.log("Resposta da API:", response);  // Verifique o que está sendo retornado
 
       if (response) {
         showAlert("Sucesso, login bem-sucedido!");
 
-        console.log(response.access_token)
         await AsyncStorage.setItem("userToken", response.access_token);
 
         // Navega para a tela principal com as informações do usuário
