@@ -79,6 +79,18 @@ export default function SpecificSearchScreen({ navigation }) {
   };
 
 
+  const clearFilters = () => {
+    setSelectedTeacher(null);
+    setSelectedCourse(null);
+    setSelectedSubject(null);
+    setSelectedDate(null);
+    setFormattedDate(null);
+    setWeekDay(null);
+
+    fetchFilteredTimetable(); // Recarrega os dados completos
+  };
+
+
   const handleDayPress = (day) => {
     const newSelectedDate = parseISO(day.dateString);
 
@@ -102,35 +114,12 @@ export default function SpecificSearchScreen({ navigation }) {
     }
 
     try {
-      console.log("Data formatada para comparação:", formattedDate);
-      console.log("Dia da semana formatado para comparação:", weekDay);
-
       // Buscar as reservas
       const reservationResponse = await axios.get(`${API_URL}/reservation/`, {
         headers: {
           Authorization: `Bearer ${accessToken}`,
         },
       });
-
-      const filteredReservations = reservationResponse.data.filter((item) => {
-        const reservationDate = item.date; // Data da reserva
-        const reservationWeekDay = item.weekDay.toLowerCase(); // Dia da semana da reserva
-
-        // Verificando a comparação
-        console.log("Data da reserva:", reservationDate);
-        console.log("Data formatada para comparação:", formattedDate);
-        console.log("Dia da semana da reserva:", reservationWeekDay);
-        console.log("Dia da semana formatado para comparação:", weekDay);
-
-        const isDateMatch = reservationDate === formattedDate;
-        const isWeekDayMatch = reservationWeekDay === weekDay;
-
-        // Mostra o resultado da comparação
-        console.log("Resultado da comparação (data ou dia da semana):", isDateMatch || isWeekDayMatch);
-
-        return isDateMatch || isWeekDayMatch;
-      });
-
 
       // Buscar os horários fixos
       const scheduleResponse = await axios.get(`${API_URL}/schedule/`, {
@@ -139,15 +128,26 @@ export default function SpecificSearchScreen({ navigation }) {
         },
       });
 
-      const filteredSchedule = scheduleResponse.data.filter((schedule) => {
-        const scheduleDay = schedule.weekday.toLowerCase();
-        return scheduleDay === weekDay;
-      });
+      let combinedTimetable = [...scheduleResponse.data];
 
-      if (filteredReservations.length === 0) {
-        setTimetable(filteredSchedule);
-      } else {
-        const timetable = filteredSchedule.map((schedule) => {
+      // Aplicar filtros de data apenas se uma data estiver selecionada
+      if (formattedDate || weekDay) {
+        const filteredReservations = reservationResponse.data.filter((item) => {
+          const reservationDate = item.date;
+          const reservationWeekDay = item.weekDay.toLowerCase();
+
+          const isDateMatch = reservationDate === formattedDate;
+          const isWeekDayMatch = reservationWeekDay === weekDay;
+
+          return isDateMatch || isWeekDayMatch;
+        });
+
+        const filteredSchedule = scheduleResponse.data.filter((schedule) => {
+          const scheduleDay = schedule.weekday.toLowerCase();
+          return scheduleDay === weekDay;
+        });
+
+        combinedTimetable = filteredSchedule.map((schedule) => {
           const reservationForSchedule = filteredReservations.find((reservation) => {
             const reservationTime = reservation.time.split(" - ")[1].split(" ")[0];
             const scheduleTime = schedule.time.split(" - ")[0];
@@ -158,14 +158,27 @@ export default function SpecificSearchScreen({ navigation }) {
             ? { ...schedule, status: "reserved", reservation: reservationForSchedule }
             : { ...schedule, status: "available" };
         });
-
-        setTimetable(timetable);
       }
+
+      // Aplicar os filtros de professor, curso e disciplina
+      const filterTimetable = (timetable) => {
+        return timetable.filter((item) => {
+          const matchesTeacher = selectedTeacher ? item.teacher === selectedTeacher : true;
+          const matchesCourse = selectedCourse ? item.course === selectedCourse : true;
+          const matchesSubject = selectedSubject ? item.subject === selectedSubject : true;
+
+          return matchesTeacher && matchesCourse && matchesSubject;
+        });
+      };
+
+      const finalTimetable = filterTimetable(combinedTimetable);
+      setTimetable(finalTimetable);
     } catch (error) {
       console.error(error);
       setErrorMessage("Erro ao carregar os dados. Tente novamente mais tarde.");
     }
   };
+
 
   const fetchFilters = async () => {
     if (!accessToken) {
@@ -228,15 +241,23 @@ export default function SpecificSearchScreen({ navigation }) {
     return (
       <FlatList
         data={timetable}
-        renderItem={({ item }) => (
-          <View style={styles.tableRow}>
-            <Text style={styles.tableCell}>{item.course || "Curso Indisponível"}</Text>
-            <Text style={styles.tableCell}>{item.weekDay || "Dia não especificado"}</Text>
-            <Text style={styles.tableCell}>{item.teacher}</Text>
-            <Text style={styles.tableCell}>{item.subject}</Text>
-            <Text style={styles.tableCell}>{item.time}</Text>
-          </View>
-        )}
+        renderItem={({ item }) => {
+          const courseParts = item.course ? item.course.split(" - ") : [];
+          const courseName = courseParts[0] || "N/A";
+          const semester = courseParts[1] || "N/A";
+
+          return (
+            <View style={styles.tableRow}>
+              <Text style={styles.tableCell}>{semester}</Text>
+              <Text style={styles.tableCell}>{courseName}</Text>
+              <Text style={styles.tableCell}>{item.weekDay || "N/A"}</Text>
+              <Text style={styles.tableCell}>{item.teacher || "N/A"}</Text>
+              <Text style={styles.tableCell}>{item.subject || "N/A"}</Text>
+              <Text style={styles.tableCell}>{item.time || "N/A"}</Text>
+              <Text style={styles.tableCell}>{item.room || "N/A"}</Text>
+            </View>
+          );
+        }}
         keyExtractor={(item, index) => item.id ? item.id.toString() : index.toString()}
       />
     );
@@ -268,57 +289,76 @@ export default function SpecificSearchScreen({ navigation }) {
         }}
       />
 
+      <TouchableOpacity
+        style={styles.clearButton}
+        onPress={() => clearFilters()}>
+        <Text style={styles.clearButtonText}>Limpar Filtros</Text>
+      </TouchableOpacity>
 
       <RNPickerSelect
-        onValueChange={(value) => setSelectedTeacher(value)}
+        onValueChange={(value) => {
+          // Quando o "Selecione um Professor" for escolhido, o valor será null
+          setSelectedTeacher(value === "defaultTeacher" ? null : value);
+        }}
         items={teachers && teachers.length > 0
           ? teachers.map((teacher, index) => ({
             label: teacher.label || "Curso não disponível",
-            value: teacher.value || "defaultTeacher",
+            value: teacher.value || "defaultTeacher", // Usar "defaultTeacher" como valor para a opção de placeholder
             key: `${teacher.value}-${index}`
           }))
           : [{ label: "Nenhum professor disponível", value: "defaultTeacher" }]}
-        placeholder={{ label: "Selecione um Professor", value: undefined }}
-        value={selectedTeacher || "defaultTeacher"}
+
+        placeholder={{ label: "Selecione um Professor", value: "defaultTeacher" }} // Alterar placeholder para "defaultTeacher"
+        value={selectedTeacher || "defaultTeacher"}  // Garantir que o valor inicial seja "defaultTeacher"
         style={pickerSelectStyles}
       />
 
       <RNPickerSelect
-        onValueChange={(value) => setSelectedCourse(value)}
+        onValueChange={(value) => {
+          // Quando o "Selecione um Curso" for escolhido, o valor será null
+          setSelectedCourse(value === "defaultCourse" ? null : value);
+        }}
         items={courses && courses.length > 0
           ? courses.map((course, index) => ({
             label: course.label || "Curso não disponível",
-            value: course.value || "defaultCourse",
+            value: course.value || "defaultCourse", // Usar "defaultCourse" como valor para a opção de placeholder
             key: `${course.value}-${index}`
           }))
           : [{ label: "Nenhum curso disponível", value: "defaultCourse" }]}
-        placeholder={{ label: "Selecione um Curso", value: undefined }}
-        value={selectedCourse || "deafultCourse"}
+
+        placeholder={{ label: "Selecione um Curso", value: "defaultCourse" }} // Alterar placeholder para "defaultCourse"
+        value={selectedCourse || "defaultCourse"}  // Garantir que o valor inicial seja "defaultCourse"
         style={pickerSelectStyles}
       />
-
 
 
       <RNPickerSelect
-        onValueChange={(value) => setSelectedSubject(value)}
-        items={subjects && subjects.length > 0 ? subjects.map((subject, index) => ({
-          label: subject.label || "Disciplina não disponível",
-          value: subject.value || "defaultSubject", // Valor padrão
-          key: `${subject.value}-${index}`
-        })) : [{ label: "Nenhuma disciplina disponível", value: "defaultSubject" }]} // Valor padrão caso a lista esteja vazia
-        placeholder={{ label: "Selecione uma Disciplina", value: undefined }}
-        value={selectedSubject || "defaultSubject"} // Valor padrão
+        onValueChange={(value) => {
+          // Quando o "Selecione uma Disciplina" for escolhido, o valor será null
+          setSelectedSubject(value === "defaultSubject" ? null : value);
+        }}
+        items={subjects && subjects.length > 0
+          ? subjects.map((subject, index) => ({
+            label: subject.label || "Disciplina não disponível",
+            value: subject.value || "defaultSubject", // Usar "defaultSubject" como valor para a opção de placeholder
+            key: `${subject.value}-${index}`
+          }))
+          : [{ label: "Nenhuma disciplina disponível", value: "defaultSubject" }]}
+
+        placeholder={{ label: "Selecione uma Disciplina", value: "defaultSubject" }} // Alterar placeholder para "defaultSubject"
+        value={selectedSubject || "defaultSubject"}  // Garantir que o valor inicial seja "defaultSubject"
         style={pickerSelectStyles}
       />
 
-
       <View style={styles.table}>
         <View style={styles.tableHeader}>
+          <Text style={styles.tableHeaderText}>Semestre</Text>
           <Text style={styles.tableHeaderText}>Curso</Text>
           <Text style={styles.tableHeaderText}>Dia</Text>
           <Text style={styles.tableHeaderText}>Professor</Text>
           <Text style={styles.tableHeaderText}>Disciplina</Text>
           <Text style={styles.tableHeaderText}>Horário</Text>
+          <Text style={styles.tableHeaderText}>Sala</Text>
         </View>
         {renderTable()}
       </View>
@@ -388,6 +428,18 @@ const styles = StyleSheet.create({
     marginTop: 20,
     fontSize: 16,
     color: "red",
+  },
+  clearButton: {
+    backgroundColor: "#B20000",
+    padding: 10,
+    borderRadius: 5,
+    alignItems: "center",
+    marginVertical: 10,
+  },
+  clearButtonText: {
+    color: "#fff",
+    fontWeight: "bold",
+    fontSize: 16,
   },
 });
 
