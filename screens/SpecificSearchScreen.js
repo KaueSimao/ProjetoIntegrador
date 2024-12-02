@@ -112,7 +112,7 @@ export default function SpecificSearchScreen({ navigation }) {
     if (!accessToken) {
       return setErrorMessage("Token não encontrado. Por favor, faça login novamente.");
     }
-  
+
     try {
       // Buscar as reservas
       const reservationResponse = await axios.get(`${API_URL}/reservation/`, {
@@ -120,31 +120,31 @@ export default function SpecificSearchScreen({ navigation }) {
           Authorization: `Bearer ${accessToken}`,
         },
       });
-  
+
       // Buscar os horários fixos
       const scheduleResponse = await axios.get(`${API_URL}/schedule/`, {
         headers: {
           Authorization: `Bearer ${accessToken}`,
         },
       });
-  
+
       const reservationsData = reservationResponse.data;
       const scheduleData = scheduleResponse.data;
-  
+
       let combinedTimetable = [...scheduleData];
-  
+
       // Aplicar filtros de data e dia da semana
       if (formattedDate || weekDay) {
         const filteredReservations = reservationsData.filter((item) => {
           const reservationDate = item.date;
           const reservationWeekDay = item.weekDay.toLowerCase();
-  
+
           const isDateMatch = reservationDate === formattedDate;
           const isWeekDayMatch = reservationWeekDay === weekDay;
-  
+
           return isDateMatch || isWeekDayMatch;
         });
-  
+
         combinedTimetable = scheduleData.map((schedule) => {
           const matchingReservation = filteredReservations.find((reservation) => {
             return (
@@ -152,12 +152,12 @@ export default function SpecificSearchScreen({ navigation }) {
               reservation.room === schedule.room
             );
           });
-  
+
           return matchingReservation
             ? { ...matchingReservation, status: "reserved" }
             : { ...schedule, status: "available" };
         });
-  
+
         // Adicionar reservas que não se sobrepõem com os horários fixos
         filteredReservations.forEach((reservation) => {
           const isOverlapping = combinedTimetable.some(
@@ -170,18 +170,18 @@ export default function SpecificSearchScreen({ navigation }) {
           }
         });
       }
-  
+
       // Aplicar os filtros de professor, curso e disciplina
       const filterTimetable = (timetable) => {
         return timetable.filter((item) => {
           const matchesTeacher = selectedTeacher ? item.teacher === selectedTeacher : true;
           const matchesCourse = selectedCourse ? item.course === selectedCourse : true;
           const matchesSubject = selectedSubject ? item.subject === selectedSubject : true;
-  
+
           return matchesTeacher && matchesCourse && matchesSubject;
         });
       };
-  
+
       const finalTimetable = filterTimetable(combinedTimetable);
       setTimetable(finalTimetable);
     } catch (error) {
@@ -189,7 +189,7 @@ export default function SpecificSearchScreen({ navigation }) {
       setErrorMessage("Erro ao carregar os dados. Tente novamente mais tarde.");
     }
   };
-  
+
 
 
   const fetchFilters = async () => {
@@ -218,7 +218,7 @@ export default function SpecificSearchScreen({ navigation }) {
       if (Array.isArray(teachersResponse.data)) {
         const formattedTeachers = teachersResponse.data.map((teacher) => ({
           label: teacher.teacherName || "Professor não disponível", // Garantir que o label nunca seja undefined
-          value: teacher.teacherId,
+          value: teacher.teacherName,
         }));
         setTeachers(formattedTeachers);
       }
@@ -233,7 +233,7 @@ export default function SpecificSearchScreen({ navigation }) {
 
       if (Array.isArray(coursesResponse.data)) {
         const formattedCourses = coursesResponse.data.map((course) => ({
-          label: course.courseName || "Curso não disponível", // Garantir que o label nunca seja undefined
+          label: course.courseName || "Curso não disponível",
           value: course.courseName,
         }));
         setCourses(formattedCourses);
@@ -243,6 +243,11 @@ export default function SpecificSearchScreen({ navigation }) {
       console.error("Erro ao carregar os filtros", error);
       setErrorMessage("Erro ao carregar os filtros. Tente novamente mais tarde.");
     }
+
+    console.log("Cursos carregados:", courses);
+    console.log("Curso selecionado:", selectedCourse);
+    console.log("Tabela filtrada:", timetable);
+
   };
 
   const renderTable = () => {
@@ -327,21 +332,21 @@ export default function SpecificSearchScreen({ navigation }) {
 
       <RNPickerSelect
         onValueChange={(value) => {
-          // Quando o "Selecione um Curso" for escolhido, o valor será null
           setSelectedCourse(value === "defaultCourse" ? null : value);
         }}
         items={courses && courses.length > 0
           ? courses.map((course, index) => ({
             label: course.label || "Curso não disponível",
-            value: course.value || "defaultCourse", // Usar "defaultCourse" como valor para a opção de placeholder
+            value: course.value || "defaultCourse",
             key: `${course.value}-${index}`
           }))
           : [{ label: "Nenhum curso disponível", value: "defaultCourse" }]}
-
-        placeholder={{ label: "Selecione um Curso", value: "defaultCourse" }} // Alterar placeholder para "defaultCourse"
-        value={selectedCourse || "defaultCourse"}  // Garantir que o valor inicial seja "defaultCourse"
+        placeholder={{ label: "Selecione um Curso", value: "defaultCourse" }}
+        value={selectedCourse || "defaultCourse"}
         style={pickerSelectStyles}
       />
+
+
 
 
       <RNPickerSelect
