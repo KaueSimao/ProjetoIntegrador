@@ -112,7 +112,7 @@ export default function SpecificSearchScreen({ navigation }) {
     if (!accessToken) {
       return setErrorMessage("Token não encontrado. Por favor, faça login novamente.");
     }
-
+  
     try {
       // Buscar as reservas
       const reservationResponse = await axios.get(`${API_URL}/reservation/`, {
@@ -120,31 +120,31 @@ export default function SpecificSearchScreen({ navigation }) {
           Authorization: `Bearer ${accessToken}`,
         },
       });
-
+  
       // Buscar os horários fixos
       const scheduleResponse = await axios.get(`${API_URL}/schedule/`, {
         headers: {
           Authorization: `Bearer ${accessToken}`,
         },
       });
-
+  
       const reservationsData = reservationResponse.data;
       const scheduleData = scheduleResponse.data;
-
+  
       let combinedTimetable = [...scheduleData];
-
+  
       // Aplicar filtros de data e dia da semana
       if (formattedDate || weekDay) {
         const filteredReservations = reservationsData.filter((item) => {
           const reservationDate = item.date;
           const reservationWeekDay = item.weekDay.toLowerCase();
-
+  
           const isDateMatch = reservationDate === formattedDate;
           const isWeekDayMatch = reservationWeekDay === weekDay;
-
+  
           return isDateMatch || isWeekDayMatch;
         });
-
+  
         combinedTimetable = scheduleData.map((schedule) => {
           const matchingReservation = filteredReservations.find((reservation) => {
             return (
@@ -152,12 +152,12 @@ export default function SpecificSearchScreen({ navigation }) {
               reservation.room === schedule.room
             );
           });
-
+  
           return matchingReservation
             ? { ...matchingReservation, status: "reserved" }
             : { ...schedule, status: "available" };
         });
-
+  
         // Adicionar reservas que não se sobrepõem com os horários fixos
         filteredReservations.forEach((reservation) => {
           const isOverlapping = combinedTimetable.some(
@@ -170,18 +170,27 @@ export default function SpecificSearchScreen({ navigation }) {
           }
         });
       }
-
+  
       // Aplicar os filtros de professor, curso e disciplina
       const filterTimetable = (timetable) => {
         return timetable.filter((item) => {
           const matchesTeacher = selectedTeacher ? item.teacher === selectedTeacher : true;
-          const matchesCourse = selectedCourse ? item.course === selectedCourse : true;
+  
+          // Separar nome e semestre do curso no horário
+          const [courseNameFromSchedule, courseSemesterFromSchedule] = item.course
+            ? item.course.split(" - ")
+            : [null, null];
+  
+          // Comparar o nome do curso
+          const matchesCourse =
+            selectedCourse ? courseNameFromSchedule === selectedCourse : true;
+  
           const matchesSubject = selectedSubject ? item.subject === selectedSubject : true;
-
+  
           return matchesTeacher && matchesCourse && matchesSubject;
         });
       };
-
+  
       const finalTimetable = filterTimetable(combinedTimetable);
       setTimetable(finalTimetable);
     } catch (error) {
@@ -189,6 +198,7 @@ export default function SpecificSearchScreen({ navigation }) {
       setErrorMessage("Erro ao carregar os dados. Tente novamente mais tarde.");
     }
   };
+  
 
 
 
