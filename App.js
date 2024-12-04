@@ -13,6 +13,7 @@ import SearchScreen from './screens/SearchScreen';
 import ForgotPasswordScreen from './screens/ForgotPasswordScreen';
 import AutoRegisterScreen from './screens/AutoRegisterScreen';
 import SpecificSearchScreen from './screens/SpecificSearchScreen';
+import ConfirmPasswordScreen from './screens/ConfirmPassword';
  
 const Stack = createNativeStackNavigator();
  
@@ -87,6 +88,7 @@ function App() {
         <Stack.Screen name="HomeScreen" component={HomeScreen} />
         <Stack.Screen name="SearchScreen" component={SearchScreen} />
         <Stack.Screen name="ForgotPassword" component={ForgotPasswordScreen} />
+        <Stack.Screen name="ConfirmPassword" component={ConfirmPasswordScreen} />
         <Stack.Screen name="Register" component={AutoRegisterScreen} />
         <Stack.Screen name="Search" component={SpecificSearchScreen} />
       </Stack.Navigator>
