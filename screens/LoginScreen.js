@@ -29,6 +29,17 @@ export default function LoginScreen({ navigation }) {
   const [alertMessage, setAlertMessage] = useState(""); // Mensagem de alerta
   const [alertVisible, setAlertVisible] = useState(false); // Controle de visibilidade do alerta
 
+  // Limpar os campos de login quando a tela de login for carregada
+  useEffect(() => {
+    const clearLoginData = async () => {
+      await AsyncStorage.removeItem("userToken");  // Garantir que o token é removido caso o usuário tenha feito logout
+      setEmail("");  // Limpa o campo de email
+      setPassword("");  // Limpa o campo de senha
+    };
+
+    clearLoginData();
+  }, []);
+
   // Função de validação dos campos
   const validateLoginFields = () => {
     if (!institutionalEmail || !studentPassword) {
@@ -63,7 +74,6 @@ export default function LoginScreen({ navigation }) {
 
 
       if (response) {
-        showAlert("Sucesso, login bem-sucedido!");
 
         await AsyncStorage.setItem("userToken", response.access_token);
 
@@ -132,7 +142,7 @@ export default function LoginScreen({ navigation }) {
           <Text style={styles.forgotPassword}>Esqueci minha senha</Text>
         </TouchableOpacity>
       </View>
-      
+
       <TouchableOpacity style={styles.button} onPress={login} disabled={isLoading}>
       {isLoading ? (
             <ActivityIndicator size="small" color="white" />

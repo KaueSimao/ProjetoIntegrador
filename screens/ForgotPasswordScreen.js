@@ -24,20 +24,20 @@ const ForgotPasswordScreen = ({ navigation }) => {
     "Roboto-Medium": require("../assets/fonts/Roboto-Medium.ttf"),
   });
 
- // Função para exibir mensagens de alerta e ocultá-las após 3 segundos
- const showAlert = (message, isSuccess = false) => {
-  setAlertMessage(message);
-  setAlertVisible(true);
+  // Função para exibir mensagens de alerta e ocultá-las após 3 segundos
+  const showAlert = (message, isSuccess = false) => {
+    setAlertMessage(message);
+    setAlertVisible(true);
 
-  if (isSuccess) {
-    setTimeout(() => {
-      setAlertVisible(false);
-      navigation.navigate("Login"); // Navega para a tela de login após o sucesso
-    }, 3000); // Alerta desaparece após 3 segundos
-  } else {
-    setTimeout(() => setAlertVisible(false), 3000);
-  }
-};
+    if (isSuccess) {
+      setTimeout(() => {
+        setAlertVisible(false);
+        navigation.navigate("ConfirmPassword"); // Navega para a tela de login após o sucesso
+      }, 3000); // Alerta desaparece após 3 segundos
+    } else {
+      setTimeout(() => setAlertVisible(false), 3000);
+    }
+  };
 
   if (!fontsLoaded) {
     return null;
@@ -48,12 +48,12 @@ const ForgotPasswordScreen = ({ navigation }) => {
       showAlert("Por favor, insira um e-mail institucional válido.");
       return;
     }
-  
+
     setIsLoading(true);
-  
+
     try {
       const response = await forgotPassword(email);
-  
+
       if (response) {
         showAlert("Um e-mail de recuperação foi enviado.", true);
       } else {
@@ -61,7 +61,7 @@ const ForgotPasswordScreen = ({ navigation }) => {
       }
     } catch (error) {
       console.error("Erro na requisição:", error);
-  
+
       if (axios.isAxiosError(error)) {
         showAlert("Ocorreu um erro inesperado. Tente novamente.");
       } else {
@@ -71,9 +71,9 @@ const ForgotPasswordScreen = ({ navigation }) => {
       setIsLoading(false);
     }
   };
-  
 
-  
+
+
 
   return (
     <View style={styles.container}>
@@ -117,6 +117,11 @@ const ForgotPasswordScreen = ({ navigation }) => {
           autoCapitalize="none"
           autoCorrect={false}
         />
+        <View style={styles.optionsContainer}>
+          <TouchableOpacity onPress={() => navigation.navigate("ConfirmPassword")}>
+            <Text style={styles.forgotPassword}>Caso já tenha recebido o código, clique aqui</Text>
+          </TouchableOpacity>
+        </View>
         <TouchableOpacity
           onPress={handleForgotPassword}
           style={styles.button1}
@@ -163,6 +168,18 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontFamily: "Roboto-Regular",
     marginBottom: 10,
+  },
+  optionsContainer: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    width: "100%",
+    marginBottom: 15,
+  },
+  forgotPassword: {
+    fontSize: 16,
+    fontFamily: "Roboto-Regular",
+    color: "red",
+    textDecorationLine: "underline",
   },
   inputEmail: {
     fontSize: 16,

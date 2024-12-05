@@ -33,9 +33,9 @@ export const loginStudent = async (credentials) => {
 };
 
 // Função para recuperar a senha
- export const resetPassword = async (email) => {
+ export const resetPassword = async (credentials) => {
     try {
-      const response = await axios.post('https://projeto-integrador-1v4i.onrender.com/student/reset-password', { email });
+      const response = await axios.post('https://projeto-integrador-1v4i.onrender.com/student/reset-password', credentials);
       return response.data; // Retorna os dados da resposta
     } catch (error) {
       throw new Error('Erro ao tentar recuperar a senha: ' + error.message);

@@ -3,15 +3,14 @@ import { View, Text, TextInput, TouchableOpacity, StyleSheet, Image, ActivityInd
 import { useFonts } from "expo-font";
 import { resetPassword } from "../api/apiService";
 import axios from "axios";
-import * as Linking from 'expo-linking'; // Importando Linking
 
 const ConfirmPassword = ({ navigation }) => {
-  const [password, setPassword] = useState(""); // Estado para a senha
-  const [confirmPassword, setConfirmPassword] = useState(""); // Estado para confirmar senha
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [token, setToken] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [alertMessage, setAlertMessage] = useState(""); 
-  const [alertVisible, setAlertVisible] = useState(false); 
-  const [token, setToken] = useState(""); // Estado para armazenar o token extraído da URL
+  const [alertVisible, setAlertVisible] = useState(false);
 
   const [fontsLoaded] = useFonts({
     "Roboto-Light": require("../assets/fonts/Roboto-Light.ttf"),
@@ -33,53 +32,42 @@ const ConfirmPassword = ({ navigation }) => {
     }
   };
 
-  // Função para extrair o token da URL
-  useEffect(() => {
-    const getTokenFromUrl = async () => {
-      try {
-        const url = await Linking.getInitialURL(); // Obtém a URL inicial
-        if (url) {
-          // Exemplo de URL: http://localhost:8080/student/reset-password?token=0c31a721-def9-4cfe-9721-c6305204e520
-          const tokenMatch = url.match(/token=([a-f0-9\-]+)/); // Expressão regular para capturar o token
-          if (tokenMatch && tokenMatch[1]) {
-            setToken(tokenMatch[1]); // Armazena o token no estado
-          } else {
-            showAlert("Token inválido ou ausente.", false);
-          }
-        }
-      } catch (error) {
-        console.error("Erro ao obter a URL: ", error);
-        showAlert("Erro ao processar o link de recuperação.", false);
-      }
-    };
-
-    getTokenFromUrl();
-  }, []);
-
   if (!fontsLoaded) return null;
 
   const handleConfirmPassword = async () => {
+
+    const credentials = {
+      token: token,
+      newPassword: newPassword,
+      confirmPassword: confirmPassword
+    };
+
     // Verificar se as senhas são iguais
-    if (password !== confirmPassword) {
+    if (newPassword !== confirmPassword) {
       showAlert("As senhas devem ser iguais.", false);
       return;
     }
 
-    // Verificar se o token está presente
-    if (!token) {
-      showAlert("Token não encontrado.", false);
+    if(token == "") {
+      showAlert("Digite o código que foi enviado no seu email.", false);
+      return;
+    }
+
+    if(newPassword == ""){
+      showAlert("Digite sua senha", false);
+      return;
+    }
+
+    if(confirmPassword == ""){
+      showAlert("Digite sua senha", false);
       return;
     }
 
     // Enviar a requisição de reset de senha
     setIsLoading(true);
     try {
-      const response = await resetPassword(token, password); // Passa o token e a nova senha para o backend
-      if (response.success) {
+      const response = await resetPassword(credentials); // Passa o token e a nova senha para o backend
         showAlert("Senha resetada com sucesso.", true);
-      } else {
-        showAlert("Erro ao resetar a senha. Tente novamente.", false);
-      }
     } catch (error) {
       console.error("Erro na requisição:", error);
       showAlert("Erro ao resetar a senha.", false);
@@ -100,12 +88,19 @@ const ConfirmPassword = ({ navigation }) => {
         </View>
       )}
       <View style={styles.groupInputs}>
+      <Text style={styles.studentPassword}>Digite seu código</Text>
+        <TextInput 
+          style={styles.inputPassword} 
+          placeholder="Digite o código que chegou no seu email: " 
+          value={token} 
+          onChangeText={setToken} 
+        />
         <Text style={styles.studentPassword}>Digite sua senha</Text>
         <TextInput 
           style={styles.inputPassword} 
           placeholder="Digite sua senha: " 
-          value={password} 
-          onChangeText={setPassword} 
+          value={newPassword} 
+          onChangeText={setNewPassword} 
           secureTextEntry={true} // Senha oculta
         />
         <Text style={styles.studentPassword}>Confirme sua senha</Text>
