@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import RNPickerSelect from "react-native-picker-select";
 import axios from "axios";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { StyleSheet, View, Image, Text, TouchableOpacity, FlatList, ScrollView } from "react-native";
+import { StyleSheet, View, Image, Text, TouchableOpacity, FlatList, ScrollView, Pressable, } from "react-native";
 import { useFonts } from "expo-font";
 import { Calendar, LocaleConfig } from "react-native-calendars";
 import { format, parseISO } from "date-fns";
@@ -293,9 +293,9 @@ export default function SpecificSearchScreen({ navigation }) {
   return (
     <ScrollView style={styles.container}>
       <View style={styles.header}>
-        <TouchableOpacity style={styles.button} onPress={() => navigation.navigate("HomeScreen")}>
-          <Text style={styles.voltar}>Voltar</Text>
-        </TouchableOpacity>
+        <Pressable style={styles.buttonVoltar} onPress={() => navigation.navigate("HomeScreen")}>
+          <Text style={styles.buttonText}>Voltar</Text>
+        </Pressable>
         <Image source={require("../assets/fatec-logo.png")} style={styles.logo} />
       </View>
 
@@ -410,10 +410,19 @@ const styles = StyleSheet.create({
     height: 50,
     resizeMode: "contain",
   },
-  voltar: {
-    fontSize: 16,
-    fontWeight: "bold",
-    color: "#B20000",
+  buttonVoltar: {
+    width: 90,
+    height: 40,
+    backgroundColor: "#B20000",
+    justifyContent: "center",
+    alignItems: "center",
+    borderRadius: 5,
+    marginBottom: 15,
+  },
+  buttonText: {
+    fontSize: 18,
+    fontFamily: "Roboto-Medium",
+    color: "white",
   },
   title: {
     fontSize: 20,

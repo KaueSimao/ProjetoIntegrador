@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import {
   View,
   Text,
@@ -9,6 +9,7 @@ import {
   ActivityIndicator,
 } from "react-native";
 import { useFonts } from "expo-font";
+import { useFocusEffect } from "@react-navigation/native";
 import { forgotPassword } from "../api/apiService";
 import axios from "axios";
 
@@ -55,7 +56,7 @@ const ForgotPasswordScreen = ({ navigation }) => {
       const response = await forgotPassword(email);
 
       if (response) {
-        showAlert("Um e-mail de recuperação foi enviado.", true);
+        showAlert("Um e-mail de recuperação foi enviado!", true);
       } else {
         showAlert("Ocorreu um erro ao tentar recuperar a senha. Tente novamente mais tarde.");
       }
@@ -72,8 +73,11 @@ const ForgotPasswordScreen = ({ navigation }) => {
     }
   };
 
-
-
+  useFocusEffect(
+    useCallback(() => {
+      setEmail("");
+    }, [])
+  );
 
   return (
     <View style={styles.container}>
@@ -152,7 +156,7 @@ const styles = StyleSheet.create({
     padding: 20,
   },
   textRecoverPassword: {
-    fontSize: 18,
+    fontSize: 32,
     marginBottom: 20,
     fontFamily: "Roboto-Regular",
   },

@@ -7,10 +7,12 @@ import {
   Text,
   Pressable,
   ActivityIndicator,
+  TouchableOpacity,
 } from "react-native";
 import { useFonts } from "expo-font";
 import { useFocusEffect } from "@react-navigation/native";
 import { registerStudent } from "../api/apiService";
+import { Ionicons } from "@expo/vector-icons";
 import axios from "axios";
 
 export default function AutoRegisterScreen({ navigation }) {
@@ -26,6 +28,7 @@ export default function AutoRegisterScreen({ navigation }) {
   const [isLoading, setIsLoading] = useState(false);
   const [alertVisible, setAlertVisible] = useState(false);
   const [alertMessage, setAlertMessage] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
 
   // Função para exibir mensagens de alerta e ocultá-las após 3 segundos
   const showAlert = (message, isSuccess = false) => {
@@ -51,7 +54,9 @@ export default function AutoRegisterScreen({ navigation }) {
     const nameRegex = /^[A-Za-zÀ-ÿ\s]+$/;
 
     if (!trimmedNome || !nameRegex.test(trimmedNome)) {
-      showAlert("Por favor, o nome deve conter apenas letras, espaços e acentos.");
+      showAlert(
+        "Por favor, digite o seu nome completo."
+      );
       return false;
     }
 
@@ -80,7 +85,6 @@ export default function AutoRegisterScreen({ navigation }) {
       institutionalEmail: institutionalEmail.trim(),
       studentPassword: studentPassword,
     };
-
 
     try {
       const response = await registerStudent(data);
@@ -161,14 +165,26 @@ export default function AutoRegisterScreen({ navigation }) {
           value={institutionalEmail}
         />
         <Text style={styles.label}>Senha</Text>
-        <TextInput
-          style={styles.input}
-          placeholder="Digite sua senha"
-          secureTextEntry
-          onChangeText={(text) => setSenha(text.trim())}
-          value={studentPassword}
-        />
-
+        <View style={styles.passwordContainer}>
+          <TextInput
+            style={styles.input}
+            placeholder="Digite sua senha"
+            secureTextEntry={!showPassword}
+            value={studentPassword}
+            onChangeText={(text) => setSenha(text.trim())}
+          />
+          <TouchableOpacity
+            onPress={() => setShowPassword(!showPassword)}
+            style={styles.eyeButton}
+          >
+            <Ionicons
+              style={styles.icon}
+              name={showPassword ? "eye-off" : "eye"}
+              size={24}
+              color="gray"
+            />
+          </TouchableOpacity>
+        </View>
         <Pressable
           style={styles.button}
           onPress={cadastro}
@@ -194,13 +210,36 @@ export default function AutoRegisterScreen({ navigation }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 20,
     alignItems: "center",
+    justifyContent: "center",
     backgroundColor: "#fff",
+    paddingHorizontal: 20,
   },
   groupInputs: {
     width: "100%",
-    paddingHorizontal: 20,
+  },
+  input: {
+    width: "100%",
+    height: 50,
+    borderWidth: 1,
+    borderColor: "#ccc",
+    borderRadius: 5,
+    paddingHorizontal: 10,
+    marginBottom: 15,
+    fontSize: 16,
+    fontFamily: "Roboto-Regular",
+  },
+  passwordContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    width: '100%',
+  },
+  eyeButton: {
+    position: 'absolute',
+    right: 10,
+  },
+  icon:{
+    marginBottom : 15
   },
   logo: {
     width: 200,
@@ -214,16 +253,6 @@ const styles = StyleSheet.create({
     marginTop: 10,
     marginBottom: 5,
     color: "#333",
-  },
-  input: {
-    fontSize: 16,
-    fontFamily: "Roboto-Regular",
-    height: 40,
-    borderColor: "#ccc",
-    borderWidth: 1,
-    borderRadius: 5,
-    paddingHorizontal: 10,
-    marginBottom: 10,
   },
   button: {
     backgroundColor: "#B20000",

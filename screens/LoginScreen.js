@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import {
   View,
   Image,
@@ -11,7 +11,8 @@ import {
 import { useFonts } from "expo-font";
 import Checkbox from 'expo-checkbox';
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { Ionicons } from '@expo/vector-icons';  
+import { Ionicons } from '@expo/vector-icons';
+import { useFocusEffect } from "@react-navigation/native";
 import { loginStudent } from '../api/apiService'; // Importando a função que faz o login
 
 export default function LoginScreen({ navigation }) {
@@ -23,7 +24,6 @@ export default function LoginScreen({ navigation }) {
 
   const [institutionalEmail, setEmail] = useState("");
   const [studentPassword, setPassword] = useState("");
-  const [rememberLogin, setRememberLogin] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false); 
   const [alertMessage, setAlertMessage] = useState(""); // Mensagem de alerta
@@ -92,6 +92,13 @@ export default function LoginScreen({ navigation }) {
   if (!fontsLoaded) {
     return null;
   }
+
+  useFocusEffect(
+    useCallback(() => {
+      setEmail("");
+      setPassword("");
+    }, [])
+  );
 
   return (
     <View style={styles.container}>
@@ -182,8 +189,8 @@ const styles = StyleSheet.create({
     marginBottom: 5,
   },
   input: {
-    width: 300,
-    height: 40,
+    width: "100%",
+    height: 50,
     borderWidth: 1,
     borderColor: "#ccc",
     borderRadius: 5,
