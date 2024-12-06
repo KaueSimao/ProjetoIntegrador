@@ -57,6 +57,25 @@ export default function SpecificSearchScreen({ navigation }) {
     }
   }, [selectedTeacher, selectedCourse, selectedSubject, selectedDate, weekDay]);
 
+
+  const formatDate = (date) => {
+  const [year, month, day] = date.split("-");
+  return `${day}/${month}/${year}`;
+};
+
+const formatWeekDay = (weekday) => {
+  const weekdays = {
+    "segunda-feira": "Segunda-Feira",
+    "terça-feira": "Terça-Feira",
+    "quarta-feira": "Quarta-Feira",
+    "quinta-feira": "Quinta-Feira",
+    "sexta-feira": "Sexta-Feira",
+    "sábado": "Sábado",
+    "domingo": "Domingo",
+  };
+  return weekdays[weekday.toLowerCase()] || weekday;
+};
+
   LocaleConfig.locales['pt-br'] = {
     monthNames: [
       'Janeiro',
@@ -115,11 +134,21 @@ export default function SpecificSearchScreen({ navigation }) {
   
     try {
       // Buscar as reservas
-      const reservationResponse = await axios.get(`${API_URL}/reservation/`, {
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-        },
-      });
+      let reservationsData = [];
+      try {
+        const reservationResponse = await axios.get(`${API_URL}/reservation/`, {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        });
+        reservationsData = reservationResponse.data;
+      } catch (error) {
+        if (error.response && error.response.status === 404) {
+          console.warn("Nenhuma reserva encontrada, exibindo apenas horários fixos.");
+        } else {
+          throw error; // Repassa outros erros para o catch principal
+        }
+      }
   
       // Buscar os horários fixos
       const scheduleResponse = await axios.get(`${API_URL}/schedule/`, {
@@ -128,37 +157,24 @@ export default function SpecificSearchScreen({ navigation }) {
         },
       });
   
-      const reservationsData = reservationResponse.data;
       const scheduleData = scheduleResponse.data;
   
       let combinedTimetable = [...scheduleData];
   
-      // Aplicar filtros de data e dia da semana
+      // Comparação da data selecionada com a data da reserva
       if (formattedDate || weekDay) {
         const filteredReservations = reservationsData.filter((item) => {
           const reservationDate = item.date;
-          const reservationWeekDay = item.weekDay.toLowerCase();
+          const reservationWeekDay = item.weekday ? item.weekday.toLowerCase() : null;
   
-          const isDateMatch = reservationDate === formattedDate;
-          const isWeekDayMatch = reservationWeekDay === weekDay;
+          const isDateMatch = reservationDate === formattedDate;  // Compara as datas no formato correto
+          const isWeekDayMatch =
+            reservationWeekDay && reservationWeekDay === weekDay.toLowerCase();
   
           return isDateMatch || isWeekDayMatch;
         });
   
-        combinedTimetable = scheduleData.map((schedule) => {
-          const matchingReservation = filteredReservations.find((reservation) => {
-            return (
-              reservation.time.split(" - ")[0] === schedule.time.split(" - ")[0] &&
-              reservation.room === schedule.room
-            );
-          });
-  
-          return matchingReservation
-            ? { ...matchingReservation, status: "reserved" }
-            : { ...schedule, status: "available" };
-        });
-  
-        // Adicionar reservas que não se sobrepõem com os horários fixos
+        // Adiciona as reservas filtradas aos horários fixos
         filteredReservations.forEach((reservation) => {
           const isOverlapping = combinedTimetable.some(
             (item) =>
@@ -171,17 +187,15 @@ export default function SpecificSearchScreen({ navigation }) {
         });
       }
   
-      // Aplicar os filtros de professor, curso e disciplina
+      // Filtra os horários para o dia da semana e o restante dos filtros (curso, disciplina, etc.)
       const filterTimetable = (timetable) => {
         return timetable.filter((item) => {
           const matchesTeacher = selectedTeacher ? item.teacher === selectedTeacher : true;
   
-          // Separar nome e semestre do curso no horário
-          const [courseNameFromSchedule, courseSemesterFromSchedule] = item.course
+          const [courseNameFromSchedule] = item.course
             ? item.course.split(" - ")
-            : [null, null];
+            : [null];
   
-          // Comparar o nome do curso
           const matchesCourse =
             selectedCourse ? courseNameFromSchedule === selectedCourse : true;
   
@@ -191,17 +205,27 @@ export default function SpecificSearchScreen({ navigation }) {
         });
       };
   
-      const finalTimetable = filterTimetable(combinedTimetable);
-      setTimetable(finalTimetable);
+      // Aplica os filtros de data e dia da semana
+      combinedTimetable = filterTimetable(combinedTimetable);
+  
+      // Filtra por semana se o dia da semana foi selecionado
+      if (weekDay) {
+        combinedTimetable = combinedTimetable.filter((item) => {
+          const scheduleWeekDay = item.weekday ? item.weekday.toLowerCase() : null;
+          return scheduleWeekDay === weekDay.toLowerCase();
+        });
+      }
+  
+      // Atualiza a variável de estado com os horários filtrados
+      setTimetable(combinedTimetable);
+      console.log("Dados do horário filtrado:", combinedTimetable);
+      console.log("Dia da semana selecionado:", weekDay);
     } catch (error) {
       console.error(error);
       setErrorMessage("Erro ao carregar os dados. Tente novamente mais tarde.");
     }
   };
   
-
-
-
   const fetchFilters = async () => {
     if (!accessToken) {
       return setErrorMessage("Token não encontrado. Por favor, faça login novamente.");
@@ -264,7 +288,27 @@ export default function SpecificSearchScreen({ navigation }) {
     if (timetable.length === 0) {
       return <Text style={styles.emptyMessage}>Não há horários disponíveis para os filtros selecionados.</Text>;
     }
-
+  
+    // Função de formatação de data
+    const formatDate = (date) => {
+      const [year, month, day] = date.split("-");
+      return `${day}/${month}/${year}`;
+    };
+  
+    // Função de formatação de dia da semana
+    const formatWeekDay = (weekday) => {
+      const weekdays = {
+        "segunda-feira": "Segunda-Feira",
+        "terça-feira": "Terça-Feira",
+        "quarta-feira": "Quarta-Feira",
+        "quinta-feira": "Quinta-Feira",
+        "sexta-feira": "Sexta-Feira",
+        "sábado": "Sábado",
+        "domingo": "Domingo",
+      };
+      return weekdays[weekday.toLowerCase()] || weekday;
+    };
+  
     return (
       <FlatList
         data={timetable}
@@ -272,12 +316,17 @@ export default function SpecificSearchScreen({ navigation }) {
           const courseParts = item.course ? item.course.split(" - ") : [];
           const courseName = courseParts[0] || "N/A";
           const semester = courseParts[1] || "N/A";
-
+          
+          // Formatar o dia da semana ou data
+          const formattedWeekDay = item.weekday ? formatWeekDay(item.weekday) : "N/A";
+          const formattedDate = item.date ? formatDate(item.date) : "N/A";
+  
           return (
             <View style={styles.tableRow}>
               <Text style={styles.tableCell}>{semester}</Text>
               <Text style={styles.tableCell}>{courseName}</Text>
-              <Text style={styles.tableCell}>{item.weekDay || "N/A"}</Text>
+              {/* Exibe o dia da semana ou a data formatada */}
+              <Text style={styles.tableCell}>{item.date ? formattedDate : formattedWeekDay}</Text>
               <Text style={styles.tableCell}>{item.teacher || "N/A"}</Text>
               <Text style={styles.tableCell}>{item.subject || "N/A"}</Text>
               <Text style={styles.tableCell}>{item.time || "N/A"}</Text>
@@ -289,6 +338,7 @@ export default function SpecificSearchScreen({ navigation }) {
       />
     );
   };
+  
 
   return (
     <ScrollView style={styles.container}>

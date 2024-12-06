@@ -49,11 +49,11 @@ export default function LoginScreen({ navigation }) {
     return true;
   };
 
-   // Função para exibir mensagens de alerta e ocultá-las após 3 segundos
+   // Função para exibir mensagens de alerta e ocultá-las após 10 segundos
    const showAlert = (message) => {
     setAlertMessage(message);
     setAlertVisible(true);
-    setTimeout(() => setAlertVisible(false), 10000); // Alerta desaparece após 3 segundos
+    setTimeout(() => setAlertVisible(false), 10000); // Alerta desaparece após 10 segundos
   };
 
   // Função de login
@@ -72,11 +72,8 @@ export default function LoginScreen({ navigation }) {
     try {
       const response = await loginStudent(credentials); // Envia as credenciais para a API
 
-
       if (response) {
-
         await AsyncStorage.setItem("userToken", response.access_token);
-
         // Navega para a tela principal com as informações do usuário
         navigation.navigate("HomeScreen"); // Passando 'user' para HomeScreen
       }
@@ -90,7 +87,11 @@ export default function LoginScreen({ navigation }) {
 
   // Aguarda o carregamento das fontes
   if (!fontsLoaded) {
-    return null;
+    return (
+      <View style={styles.container}>
+        <ActivityIndicator size="large" color="#B20000" />
+      </View>
+    );
   }
 
   useFocusEffect(
@@ -136,7 +137,7 @@ export default function LoginScreen({ navigation }) {
           style={styles.eyeButton}
         >
           <Ionicons
-          style={styles.icon}
+            style={styles.icon}
             name={showPassword ? "eye-off" : "eye"}
             size={24}
             color="gray"
@@ -151,11 +152,11 @@ export default function LoginScreen({ navigation }) {
       </View>
 
       <TouchableOpacity style={styles.button} onPress={login} disabled={isLoading}>
-      {isLoading ? (
-            <ActivityIndicator size="small" color="white" />
-          ) : (
-            <Text style={styles.buttonText}>ENTRAR</Text>
-          )}
+        {isLoading ? (
+          <ActivityIndicator size="small" color="white" />
+        ) : (
+          <Text style={styles.buttonText}>ENTRAR</Text>
+        )}
       </TouchableOpacity>
 
       <TouchableOpacity onPress={() => navigation.navigate("Register")}>
@@ -198,6 +199,7 @@ const styles = StyleSheet.create({
     marginBottom: 15,
     fontSize: 16,
     fontFamily: "Roboto-Regular",
+    textAlignVertical: "center",  // Isso pode ajudar a manter o texto no centro do campo
   },
   passwordContainer: {
     flexDirection: 'row',
@@ -257,7 +259,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontFamily: "Roboto-Regular",
   },
-  icon:{
-    marginBottom : 15
+  icon: {
+    marginBottom: 15
   }
 });
