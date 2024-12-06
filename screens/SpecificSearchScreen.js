@@ -221,7 +221,6 @@ const formatWeekDay = (weekday) => {
       console.log("Dados do horário filtrado:", combinedTimetable);
       console.log("Dia da semana selecionado:", weekDay);
     } catch (error) {
-      console.error(error);
       setErrorMessage("Erro ao carregar os dados. Tente novamente mais tarde.");
     }
   };
@@ -274,7 +273,6 @@ const formatWeekDay = (weekday) => {
       }
 
     } catch (error) {
-      console.error("Erro ao carregar os filtros", error);
       setErrorMessage("Erro ao carregar os filtros. Tente novamente mais tarde.");
     }
 

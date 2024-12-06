@@ -9,7 +9,6 @@ import * as ScreenOrientation from 'expo-screen-orientation'; // Importando a bi
  
 import LoginScreen from './screens/LoginScreen';
 import HomeScreen from './screens/HomeScreen';
-import SearchScreen from './screens/SearchScreen';
 import ForgotPasswordScreen from './screens/ForgotPasswordScreen';
 import AutoRegisterScreen from './screens/AutoRegisterScreen';
 import SpecificSearchScreen from './screens/SpecificSearchScreen';
@@ -86,7 +85,6 @@ function App() {
         <Stack.Screen name="Projeto Integrador" component={LoadingScreen} />
         <Stack.Screen name="Login" component={LoginScreen} />
         <Stack.Screen name="HomeScreen" component={HomeScreen} />
-        <Stack.Screen name="SearchScreen" component={SearchScreen} />
         <Stack.Screen name="ForgotPassword" component={ForgotPasswordScreen} />
         <Stack.Screen name="ConfirmPassword" component={ConfirmPasswordScreen} />
         <Stack.Screen name="Register" component={AutoRegisterScreen} />

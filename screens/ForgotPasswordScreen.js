@@ -61,7 +61,6 @@ const ForgotPasswordScreen = ({ navigation }) => {
         showAlert("Ocorreu um erro ao tentar recuperar a senha. Tente novamente mais tarde.");
       }
     } catch (error) {
-      console.error("Erro na requisição:", error);
 
       if (axios.isAxiosError(error)) {
         showAlert("Ocorreu um erro inesperado. Tente novamente.");

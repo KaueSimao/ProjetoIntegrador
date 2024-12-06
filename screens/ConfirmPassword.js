@@ -79,7 +79,6 @@ const ConfirmPassword = ({ navigation }) => {
       const response = await resetPassword(credentials); // Passa o token e a nova senha para o backend
       showAlert("Senha resetada com sucesso!", true);
     } catch (error) {
-      console.error("Erro na requisição:", error);
       showAlert("Erro ao resetar a senha.", false);
     } finally {
       setIsLoading(false);

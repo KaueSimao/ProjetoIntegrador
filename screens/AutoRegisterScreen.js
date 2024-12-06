@@ -93,7 +93,6 @@ export default function AutoRegisterScreen({ navigation }) {
         showAlert("Cadastro realizado com sucesso!", true); // Passa `true` para indicar sucesso
       }
     } catch (error) {
-      console.error("Erro na requisição:", error);
       if (axios.isAxiosError(error) && error.response?.status === 404) {
         showAlert("Erro: não foi possível realizar o cadastro.");
       } else {

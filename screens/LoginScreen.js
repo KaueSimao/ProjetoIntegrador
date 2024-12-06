@@ -78,7 +78,6 @@ export default function LoginScreen({ navigation }) {
         navigation.navigate("HomeScreen"); // Passando 'user' para HomeScreen
       }
     } catch (error) {
-      console.error("Erro ao tentar fazer login", error);
       showAlert("Erro ao tentar fazer login.");
     } finally {
       setIsLoading(false);
